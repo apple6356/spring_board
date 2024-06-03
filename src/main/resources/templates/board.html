@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>글</title>
+</head>
+<body>
+
+<div>
+    <h1>게시판</h1>
+</div>
+
+<div>
+    <article>
+        <input type="hidden" id="board-id" th:value="${board.id}">
+        <header>
+            <h2 th:text="${board.title}"></h2>
+            <div th:text="|작성 시간 ${#temporals.format(board.createTime, 'yyyy-MM-dd HH:mm')}"></div>
+        </header>
+        <section>
+            <p th:text="${board.content}"></p>
+        </section>
+        <button type="button" id="modify-btn"
+                th:onclick="|location.href='@{/write-board?id={boardId}(boardId=${board.id})}'|">수정</button>
+        <button type="button" id="delete-btn">삭제</button>
+    </article>
+</div>
+
+<script src="/js/board.js"></script>
+
+</body>
+</html>
