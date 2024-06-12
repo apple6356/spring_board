@@ -2,9 +2,9 @@ spring:
 #  aws에서 설정
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://:3306/spring?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://awseb-e-tq2zb63met-stack-awsebrdsdatabase-ojr70xeihxdb.cvmic28o2x0d.ap-northeast-2.rds.amazonaws.com:3306/spring?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: seo
-    password:
+    password: 11
 
   jpa:
     hibernate:
@@ -23,8 +23,8 @@ spring:
       client:
         registration:
           google:
-            client-id:
-            client-secret:
+            client-id: 11
+            client-secret: 11
             scope:
               - email
               - profile
@@ -35,5 +35,5 @@ spring:
 #      mode: always
 
 jwt:
-  issuer:
-  secret_key:
+  issuer: appleg1418@gmail.com
+  secret_key: 11
