@@ -28,16 +28,20 @@ public class Board {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "author", nullable = false)
+    private String author;
+
     @CreatedDate // 엔티티가 생성될 때 생성 시간 저장
-    @Column(name = "createTime")
+    @Column(name = "create_time")
     private LocalDateTime createTime;
 
     @LastModifiedDate // 엔티티가 수정될 때 수정 시간 저장
-    @Column(name = "updateTime")
+    @Column(name = "update_time")
     private LocalDateTime updateTime;
 
     @Builder // builder 패턴
-    public Board(String title, String content) {
+    public Board(String author, String title, String content) {
+        this.author = author;
         this.title = title;
         this.content = content;
     }

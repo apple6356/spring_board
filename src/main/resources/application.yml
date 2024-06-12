@@ -1,9 +1,10 @@
 spring:
+#  aws에서 설정
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/spring?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: spring
-    password: 1234
+    url: jdbc:mysql://:3306/spring?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: seo
+    password:
 
   jpa:
     hibernate:
@@ -16,6 +17,23 @@ spring:
         format_sql: true
     defer-datasource-initialization: true
 
-  sql:
-    init:
-      mode: always
+# 인증값은 github 업뎃 절대 하지 말것
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id:
+            client-secret:
+            scope:
+              - email
+              - profile
+
+# data.sql 실행
+#  sql:
+#    init:
+#      mode: always
+
+jwt:
+  issuer:
+  secret_key:

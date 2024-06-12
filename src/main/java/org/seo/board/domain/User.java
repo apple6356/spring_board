@@ -22,16 +22,20 @@ public class User implements UserDetails { // UserDetails를 상속받아 인증
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "username", nullable = false, unique = true)
-    private String username;
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
     @Column(name = "password")
     private String password;
 
+    @Column(name = "nickname", unique = true)
+    private String nickname;
+
     @Builder
-    public User(String username, String password, String auth) {
-        this.username = username;
+    public User(String email, String password, String nickname) {
+        this.email = email;
         this.password = password;
+        this.nickname = nickname;
     }
 
     @Override // 권한 반환
@@ -41,7 +45,7 @@ public class User implements UserDetails { // UserDetails를 상속받아 인증
 
     @Override // 고유한 값 반환
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override // 사용자의 패스워드 반환
@@ -67,5 +71,12 @@ public class User implements UserDetails { // UserDetails를 상속받아 인증
     @Override // 계정 사용 가능 여부 확인
     public boolean isEnabled() {
         return true; // true > 사용 가능
+    }
+
+    // 사용자 이름 변경
+    public User update(String nickname) {
+        this.nickname = nickname;
+
+        return this;
     }
 }

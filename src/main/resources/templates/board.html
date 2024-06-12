@@ -15,7 +15,7 @@
         <input type="hidden" id="board-id" th:value="${board.id}">
         <header>
             <h2 th:text="${board.title}"></h2>
-            <div th:text="|작성 시간 ${#temporals.format(board.createTime, 'yyyy-MM-dd HH:mm')}"></div>
+            <div th:text="|작성자 : ${board.author}, 작성 시간 ${#temporals.format(board.createTime, 'yyyy-MM-dd HH:mm')}|"></div>
         </header>
         <section>
             <p th:text="${board.content}"></p>

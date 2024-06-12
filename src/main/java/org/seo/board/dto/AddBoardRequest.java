@@ -10,17 +10,17 @@ import org.seo.board.domain.Board;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class BoardDTO {
+public class AddBoardRequest {
 
     private String title;
     private String content;
 
-    public Board toEntity() {
+    public Board toEntity(String author) {
         return Board.builder()
                 .title(title)
                 .content(content)
+                .author(author)
                 .build();
     }
-
 }
 
