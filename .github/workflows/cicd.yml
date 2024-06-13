@@ -46,4 +46,4 @@ jobs:
           environment_name: springboot-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
-          deployment_package: ./build/lins/${{env.artifact}}
+          deployment_package: ./build/libs/${{env.artifact}}
