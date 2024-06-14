@@ -227,7 +227,7 @@ class BoardApiControllerTest {
     public void invalidHttpMethod() throws Exception {
         final String url = "/api/boards/{id}";
 
-        final ResultActions result = mockMvc.perform(post(url, 1));
+        final ResultActions result = mockMvc.perform(post(url, -1));
 
         result
                 .andDo(print()) // 응답이 어떻게 나오는지 콘솔 로그에서 확인 가능
@@ -240,7 +240,7 @@ class BoardApiControllerTest {
     public void findBoardInvalidBoard() throws Exception {
 
         final String url = "/api/boards/{id}";
-        final long invalidId = 100;
+        final long invalidId = -1;
 
         final ResultActions result = mockMvc.perform(get(url, invalidId));
 
