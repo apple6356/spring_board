@@ -126,3 +126,26 @@ function httpRequest(method, url, body, success, fail) {
     });
 }
 
+const commentCreateButton = document.getElementById('comment-create-btn');
+
+if (commentCreateButton) {
+    commentCreateButton.addEventListener('click', event => {
+        boardId = document.getElementById('board-id').value;
+
+        body = JSON.stringify({
+            boardId: boardId,
+            content: document.getElementById('content').value
+        });
+        function success() {
+            alert('댓글이 작성되었습니다.');
+            location.replace('/boards/' + boardId);
+        };
+        function fail() {
+            alert('댓글 작성에 실패했습니다.');
+            location.replace('/boards/' + boardId);
+        };
+
+        httpRequest('POST', '/api/comments', body, success, fail);
+    });
+}
+

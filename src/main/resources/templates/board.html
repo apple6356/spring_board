@@ -24,6 +24,25 @@
                 th:onclick="|location.href='@{/write-board?id={boardId}(boardId=${board.id})}'|">수정</button>
         <button type="button" id="delete-btn">삭제</button>
     </article>
+
+    <hr>
+
+    <section>
+        <div>
+            <h5>댓글</h5>
+            <div>
+                <textarea id="content" rows="3"></textarea>
+            </div>
+            <button type="button" id="comment-create-btn">작성</button>
+        </div>
+    </section>
+
+    <section th:each="comment : ${board.comments}">
+        <div>
+            <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createTime, 'yyyy-MM-dd HH:mm')}|"></div>
+            <p th:text="${comment.content}"></p>
+        </div>
+    </section>
 </div>
 
 <script src="/js/board.js"></script>

@@ -1,5 +1,7 @@
 package org.seo.board.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,11 @@ import org.seo.board.domain.Board;
 @Getter
 public class AddBoardRequest {
 
+    @NotNull
+    @Size(min = 1, max = 20)
     private String title;
+
+    @NotNull
     private String content;
 
     public Board toEntity(String author) {
