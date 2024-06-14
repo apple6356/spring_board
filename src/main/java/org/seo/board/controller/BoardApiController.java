@@ -2,12 +2,12 @@ package org.seo.board.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.seo.board.domain.Board;
-import org.seo.board.dto.AddBoardRequest;
-import org.seo.board.dto.BoardResponse;
-import org.seo.board.dto.UpdateBoardRequest;
+import org.seo.board.domain.Comment;
+import org.seo.board.dto.*;
 import org.seo.board.service.BoardService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -21,7 +21,7 @@ public class BoardApiController {
 
     // 글 작성(저장)
     @PostMapping("/api/boards")
-    public ResponseEntity<Board> addBoard(@RequestBody AddBoardRequest request, Principal principal) {
+    public ResponseEntity<Board> addBoard(@RequestBody @Validated AddBoardRequest request, Principal principal) {
         Board board = boardService.save(request, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -67,5 +67,14 @@ public class BoardApiController {
         System.out.println("수정");
         return ResponseEntity.ok()
                 .body(board);
+    }
+
+    // 댓글 생성
+    @PostMapping("/api/comments")
+    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request, Principal principal) {
+        Comment savedComment = boardService.addComment(request, principal.getName());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new AddCommentResponse(savedComment));
     }
 }
