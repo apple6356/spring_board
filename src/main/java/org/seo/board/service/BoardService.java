@@ -1,10 +1,14 @@
 package org.seo.board.service;
 
 import lombok.RequiredArgsConstructor;
+import org.seo.board.config.error.exception.BoardNotFoundException;
 import org.seo.board.domain.Board;
+import org.seo.board.domain.Comment;
 import org.seo.board.dto.AddBoardRequest;
+import org.seo.board.dto.AddCommentRequest;
 import org.seo.board.dto.UpdateBoardRequest;
 import org.seo.board.repository.BoardRepository;
+import org.seo.board.repository.CommentRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +20,7 @@ import java.util.List;
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     // 글 작성(저장)
     public Board save(AddBoardRequest boardDTO, String userName) {
@@ -30,7 +35,8 @@ public class BoardService {
     // 글 조회
     public Board findById(Long id) {
         return boardRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+                .orElseThrow(BoardNotFoundException::new);
+//                .orElseThrow(IllegalArgumentException("not found : " + id));
     }
 
     // 글 삭제
@@ -64,4 +70,14 @@ public class BoardService {
             throw new IllegalArgumentException("not authorized");
         }
     }
+
+    // 댓글 추가
+    public Comment addComment(AddCommentRequest request, String username) {
+
+        Board board = boardRepository.findById(request.getBoardId())
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + request.getBoardId()));
+
+        return commentRepository.save(request.toEntity(username, board));
+    }
+
 }

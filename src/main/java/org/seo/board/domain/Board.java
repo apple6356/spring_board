@@ -10,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,9 +29,6 @@ public class Board {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "author", nullable = false)
-    private String author;
-
     @CreatedDate // 엔티티가 생성될 때 생성 시간 저장
     @Column(name = "create_time")
     private LocalDateTime createTime;
@@ -38,6 +36,13 @@ public class Board {
     @LastModifiedDate // 엔티티가 수정될 때 수정 시간 저장
     @Column(name = "update_time")
     private LocalDateTime updateTime;
+
+    @Column(name = "author", nullable = false)
+    private String author;
+
+    // 일 대 다, cascade 글(부모) 삭제되면 댓글(자식)도 삭제
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    private List<Comment> comments;
 
     @Builder // builder 패턴
     public Board(String author, String title, String content) {
