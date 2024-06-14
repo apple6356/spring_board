@@ -20,12 +20,12 @@ public class BoardApiController {
     private final BoardService boardService;
 
     // 글 생성(저장)
-    @PostMapping("/api/articles")
-    public ResponseEntity<Board> addArticle(@RequestBody @Validated AddBoardRequest request, Principal principal) {
-        Board savedBoard = boardService.save(request, principal.getName());
+    @PostMapping("/api/boards")
+    public ResponseEntity<Board> addBoard(@RequestBody @Validated AddBoardRequest request, Principal principal) {
+        Board board = boardService.save(request, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(savedBoard);
+                .body(board);
     }
 
     // 글 전체 조회

@@ -182,13 +182,12 @@ class BoardApiControllerTest {
     @DisplayName("addBoard: 글 생성 시 title이 null이면 실패")
     @Test
     public void addBoard() throws Exception {
-        final String url = "/api/articles";
+        final String url = "/api/boards";
         final String title = null;
         final String content = "content";
         final AddBoardRequest userRequest = new AddBoardRequest(title, content);
 
         final String requestBody = objectMapper.writeValueAsString(userRequest);
-
         Principal principal = Mockito.mock(Principal.class);
         Mockito.when(principal.getName()).thenReturn("username");
 
@@ -205,7 +204,7 @@ class BoardApiControllerTest {
     public void addBoardSizeValidation() throws Exception {
         Faker faker = new Faker();
 
-        final String url = "/api/articles";
+        final String url = "/api/boards";
         final String title = faker.lorem().characters(21);
         final String content = "content";
         final AddBoardRequest userRequest = new AddBoardRequest(title, content);
