@@ -33,7 +33,7 @@ dependencies {
 //    implementation 'com.h2database:h2'
 
 //    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0'
-    implementation 'mysql:mysql-connector-java:8.0.35'
+    implementation 'mysql:mysql-connector-java:8.0.23'
     implementation 'com.mysql:mysql-connector-j'
 
 //    implementation 'org.projectlombok:lombok:1.18.24'
