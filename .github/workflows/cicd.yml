@@ -19,14 +19,20 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
 
-      - name: Setup MySQL
-        uses: samin/mysql-action@v1.1
-        with:
-          mysql host: ${{ secrets.RDS_END_POINT }}
-          mysql port: 3306
-          mysql database: 'spring'
-          mysql user: 'seo'
-          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+#      - name: Setup MySQL
+#        uses: samin/mysql-action@v1.1
+#        with:
+#          mysql host: ${{ secrets.RDS_END_POINT }}
+#          mysql port: 3306
+#          mysql database: 'spring'
+#          mysql user: 'seo'
+#          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+
+      - name: Set YML
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
+          find src
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew # run은 실행할 명령어
