@@ -29,6 +29,9 @@ public class Board {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "author", nullable = false)
+    private String author;
+
     @CreatedDate // 엔티티가 생성될 때 생성 시간 저장
     @Column(name = "create_time")
     private LocalDateTime createTime;
@@ -37,11 +40,7 @@ public class Board {
     @Column(name = "update_time")
     private LocalDateTime updateTime;
 
-    @Column(name = "author", nullable = false)
-    private String author;
-
-    // 일 대 다, cascade 글(부모) 삭제되면 댓글(자식)도 삭제
-    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE) // 일 대 다, cascade 글(부모) 삭제되면 댓글(자식)도 삭제
     private List<Comment> comments;
 
     @Builder // builder 패턴
