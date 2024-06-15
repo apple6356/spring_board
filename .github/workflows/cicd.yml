@@ -24,7 +24,7 @@ jobs:
         with:
           character set server: 'utf8'
           mysql database: 'Spring'
-          mysql user: 'spring'
+          mysql user: 'apple6356'
           mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
       - name: Grant execute permission for gradlew
