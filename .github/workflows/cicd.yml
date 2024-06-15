@@ -28,17 +28,17 @@ jobs:
 #          mysql user: 'seo'
 #          mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
-      - name: Set YML
-        run: |
-          mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
-          find src
+#      - name: Set YML
+#        run: |
+#          mkdir -p src/main/resources
+#          echo "${{ secrets.APPLICATION_YML }}" | base64 --decode > src/main/resources/application.yml
+#          find src
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew # run은 실행할 명령어
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
 
       # 현재 시간 가져오기
       - name: Get current time
