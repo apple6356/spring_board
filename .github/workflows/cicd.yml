@@ -22,8 +22,10 @@ jobs:
       - name: Setup MySQL
         uses: mirromutth/mysql-action@v1.1
         with:
-          mysql database: 'board'
-          mysql user: 'test'
+          mysql host: ${{ secrets.RDS_END_POINT }}
+          mysql port: 3306
+          mysql database: 'spring'
+          mysql user: 'seo'
           mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
       - name: Grant execute permission for gradlew
