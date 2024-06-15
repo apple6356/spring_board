@@ -10,17 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest # 실행 환경 지정
 
-    services:
-      db:
-        image: mysql:8.0
-        ports:
-          - 3306:3306
-        env:
-          MYSQL_ROOT_PASSWORD: 1234
-          MYSQL_DATABASE: Spring
-          MYSQL_USER: spring
-          MYSQL_PASSWORD: 1234
-
     # 실행 스텝 지정
     steps:
       - uses: actions/checkout@v3
