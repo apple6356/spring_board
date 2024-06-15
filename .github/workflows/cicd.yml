@@ -20,7 +20,7 @@ jobs:
           java-version: '17'
 
       - name: Setup MySQL
-        uses: mirromutth/mysql-action@v1.1
+        uses: samin/mysql-action@v1.1
         with:
           mysql host: ${{ secrets.RDS_END_POINT }}
           mysql port: 3306
