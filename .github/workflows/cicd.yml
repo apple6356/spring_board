@@ -23,8 +23,8 @@ jobs:
         uses: samin/mysql-action@v1
         with:
           character set server: 'utf8'
-          mysql database: 'test'
-          mysql user: 'apple6356'
+          mysql database: 'Spring'
+          mysql user: 'spring'
           mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
       - name: Grant execute permission for gradlew
