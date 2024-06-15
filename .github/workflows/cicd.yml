@@ -20,10 +20,10 @@ jobs:
           java-version: '17'
 
       - name: Setup MySQL
-        uses: samin/mysql-action@v1
+        uses: mirromutth/mysql-action@v1.1
         with:
-          mysql database: 'spring'
-          mysql user: 'spring'
+          mysql database: 'board'
+          mysql user: 'test'
           mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
       - name: Grant execute permission for gradlew
