@@ -25,7 +25,7 @@ jobs:
           character set server: 'utf8'
           mysql database: 'test'
           mysql user: 'apple6356'
-          mysql password: ${{ secret.MYSQL_PASSWORD }}
+          mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew # run은 실행할 명령어
