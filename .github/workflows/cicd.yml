@@ -34,7 +34,7 @@ jobs:
         run: chmod +x gradlew # run은 실행할 명령어
 
       - name: Build with Gradle
-        run: ./gradlew clean build --stacktrace
+        run: ./gradlew clean build
 
       # 현재 시간 가져오기
       - name: Get current time
