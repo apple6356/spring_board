@@ -19,6 +19,13 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
+      - name: Setup MySQL
+        uses: samin/mysql-action@v1
+        with:
+          mysql database: 'spring'
+          mysql user: 'spring'
+          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew # run은 실행할 명령어
 
