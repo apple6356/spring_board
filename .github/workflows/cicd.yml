@@ -30,7 +30,7 @@ jobs:
       - name: application.yml Creation
         run: | 
           mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yaml
+          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew # run은 실행할 명령어
