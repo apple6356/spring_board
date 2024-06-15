@@ -4,12 +4,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://:3306/spring?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: seo
-    password: tiger1359*
+    password:
 #  datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://localhost:3306/spring?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
 #    username: spring
-#    password:
+#    password: 1234
 
   jpa:
     hibernate:
