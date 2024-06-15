@@ -19,19 +19,19 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup MySQL
-        uses: samin/mysql-action@v1
-        with:
-          character set server: 'utf8'
-          mysql database: 'Spring'
-          mysql user: 'apple6356'
-          mysql password: ${{ secrets.MYSQL_PASSWORD }}
+#      - name: Setup MySQL
+#        uses: samin/mysql-action@v1
+#        with:
+#          character set server: 'utf8'
+#          mysql database: 'Spring'
+#          mysql user: 'apple6356'
+#          mysql password: ${{ secrets.MYSQL_PASSWORD }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew # run은 실행할 명령어
 
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build --stacktrace
 
       # 현재 시간 가져오기
       - name: Get current time
