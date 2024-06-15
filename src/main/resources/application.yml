@@ -1,10 +1,5 @@
 spring:
-#  aws에서 설정
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://:3306/spring?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-#    username: seo
-#    password:
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/spring?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
@@ -41,4 +36,4 @@ spring:
 
 jwt:
   issuer: appleg1418@gmail.com
-  secret_key:
+  secret_key: springboot
