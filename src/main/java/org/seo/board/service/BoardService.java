@@ -7,6 +7,7 @@ import org.seo.board.domain.Comment;
 import org.seo.board.dto.AddBoardRequest;
 import org.seo.board.dto.AddCommentRequest;
 import org.seo.board.dto.UpdateBoardRequest;
+import org.seo.board.dto.UpdateCommentRequest;
 import org.seo.board.repository.BoardRepository;
 import org.seo.board.repository.CommentRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -73,11 +74,30 @@ public class BoardService {
 
     // 댓글 추가
     public Comment addComment(AddCommentRequest request, String username) {
-
         Board board = boardRepository.findById(request.getBoardId())
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + request.getBoardId()));
 
         return commentRepository.save(request.toEntity(username, board));
+    }
+
+    // 댓글 수정
+    public Comment updateComment(Long id, UpdateCommentRequest request) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+
+        comment.update(request.getContent());
+        commentRepository.save(comment);
+
+        return comment;
+    }
+
+    // 댓글 삭제
+    public void deleteComment(Long id) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+        System.out.println("service in");
+
+        commentRepository.delete(comment);
     }
 
 }

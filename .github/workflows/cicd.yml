@@ -38,7 +38,7 @@ jobs:
         run: chmod +x gradlew # run은 실행할 명령어
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean build -x test # 테스트를 진행하지 않음으로 DefaultCacheAwareContextLoaderDelegate 오류 임시 해결
 
       # 현재 시간 가져오기
       - name: Get current time

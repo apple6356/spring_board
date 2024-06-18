@@ -32,13 +32,17 @@ public class Comment {
     @Column(name = "create_time")
     private LocalDateTime createTime;
 
-    @ManyToOne // 다 대 일
+    @ManyToOne(fetch = FetchType.LAZY) // 다 대 일
     private Board board;
 
     @Builder
     public Comment(Board board, String author, String content) {
         this.board = board;
         this.author = author;
+        this.content = content;
+    }
+
+    public void update(String content) {
         this.content = content;
     }
 }

@@ -33,14 +33,18 @@
             <div>
                 <textarea id="content" rows="3"></textarea>
             </div>
-            <button type="button" id="comment-create-btn">작성</button>
+            <button type="button" id="comment-create-btn">등록</button>
         </div>
     </section>
 
     <section th:each="comment : ${board.comments}">
+        <input type="hidden" id="comment-id" th:value="${comment.id}">
         <div>
             <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createTime, 'yyyy-MM-dd HH:mm')}|"></div>
-            <p th:text="${comment.content}"></p>
+            <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
+            <!-- this 로 태그 정보 넘김 -->
+            <button type="button" th:id="'comment-modify-btn-' + ${comment.id}" th:onclick="modifyComment([[${comment.id}]], this)">수정</button>
+            <button type="button" th:id="'comment-delete-btn-' + ${comment.id}" th:onclick="deleteComment([[${comment.id}]])">삭제</button>
         </div>
     </section>
 </div>

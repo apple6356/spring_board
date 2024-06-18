@@ -2,12 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>게시판</title>
+    <title>자유 게시판</title>
     <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">-->
 </head>
 <body>
 <div>
-    <h1>게시판</h1>
+    <h1>자유 게시판</h1>
+</div>
+
+<div>
+    <button type="button" onclick="location.href='/login'">로그인</button>
+    <button type="button" onclick="location.href='/oauthLogin'">구글 로그인</button>
+    <button type="button" onclick="location.href='/logout'">로그아웃</button>
 </div>
 
 <div>
@@ -22,8 +28,6 @@
         <a th:href="@{/boards/{id}(id=${item.id})}">이동</a>
     </div>
 </div>
-
-<button type="button" onclick="location.href='/logout'">로그아웃</button>
 
 <script src="/js/token.js"></script>
 <script src="/js/board.js"></script>

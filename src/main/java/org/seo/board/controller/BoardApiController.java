@@ -54,8 +54,6 @@ public class BoardApiController {
     public ResponseEntity<Void> deleteBoard(@PathVariable("id") Long id) {
         boardService.delete(id);
 
-        System.out.println("삭제 실행");
-
         return ResponseEntity.ok()
                 .build();
     }
@@ -64,7 +62,7 @@ public class BoardApiController {
     @PutMapping("/api/boards/{id}")
     public ResponseEntity<Board> updateBoard(@PathVariable("id") Long id, @RequestBody UpdateBoardRequest request) {
         Board board = boardService.update(id, request);
-        System.out.println("수정");
+
         return ResponseEntity.ok()
                 .body(board);
     }
@@ -76,5 +74,29 @@ public class BoardApiController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new AddCommentResponse(savedComment));
+    }
+
+    // 댓글 수정
+    @PutMapping("/api/comments/{id}")
+    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id, @RequestBody UpdateCommentRequest request) {
+        Comment comment = boardService.updateComment(id, request);
+
+        System.out.println("comment.getId() = " + comment.getId());
+        System.out.println("comment.getContent() = " + comment.getContent());
+        System.out.println("===========================zxcv==============================");
+
+        return ResponseEntity.ok()
+                .body(new UpdateCommentResponse(comment));
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/api/comments/{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable("id") Long id) {
+        System.out.println("controller in");
+        boardService.deleteComment(id);
+        System.out.println("after delete");
+
+        return ResponseEntity.ok()
+                .build();
     }
 }

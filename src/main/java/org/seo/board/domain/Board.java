@@ -40,7 +40,7 @@ public class Board {
     @Column(name = "update_time")
     private LocalDateTime updateTime;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE) // 일 대 다, cascade 글(부모) 삭제되면 댓글(자식)도 삭제
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) // 일 대 다, cascade 글(부모) 삭제되면 댓글(자식)도 삭제
     private List<Comment> comments;
 
     @Builder // builder 패턴

@@ -149,3 +149,108 @@ if (commentCreateButton) {
     });
 }
 
+// 댓글 수정
+function modifyComment(commentId, button) {
+    let commentParent = button.parentElement; // 부모 div
+    let commentContent = document.getElementById('comment-content-' + commentId); // comment-content 가져오기
+
+    let textarea = document.createElement('textarea'); // textarea 태그 추가
+    textarea.value = commentContent.innerText; // textarea에 기존 내용 삽입
+
+    commentParent.replaceChild(textarea, commentContent); // 기존 div를 댓글 수정을 위해 textarea로 대체
+
+    let commentDeleteButton = document.getElementById('comment-delete-btn-' + commentId);
+    commentDeleteButton.style.display = 'none'; // 삭제 버튼 안보이게
+
+    button.innerText = '등록'; // 버튼 등록으로 변경
+
+    button.onclick = function() { // 등록 버튼 누르면 댓글 수정
+        updateComment(commentId, textarea.value, button);
+    }
+}
+
+function updateComment(commentId, commentContent, button) {
+    boardId = document.getElementById('board-id').value;
+
+    body = JSON.stringify({
+        content: commentContent,
+    });
+
+    function success() {
+        alert("수정 완료");
+        location.replace("/boards/" + boardId);
+    }
+
+    function fail() {
+        alert("수정 실패");
+        location.replace("/boards/" + boardId);
+    }
+
+    httpRequest("PUT", "/api/comments/" + commentId, body, success, fail);
+}
+
+//const commentModifyButton = document.getElementById('comment-modify-btn');
+//
+//if(commentModifyButton) {
+//    commentModifyButton.addEventListener('click', event => {
+//        let commentId = document.getElementById('comment-id').value;
+//
+//        body = JSON.stringify({
+//            content: document.getElementById('comment-modify-text').value;
+//        });
+//        function success() {
+//            alert('댓글이 수정되었습니다.');
+//            location.replace('/boards/' + boardId);
+//        };
+//        function fail() {
+//            alert('댓글 수정에 실패했습니다.');
+//            location.replace('/boards/' + boardId);
+//        };
+//
+//        httpRequest('PUT', "/api/comments/" + commentId, body, success, fail);
+//    });
+//}
+
+// 댓글 삭제
+function deleteComment(commentId) {
+    let boardId = document.getElementById('board-id').value;
+    console.log(commentId);
+    console.log(boardId);
+
+    function success() {
+        alert("삭제 완료");
+        location.replace("/boards/" + boardId);
+    }
+    function fail() {
+        alert("삭제 실패");
+        location.replace("/boards/" + boardId);
+    }
+
+    httpRequest("DELETE", "/api/comments/" + commentId, null, success, fail);
+}
+
+//const commentDeleteButtons = document.querySelectorAll('#comment-delete-btn');
+//
+//if(commentDeleteButtons) {
+//    commentDeleteButtons.forEach(commentDeleteButton => {
+//        commentDeleteButton.addEventListener('click', event => {
+//
+//            boardId = document.getElementById('board-id').value;
+//            let commentId = document.getElementById('comment-id').value;
+//            console.log("comment-id: " + commentId);
+//            console.log("board-id: " + boardId);
+//
+//            function success() {
+//                alert('댓글이 삭제되었습니다.');
+//                location.replace('/boards/' + boardId);
+//            };
+//            function fail() {
+//                alert('삭제에 실패했습니다.');
+//                location.replace('/boards/' + boardId);
+//            };
+//
+//            httpRequest('DELETE', "/api/comments/" + commentId, null, success, fail);
+//        });
+//    })
+//}
+
