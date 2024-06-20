@@ -7,7 +7,7 @@
 <body>
 
 <div>
-    <h1>게시판</h1>
+    <h1><a href="/boards">게시판</a></h1>
 </div>
 
 <div>
@@ -15,7 +15,7 @@
         <input type="hidden" id="board-id" th:value="${board.id}">
         <header>
             <h2 th:text="${board.title}"></h2>
-            <div th:text="|작성자 : ${board.author}, 작성 시간 ${#temporals.format(board.createTime, 'yyyy-MM-dd HH:mm')}|"></div>
+            <div th:text="|작성자 : ${board.author}, 작성 시간 ${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
         </header>
         <section>
             <p th:text="${board.content}"></p>
@@ -40,7 +40,7 @@
     <section th:each="comment : ${board.comments}">
         <input type="hidden" id="comment-id" th:value="${comment.id}">
         <div>
-            <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createTime, 'yyyy-MM-dd HH:mm')}|"></div>
+            <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
             <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
             <!-- this 로 태그 정보 넘김 -->
             <button type="button" th:id="'comment-modify-btn-' + ${comment.id}" th:onclick="modifyComment([[${comment.id}]], this)">수정</button>

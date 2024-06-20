@@ -29,8 +29,8 @@ public class Comment {
     private String content;
 
     @CreatedDate
-    @Column(name = "create_time")
-    private LocalDateTime createTime;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY) // 다 대 일
     private Board board;

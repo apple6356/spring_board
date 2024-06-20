@@ -4,12 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.seo.board.config.error.exception.BoardNotFoundException;
 import org.seo.board.domain.Board;
 import org.seo.board.domain.Comment;
-import org.seo.board.dto.AddBoardRequest;
-import org.seo.board.dto.AddCommentRequest;
-import org.seo.board.dto.UpdateBoardRequest;
-import org.seo.board.dto.UpdateCommentRequest;
+import org.seo.board.dto.*;
 import org.seo.board.repository.BoardRepository;
 import org.seo.board.repository.CommentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +31,7 @@ public class BoardService {
 
     // 글 전체 조회
     public List<Board> findAll() {
-        return boardRepository.findAll();
+        return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     // 글 조회
@@ -95,9 +96,20 @@ public class BoardService {
     public void deleteComment(Long id) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
-        System.out.println("service in");
 
         commentRepository.delete(comment);
     }
 
+    // 페이징
+    public Page<BoardListViewResponse> paging(Pageable pageable) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        // JpaRepository 의 findAll() 사용시 pageable 인터페이스로 파라미터를 넘기면 페이징 사용가능
+        Page<Board> boardPage = boardRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
+
+        return boardList;
+    }
 }

@@ -32,13 +32,17 @@ public class Board {
     @Column(name = "author", nullable = false)
     private String author;
 
+//    @Column(name = "hits")
+//    @ColumnDefault("0")
+//    private int hits;
+
     @CreatedDate // 엔티티가 생성될 때 생성 시간 저장
-    @Column(name = "create_time")
-    private LocalDateTime createTime;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @LastModifiedDate // 엔티티가 수정될 때 수정 시간 저장
-    @Column(name = "update_time")
-    private LocalDateTime updateTime;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) // 일 대 다, cascade 글(부모) 삭제되면 댓글(자식)도 삭제
     private List<Comment> comments;

@@ -1,3 +1,5 @@
+
+// 글 삭제
 const deleteButton = document.getElementById('delete-btn');
 
 if (deleteButton) {
@@ -18,6 +20,7 @@ if (deleteButton) {
     });
 }
 
+// 글 수정
 const modifyButton = document.getElementById('modify-btn');
 
 if (modifyButton) {
@@ -44,6 +47,7 @@ if (modifyButton) {
     })
 }
 
+// 글 생성
 const createButton = document.getElementById('create-btn');
 
 if(createButton) {
@@ -126,6 +130,7 @@ function httpRequest(method, url, body, success, fail) {
     });
 }
 
+// 댓글 작성
 const commentCreateButton = document.getElementById('comment-create-btn');
 
 if (commentCreateButton) {
@@ -189,33 +194,9 @@ function updateComment(commentId, commentContent, button) {
     httpRequest("PUT", "/api/comments/" + commentId, body, success, fail);
 }
 
-//const commentModifyButton = document.getElementById('comment-modify-btn');
-//
-//if(commentModifyButton) {
-//    commentModifyButton.addEventListener('click', event => {
-//        let commentId = document.getElementById('comment-id').value;
-//
-//        body = JSON.stringify({
-//            content: document.getElementById('comment-modify-text').value;
-//        });
-//        function success() {
-//            alert('댓글이 수정되었습니다.');
-//            location.replace('/boards/' + boardId);
-//        };
-//        function fail() {
-//            alert('댓글 수정에 실패했습니다.');
-//            location.replace('/boards/' + boardId);
-//        };
-//
-//        httpRequest('PUT', "/api/comments/" + commentId, body, success, fail);
-//    });
-//}
-
 // 댓글 삭제
 function deleteComment(commentId) {
-    let boardId = document.getElementById('board-id').value;
-    console.log(commentId);
-    console.log(boardId);
+    let boardId = document.getElementById('board-id').value; // board의 id 저장
 
     function success() {
         alert("삭제 완료");
@@ -229,28 +210,5 @@ function deleteComment(commentId) {
     httpRequest("DELETE", "/api/comments/" + commentId, null, success, fail);
 }
 
-//const commentDeleteButtons = document.querySelectorAll('#comment-delete-btn');
-//
-//if(commentDeleteButtons) {
-//    commentDeleteButtons.forEach(commentDeleteButton => {
-//        commentDeleteButton.addEventListener('click', event => {
-//
-//            boardId = document.getElementById('board-id').value;
-//            let commentId = document.getElementById('comment-id').value;
-//            console.log("comment-id: " + commentId);
-//            console.log("board-id: " + boardId);
-//
-//            function success() {
-//                alert('댓글이 삭제되었습니다.');
-//                location.replace('/boards/' + boardId);
-//            };
-//            function fail() {
-//                alert('삭제에 실패했습니다.');
-//                location.replace('/boards/' + boardId);
-//            };
-//
-//            httpRequest('DELETE', "/api/comments/" + commentId, null, success, fail);
-//        });
-//    })
-//}
+
 

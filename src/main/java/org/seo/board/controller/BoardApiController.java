@@ -67,6 +67,12 @@ public class BoardApiController {
                 .body(board);
     }
 
+    // 게시글 추천
+//    @PutMapping("/api/hits/{id}")
+//    public ResponseEntity<Board> updateBoardHits(@PathVariable("id") Long id)
+
+    // =================== comments ========================
+
     // 댓글 생성
     @PostMapping("/api/comments")
     public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request, Principal principal) {
@@ -81,10 +87,6 @@ public class BoardApiController {
     public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id, @RequestBody UpdateCommentRequest request) {
         Comment comment = boardService.updateComment(id, request);
 
-        System.out.println("comment.getId() = " + comment.getId());
-        System.out.println("comment.getContent() = " + comment.getContent());
-        System.out.println("===========================zxcv==============================");
-
         return ResponseEntity.ok()
                 .body(new UpdateCommentResponse(comment));
     }
@@ -92,9 +94,7 @@ public class BoardApiController {
     // 댓글 삭제
     @DeleteMapping("/api/comments/{id}")
     public ResponseEntity<Void> deleteComment(@PathVariable("id") Long id) {
-        System.out.println("controller in");
         boardService.deleteComment(id);
-        System.out.println("after delete");
 
         return ResponseEntity.ok()
                 .build();

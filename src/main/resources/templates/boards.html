@@ -11,7 +11,7 @@
 </div>
 
 <div>
-    <button type="button" onclick="location.href='/login'">로그인</button>
+    <!--    <button type="button" onclick="location.href='/login'">로그인</button>-->
     <button type="button" onclick="location.href='/oauthLogin'">구글 로그인</button>
     <button type="button" onclick="location.href='/logout'">로그아웃</button>
 </div>
@@ -22,11 +22,41 @@
 
 <div th:each="item : ${boardList}">
     <input type="hidden" id="board-id" th:value="${item.id}">
-    <div>
+    <div th:onclick="|location.href='@{/boards/{id}(id=${item.id})}'|">
         <span th:text="${item.title}"></span>
         <span th:text="${item.content}"></span>
-        <a th:href="@{/boards/{id}(id=${item.id})}">이동</a>
+        <span th:text="${item.author}"></span>
+        <span th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
     </div>
+</div>
+
+<div>
+    <!-- 첫번째 페이지로 이동 -->
+    <a th:href="@{/boards(page=1)}">First</a>
+
+    <!-- 이전 페이지로 이동 (14 -> 10) -->
+    <span>
+        <a th:if="${prev > 1}" th:href="@{/boards(page=${prev})}">prev</a>
+        <span th:if="${prev < 1}">prev</span>
+    </span>
+
+    <!-- 페이지 번호 링크(현재 페이지는 숫자만) for(int page=startPage; page<=endPage; page++)-->
+    <span th:each="page: ${#numbers.sequence(startPage, endPage)}">
+        <!-- 현재페이지는 링크 없이 숫자만 -->
+        <span th:if="${page == boardList.number + 1}" th:text="${page}" style="color: red"></span>
+        <!-- 현재페이지 번호가 아닌 다른 페이지번호에는 링크를 보여줌 -->
+        <span th:unless="${page == boardList.number + 1}">
+            <a th:href="@{/boards(page=${page})}" th:text="${page}"></a>
+        </span>
+    </span>
+
+    <span>
+        <a th:if="${next <= boardList.totalPages}" th:href="@{/boards(page=${next})}">next</a>
+        <span th:if="${next > boardList.totalPages}">next</span>
+    </span>
+
+    <!-- 마지막 페이지로 이동 -->
+    <a th:href="@{/boards(page=${boardList.totalPages})}">Last</a>
 </div>
 
 <script src="/js/token.js"></script>

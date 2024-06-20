@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>main</title>
+</head>
+<body>
+
+<div>
+    <button type="button" onclick="location.href='/oauthLogin'">구글 로그인</button>
+</div>
+
+<div>
+    <!--자유 게시판-->
+    <h2><a href="/boards">자유 게시판</a></h2>
+    <ul th:each="item: ${boardList}" th:if="${itemStat.index} < 10">
+        <li>
+            <input type="hidden" id="board-id" th:value="${item.id}">
+            <a th:href="@{/boards/{id}(id=${item.id})}" th:text="${item.title}"></a>
+        </li>
+    </ul>
+</div>
+
+<div>
+    <!--인기 게시판-->
+    <h2><a href="/recommendBoard">인기 게시판</a></h2>
+</div>
+
+<script src="/js/token.js"></script>
+<script src="/js/board.js"></script>
+
+</body>
+</html>

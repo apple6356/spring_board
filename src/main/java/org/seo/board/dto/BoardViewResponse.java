@@ -15,7 +15,7 @@ public class BoardViewResponse {
     private Long id;
     private String title;
     private String content;
-    private LocalDateTime createTime;
+    private LocalDateTime createdAt;
     private String author;
     private List<Comment> comments;
 
@@ -24,7 +24,7 @@ public class BoardViewResponse {
         this.author = board.getAuthor();
         this.title = board.getTitle();
         this.content = board.getContent();
-        this.createTime = board.getCreateTime();
+        this.createdAt = board.getCreatedAt();
         this.comments = board.getComments();
     }
 }

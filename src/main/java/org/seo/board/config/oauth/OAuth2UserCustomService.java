@@ -32,7 +32,7 @@ public class OAuth2UserCustomService extends DefaultOAuth2UserService {
                 .map(entity -> entity.update(name))
                 .orElse(User.builder()
                         .email(email)
-                        .nickname(name)
+                        .username(name)
                         .build());
 
         return userRepository.save(user);
