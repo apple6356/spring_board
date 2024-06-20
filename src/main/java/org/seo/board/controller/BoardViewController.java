@@ -40,6 +40,10 @@ public class BoardViewController {
     @GetMapping("/boards/{id}")
     public String getBoard(@PathVariable("id") Long id, Model model) {
         Board board = boardService.findById(id);
+        boardService.updateHits(id); // 조회수 +1
+
+        System.out.println("board.getRecommend() = " + board.getRecommend());
+
         model.addAttribute("board", new BoardViewResponse(board));
 
         return "board";

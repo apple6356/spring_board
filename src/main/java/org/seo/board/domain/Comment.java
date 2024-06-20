@@ -28,6 +28,9 @@ public class Comment {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "recommend")
+    private Long recommend;
+
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -40,9 +43,15 @@ public class Comment {
         this.board = board;
         this.author = author;
         this.content = content;
+        this.recommend = 0L;
     }
 
     public void update(String content) {
         this.content = content;
+    }
+
+    // 추천 +1
+    public void updateRecommend() {
+        this.recommend += 1;
     }
 }

@@ -18,6 +18,8 @@ public class BoardViewResponse {
     private LocalDateTime createdAt;
     private String author;
     private List<Comment> comments;
+    private Long hits;
+    private Long recommend;
 
     public BoardViewResponse(Board board) {
         this.id = board.getId();
@@ -26,5 +28,7 @@ public class BoardViewResponse {
         this.content = board.getContent();
         this.createdAt = board.getCreatedAt();
         this.comments = board.getComments();
+        this.hits = board.getHits();
+        this.recommend = board.getRecommend();
     }
 }

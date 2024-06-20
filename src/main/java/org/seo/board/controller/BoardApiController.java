@@ -67,9 +67,14 @@ public class BoardApiController {
                 .body(board);
     }
 
-    // 게시글 추천
-//    @PutMapping("/api/hits/{id}")
-//    public ResponseEntity<Board> updateBoardHits(@PathVariable("id") Long id)
+    // 추천수 +1
+    @PutMapping("/api/recommend/{id}")
+    public ResponseEntity<Board> updateRecommend(@PathVariable("id") Long id) {
+        Board board = boardService.updateRecommend(id);
+
+        return ResponseEntity.ok()
+                .body(board);
+    }
 
     // =================== comments ========================
 
@@ -98,5 +103,14 @@ public class BoardApiController {
 
         return ResponseEntity.ok()
                 .build();
+    }
+
+    // 댓글 추천수 +1
+    @PutMapping("/api/comment-recommend/{id}")
+    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id, @RequestBody RecommendCommentRequest request) {
+        Comment comment = boardService.updateCommentRecommend(id, request);
+
+        return ResponseEntity.ok()
+                .body(new RecommendCommentResponse(comment));
     }
 }

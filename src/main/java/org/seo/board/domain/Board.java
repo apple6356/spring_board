@@ -32,9 +32,13 @@ public class Board {
     @Column(name = "author", nullable = false)
     private String author;
 
-//    @Column(name = "hits")
-//    @ColumnDefault("0")
-//    private int hits;
+    // 조회수
+    @Column(name = "hits")
+    private Long hits;
+
+    // 추천수
+    @Column(name = "recommend")
+    private Long recommend;
 
     @CreatedDate // 엔티티가 생성될 때 생성 시간 저장
     @Column(name = "created_at")
@@ -52,10 +56,17 @@ public class Board {
         this.author = author;
         this.title = title;
         this.content = content;
+        this.hits = 0L; // 조회수 0 초기화
+        this.recommend = 0L; // 추천수 0 초기화
     }
 
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    // 추천 +1
+    public void updateRecommend() {
+        this.recommend += 1;
     }
 }

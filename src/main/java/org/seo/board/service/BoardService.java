@@ -82,6 +82,7 @@ public class BoardService {
     }
 
     // 댓글 수정
+    @Transactional
     public Comment updateComment(Long id, UpdateCommentRequest request) {
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
@@ -111,5 +112,33 @@ public class BoardService {
         Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
 
         return boardList;
+    }
+
+    // 조회수 +1
+    @Transactional
+    public void updateHits(Long id) {
+        boardRepository.updateHits(id);
+    }
+
+    // 추천수 +1
+    @Transactional // 메서드를 하나의 트랜잭션으로 묶음
+    public Board updateRecommend(Long id) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found" + id));
+
+        board.updateRecommend();
+
+        return board;
+    }
+
+    // 댓글 추천수 +1
+    @Transactional
+    public Comment updateCommentRecommend(Long id, RecommendCommentRequest request) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found" + id));
+
+        comment.updateRecommend();
+
+        return comment;
     }
 }

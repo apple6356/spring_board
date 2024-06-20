@@ -25,8 +25,10 @@ const modifyButton = document.getElementById('modify-btn');
 
 if (modifyButton) {
     modifyButton.addEventListener('click', event => {
+        // URLSearchParams : 주소창의 url 을 다룰 수 있음
+        // location.search : url 의 파라미터를 가져올 수 있음
         let params = new URLSearchParams(location.search);
-        let id = params.get('id')
+        let id = params.get('id') // 주소창의 id 파라미터를 가져옴
 
         body = JSON.stringify({
             title: document.getElementById("title").value,
@@ -69,6 +71,27 @@ if(createButton) {
 
         httpRequest("POST", "/api/boards", body, success, fail);
     });
+}
+
+// 글 추천+1
+const recommendButton = document.getElementById('recommend-btn');
+
+if (recommendButton) {
+    recommendButton.addEventListener('click', event => {
+        let id = document.getElementById("board-id").value;
+
+        function success() {
+            alert("추천 완료");
+            location.replace("/boards/" + id);
+        }
+
+        function fail() {
+            alert("추천 실패");
+            location.replace("/boards/" + id);
+        }
+
+        httpRequest("PUT", "/api/recommend/" + id, null, success, fail);
+    })
 }
 
 // 쿠키를 가져오는 함수
@@ -154,17 +177,17 @@ if (commentCreateButton) {
     });
 }
 
-// 댓글 수정
-function modifyComment(commentId, button) {
+// 댓글 수정 화면
+function commentModify(commentId, button) {
     let commentParent = button.parentElement; // 부모 div
     let commentContent = document.getElementById('comment-content-' + commentId); // comment-content 가져오기
 
     let textarea = document.createElement('textarea'); // textarea 태그 추가
-    textarea.value = commentContent.innerText; // textarea에 기존 내용 삽입
+    textarea.value = commentContent.innerText; // textarea 에 기존 내용 삽입
 
     commentParent.replaceChild(textarea, commentContent); // 기존 div를 댓글 수정을 위해 textarea로 대체
 
-    let commentDeleteButton = document.getElementById('comment-delete-btn-' + commentId);
+    let commentDeleteButton = document.getElementById('delete-comment-btn-' + commentId);
     commentDeleteButton.style.display = 'none'; // 삭제 버튼 안보이게
 
     button.innerText = '등록'; // 버튼 등록으로 변경
@@ -174,6 +197,7 @@ function modifyComment(commentId, button) {
     }
 }
 
+// 댓글 수정
 function updateComment(commentId, commentContent, button) {
     boardId = document.getElementById('board-id').value;
 
@@ -195,8 +219,8 @@ function updateComment(commentId, commentContent, button) {
 }
 
 // 댓글 삭제
-function deleteComment(commentId) {
-    let boardId = document.getElementById('board-id').value; // board의 id 저장
+function commentDelete(commentId) {
+    let boardId = document.getElementById('board-id').value; // board 의 id 저장
 
     function success() {
         alert("삭제 완료");
@@ -208,6 +232,27 @@ function deleteComment(commentId) {
     }
 
     httpRequest("DELETE", "/api/comments/" + commentId, null, success, fail);
+}
+
+// 댓글 추천+1
+function commentRecommend(commentId) {
+    let boardId = document.getElementById('board-id').value;
+    let recommend = document.getElementById('comment-recommend-' + commentId).value;
+
+    body = JSON.stringify({
+        recommend: recommend,
+    });
+
+    function success() {
+        alert("추천 완료");
+        location.replace("/boards/" + boardId);
+    }
+    function fail() {
+        alert("추천 실패");
+        location.replace("/boards/" + boardId);
+    }
+
+    httpRequest("PUT", "/api/comment-recommend/" + commentId, body, success, fail);
 }
 
 

@@ -12,6 +12,8 @@ public class BoardListViewResponse {
     private final String content;
     private final String author;
     private final LocalDateTime createdAt;
+    private final Long hits;
+    private final Long recommend;
 
     public BoardListViewResponse(Board board) {
         this.id = board.getId();
@@ -19,5 +21,7 @@ public class BoardListViewResponse {
         this.content = board.getContent();
         this.author = board.getAuthor();
         this.createdAt = board.getCreatedAt();
+        this.hits = board.getHits();
+        this.recommend = board.getRecommend();
     }
 }

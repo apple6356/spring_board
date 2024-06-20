@@ -16,6 +16,7 @@
         <header>
             <h2 th:text="${board.title}"></h2>
             <div th:text="|작성자 : ${board.author}, 작성 시간 ${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
+            <span th:text="${board.hits}"></span>
         </header>
         <section>
             <p th:text="${board.content}"></p>
@@ -24,6 +25,11 @@
                 th:onclick="|location.href='@{/write-board?id={boardId}(boardId=${board.id})}'|">수정</button>
         <button type="button" id="delete-btn">삭제</button>
     </article>
+
+    <div>
+        <button id="recommend-btn">추천</button>
+        <span id="recommend" th:text="${board.recommend}"></span>
+    </div>
 
     <hr>
 
@@ -41,10 +47,12 @@
         <input type="hidden" id="comment-id" th:value="${comment.id}">
         <div>
             <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
+            <button id="'comment-recommend-btn-' + ${comment.id}" th:onclick="commentRecommend([[${comment.id}]])">추천</button>
+            <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
             <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
             <!-- this 로 태그 정보 넘김 -->
-            <button type="button" th:id="'comment-modify-btn-' + ${comment.id}" th:onclick="modifyComment([[${comment.id}]], this)">수정</button>
-            <button type="button" th:id="'comment-delete-btn-' + ${comment.id}" th:onclick="deleteComment([[${comment.id}]])">삭제</button>
+            <button type="button" th:id="'modify-comment-btn-' + ${comment.id}" th:onclick="commentModify([[${comment.id}]], this)">수정</button>
+            <button type="button" th:id="'delete-comment-btn-' + ${comment.id}" th:onclick="commentDelete([[${comment.id}]])">삭제</button>
         </div>
     </section>
 </div>
