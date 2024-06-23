@@ -34,6 +34,16 @@ public class BoardService {
         return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
+    // 글 10개만 조회
+    public List<Board> findTop() {
+        return boardRepository.findTop10ByOrderByIdDesc();
+    }
+
+    // 추천 30 이상 글 10개만 조회
+    public List<Board> findTopPopular() {
+        return boardRepository.findTop10ByRecommendGreaterThanEqualOrderByIdDesc(30);
+    }
+
     // 글 조회
     public Board findById(Long id) {
         return boardRepository.findById(id)
@@ -64,6 +74,31 @@ public class BoardService {
         return board;
     }
 
+    // 페이징
+    public Page<BoardListViewResponse> paging(Pageable pageable) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        // JpaRepository 의 findAll() 사용시 pageable 인터페이스로 파라미터를 넘기면 페이징 사용가능
+        Page<Board> boardPage = boardRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
+
+        return boardList;
+    }
+
+    // 인기 게시판 페이징
+    public Page<BoardListViewResponse> popularPaging(Pageable pageable) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        Page<Board> boardPage = boardRepository.findByRecommendGreaterThanEqualOrderByIdDesc(30, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
+
+        return boardList;
+    }
+
     // 게시글을 작성한 유저인지 확인
     private static void authorizeBoardAuthor(Board board) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -73,6 +108,7 @@ public class BoardService {
         }
     }
 
+
     // 댓글 추가
     public Comment addComment(AddCommentRequest request, String username) {
         Board board = boardRepository.findById(request.getBoardId())
@@ -80,6 +116,7 @@ public class BoardService {
 
         return commentRepository.save(request.toEntity(username, board));
     }
+
 
     // 댓글 수정
     @Transactional
@@ -99,19 +136,6 @@ public class BoardService {
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
 
         commentRepository.delete(comment);
-    }
-
-    // 페이징
-    public Page<BoardListViewResponse> paging(Pageable pageable) {
-        int page = pageable.getPageNumber() - 1;
-        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
-
-        // JpaRepository 의 findAll() 사용시 pageable 인터페이스로 파라미터를 넘기면 페이징 사용가능
-        Page<Board> boardPage = boardRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
-
-        Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
-
-        return boardList;
     }
 
     // 조회수 +1
