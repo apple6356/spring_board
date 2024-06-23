@@ -28,5 +28,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 상위 10개의 추천수 30개 이상 글 조회
     List<Board> findTop10ByRecommendGreaterThanEqualOrderByIdDesc(int recommend);
 
+    Page<Board> findByTitleContains(String keyword, Pageable pageable);
+
 
 }

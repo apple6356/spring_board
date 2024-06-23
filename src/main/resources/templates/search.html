@@ -2,12 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>자유 게시판</title>
-    <!--    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">-->
+    <title>검색</title>
 </head>
 <body>
+
 <div>
-    <h1>자유 게시판</h1>
+    <h1>검색 결과</h1>
 </div>
 
 <div>
@@ -31,21 +31,21 @@
     </div>
 </div>
 
+<!-- 검색 기능 -->
 <div>
     <form action="/search" method="GET">
-        <input type="text" id="keyword" name="keyword">
+        <input type="text" id="keyword" name="keyword" th:value="${keyword}">
         <button type="submit" id="search-btn">검색</button>
     </form>
-
 </div>
 
 <div>
     <!-- 첫번째 페이지로 이동 -->
-    <a th:href="@{/boards(page=1)}">First</a>
+    <a th:href="@{/search(keyword=${keyword}, page=1)}">First</a>
 
     <!-- 이전 페이지로 이동 (14 -> 10) -->
     <span>
-        <a th:if="${prev > 1}" th:href="@{/boards(page=${prev})}">prev</a>
+        <a th:if="${prev > 1}" th:href="@{/search(keyword=${keyword}, page=${prev})}">prev</a>
         <span th:if="${prev < 1}">prev</span>
     </span>
 
@@ -55,17 +55,17 @@
         <span th:if="${page == boardList.number + 1}" th:text="${page}" style="color: red"></span>
         <!-- 현재페이지 번호가 아닌 다른 페이지번호에는 링크를 보여줌 -->
         <span th:unless="${page == boardList.number + 1}">
-            <a th:href="@{/boards(page=${page})}" th:text="${page}"></a>
+            <a th:href="@{/search(keyword=${keyword}, page=${page})}" th:text="${page}"></a>
         </span>
     </span>
 
     <span>
-        <a th:if="${next <= boardList.totalPages}" th:href="@{/boards(page=${next})}">next</a>
+        <a th:if="${next <= boardList.totalPages}" th:href="@{/search(keyword=${keyword}, page=${next})}">next</a>
         <span th:if="${next > boardList.totalPages}">next</span>
     </span>
 
     <!-- 마지막 페이지로 이동 -->
-    <a th:href="@{/boards(page=${boardList.totalPages})}">Last</a>
+    <a th:href="@{/search(keyword=${keyword}, page=${boardList.totalPages})}">Last</a>
 </div>
 
 <script src="/js/token.js"></script>

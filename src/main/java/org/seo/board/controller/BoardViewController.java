@@ -127,4 +127,28 @@ public class BoardViewController {
         return "popularBoards";
     }
 
+    // 글 검색 결과 뷰
+    @GetMapping("/search")
+    public String searchBoards(@PageableDefault(page = 1) Pageable pageable, @RequestParam(value = "keyword") String keyword, Model model) {
+        Page<BoardListViewResponse> boardList = boardService.searchBoards(pageable, keyword);
+
+        int blockLimit = 10;
+        // 1 11 21 31
+        int startPage = (((int)(Math.ceil((double)pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;;
+        // 10 20 30 40
+        int endPage = ((startPage + blockLimit - 1) < boardList.getTotalPages()) ? startPage + blockLimit - 1 : boardList.getTotalPages();
+
+        int prev = startPage - 1;
+        int next = endPage + 1;
+
+        model.addAttribute("boardList", boardList);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("prev", prev);
+        model.addAttribute("next", next);
+        model.addAttribute("keyword", keyword);
+
+        return "search";
+    }
+
 }

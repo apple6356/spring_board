@@ -99,6 +99,21 @@ public class BoardService {
         return boardList;
     }
 
+    // 글 검색
+    public Page<BoardListViewResponse> searchBoards(Pageable pageable, String keyword) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        Page<Board> boardPage = boardRepository.findByTitleContains(keyword, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<BoardListViewResponse>  boardList = boardPage.map(BoardListViewResponse::new);
+        for (BoardListViewResponse boardListViewResponse : boardList) {
+            System.out.println("boardListViewResponse.getTitle() = " + boardListViewResponse.getTitle());
+        }
+
+        return boardList;
+    }
+
     // 게시글을 작성한 유저인지 확인
     private static void authorizeBoardAuthor(Board board) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();

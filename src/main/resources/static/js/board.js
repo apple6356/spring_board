@@ -91,8 +91,35 @@ if (recommendButton) {
         }
 
         httpRequest("PUT", "/api/recommend/" + id, null, success, fail);
-    })
+    });
 }
+
+// 글 검색
+//const searchButton = document.getElementById('search-btn');
+//
+//if(searchButton) {
+//    searchButton.addEventListener('click', event => {
+//
+//        let keyword = document.getElementById('keyword').value;
+//        console.log(keyword);
+//
+////        body = JSON.stringify({
+////            keyword: keyword,
+////        });
+//
+//        function success() {
+//            alert("검색 성공");
+//            location.replace("/boards/" + keyword);
+//        }
+//
+//        function fail() {
+//            alert("검색 실패")
+//            location.replace("/boards/" + keyword);
+//        }
+//
+//        httpRequest("GET", "/search/" + keyword, null, success, fail);
+//    });
+//}
 
 // 쿠키를 가져오는 함수
 function getCookie(key) {
