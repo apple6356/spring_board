@@ -48,7 +48,7 @@ public class WebOAuthSecurityConfig {
                 .logout(AbstractHttpConfigurer::disable)
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 헤더를 확인할 커스텀 필터 추가
-                .addFilterBefore(tokenAuthenticationFileter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 // 토큰 재발급 url은 인증 없이 접근 가능하도록 설정, 나머지 api url은 인증 필요
                 .authorizeRequests(auth -> auth
                         .requestMatchers(new AntPathRequestMatcher("/api/token")).permitAll()
@@ -64,7 +64,7 @@ public class WebOAuthSecurityConfig {
                                 .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                         .userService(oAuth2UserCustomService))
                         // 인증 성공 시 실행할 핸들러
-                                .successHandler(oAuth2SuccesHandler())
+                                .successHandler(oAuth2SuccessHandler())
                 )
                 // /api로 시작하는 url인 경우 401 코드를 반환하도록 예외 처리
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -76,13 +76,13 @@ public class WebOAuthSecurityConfig {
     }
 
     @Bean
-    public OAuth2SuccessHandler oAuth2SuccesHandler() {
+    public OAuth2SuccessHandler oAuth2SuccessHandler() {
         return new OAuth2SuccessHandler(tokenProvider, refreshTokenRepository,
                 oAuth2AuthorizationRequestBasedOnCookieRepository(), userService);
     }
 
     @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFileter() {
+    public TokenAuthenticationFilter tokenAuthenticationFilter() {
         return new TokenAuthenticationFilter(tokenProvider);
     }
 

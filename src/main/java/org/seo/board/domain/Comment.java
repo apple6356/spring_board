@@ -28,11 +28,14 @@ public class Comment {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @CreatedDate
-    @Column(name = "create_time")
-    private LocalDateTime createTime;
+    @Column(name = "recommend")
+    private Long recommend;
 
-    @ManyToOne // 다 대 일
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY) // 다 대 일
     private Board board;
 
     @Builder
@@ -40,5 +43,15 @@ public class Comment {
         this.board = board;
         this.author = author;
         this.content = content;
+        this.recommend = 0L;
+    }
+
+    public void update(String content) {
+        this.content = content;
+    }
+
+    // 추천 +1
+    public void updateRecommend() {
+        this.recommend += 1;
     }
 }

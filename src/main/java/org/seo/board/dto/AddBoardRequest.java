@@ -15,7 +15,7 @@ import org.seo.board.domain.Board;
 public class AddBoardRequest {
 
     @NotNull
-    @Size(min = 1, max = 20)
+    @Size(min = 1, max = 50)
     private String title;
 
     @NotNull

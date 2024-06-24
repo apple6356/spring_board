@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.seo.board.config.error.exception.BoardNotFoundException;
 import org.seo.board.domain.Board;
 import org.seo.board.domain.Comment;
-import org.seo.board.dto.AddBoardRequest;
-import org.seo.board.dto.AddCommentRequest;
-import org.seo.board.dto.UpdateBoardRequest;
+import org.seo.board.dto.*;
 import org.seo.board.repository.BoardRepository;
 import org.seo.board.repository.CommentRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +31,17 @@ public class BoardService {
 
     // 글 전체 조회
     public List<Board> findAll() {
-        return boardRepository.findAll();
+        return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+    }
+
+    // 글 10개만 조회
+    public List<Board> findTop() {
+        return boardRepository.findTop10ByOrderByIdDesc();
+    }
+
+    // 추천 30 이상 글 10개만 조회
+    public List<Board> findTopPopular() {
+        return boardRepository.findTop10ByRecommendGreaterThanEqualOrderByIdDesc(30);
     }
 
     // 글 조회
@@ -62,6 +74,46 @@ public class BoardService {
         return board;
     }
 
+    // 페이징
+    public Page<BoardListViewResponse> paging(Pageable pageable) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        // JpaRepository 의 findAll() 사용시 pageable 인터페이스로 파라미터를 넘기면 페이징 사용가능
+        Page<Board> boardPage = boardRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
+
+        return boardList;
+    }
+
+    // 인기 게시판 페이징
+    public Page<BoardListViewResponse> popularPaging(Pageable pageable) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        Page<Board> boardPage = boardRepository.findByRecommendGreaterThanEqualOrderByIdDesc(30, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
+
+        return boardList;
+    }
+
+    // 글 검색
+    public Page<BoardListViewResponse> searchBoards(Pageable pageable, String keyword) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        Page<Board> boardPage = boardRepository.findByTitleContains(keyword, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<BoardListViewResponse>  boardList = boardPage.map(BoardListViewResponse::new);
+        for (BoardListViewResponse boardListViewResponse : boardList) {
+            System.out.println("boardListViewResponse.getTitle() = " + boardListViewResponse.getTitle());
+        }
+
+        return boardList;
+    }
+
     // 게시글을 작성한 유저인지 확인
     private static void authorizeBoardAuthor(Board board) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -71,13 +123,61 @@ public class BoardService {
         }
     }
 
+
     // 댓글 추가
     public Comment addComment(AddCommentRequest request, String username) {
-
         Board board = boardRepository.findById(request.getBoardId())
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + request.getBoardId()));
 
         return commentRepository.save(request.toEntity(username, board));
     }
 
+
+    // 댓글 수정
+    @Transactional
+    public Comment updateComment(Long id, UpdateCommentRequest request) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+
+        comment.update(request.getContent());
+        commentRepository.save(comment);
+
+        return comment;
+    }
+
+    // 댓글 삭제
+    public void deleteComment(Long id) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+
+        commentRepository.delete(comment);
+    }
+
+    // 조회수 +1
+    @Transactional
+    public void updateHits(Long id) {
+        boardRepository.updateHits(id);
+    }
+
+    // 추천수 +1
+    @Transactional // 메서드를 하나의 트랜잭션으로 묶음
+    public Board updateRecommend(Long id) {
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found" + id));
+
+        board.updateRecommend();
+
+        return board;
+    }
+
+    // 댓글 추천수 +1
+    @Transactional
+    public Comment updateCommentRecommend(Long id, RecommendCommentRequest request) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found" + id));
+
+        comment.updateRecommend();
+
+        return comment;
+    }
 }

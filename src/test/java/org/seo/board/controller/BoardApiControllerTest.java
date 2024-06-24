@@ -205,7 +205,7 @@ class BoardApiControllerTest {
         Faker faker = new Faker();
 
         final String url = "/api/boards";
-        final String title = faker.lorem().characters(21);
+        final String title = faker.lorem().characters(51);
         final String content = "content";
         final AddBoardRequest userRequest = new AddBoardRequest(title, content);
 

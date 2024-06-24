@@ -28,14 +28,14 @@ public class User implements UserDetails { // UserDetails를 상속받아 인증
     @Column(name = "password")
     private String password;
 
-    @Column(name = "nickname", unique = true)
-    private String nickname;
+    @Column(name = "username", unique = true)
+    private String username;
 
     @Builder
-    public User(String email, String password, String nickname) {
+    public User(String email, String password, String username) {
         this.email = email;
         this.password = password;
-        this.nickname = nickname;
+        this.username = username;
     }
 
     @Override // 권한 반환
@@ -74,8 +74,8 @@ public class User implements UserDetails { // UserDetails를 상속받아 인증
     }
 
     // 사용자 이름 변경
-    public User update(String nickname) {
-        this.nickname = nickname;
+    public User update(String username) {
+        this.username = username;
 
         return this;
     }

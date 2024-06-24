@@ -21,13 +21,13 @@ public class UserApiController {
     @PostMapping("/user")
     public String signup(AddUserRequest request) {
         userService.save(request);
-        return "redirect:/login";
+        return "redirect:/index";
     }
 
     // 로그아웃
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-        return "redirect:/login";
+        return "redirect:/boards";
     }
 }

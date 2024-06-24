@@ -54,8 +54,6 @@ public class BoardApiController {
     public ResponseEntity<Void> deleteBoard(@PathVariable("id") Long id) {
         boardService.delete(id);
 
-        System.out.println("삭제 실행");
-
         return ResponseEntity.ok()
                 .build();
     }
@@ -64,10 +62,21 @@ public class BoardApiController {
     @PutMapping("/api/boards/{id}")
     public ResponseEntity<Board> updateBoard(@PathVariable("id") Long id, @RequestBody UpdateBoardRequest request) {
         Board board = boardService.update(id, request);
-        System.out.println("수정");
+
         return ResponseEntity.ok()
                 .body(board);
     }
+
+    // 추천수 +1
+    @PutMapping("/api/recommend/{id}")
+    public ResponseEntity<Board> updateRecommend(@PathVariable("id") Long id) {
+        Board board = boardService.updateRecommend(id);
+
+        return ResponseEntity.ok()
+                .body(board);
+    }
+
+    // =================== comments ========================
 
     // 댓글 생성
     @PostMapping("/api/comments")
@@ -76,5 +85,32 @@ public class BoardApiController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new AddCommentResponse(savedComment));
+    }
+
+    // 댓글 수정
+    @PutMapping("/api/comments/{id}")
+    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id, @RequestBody UpdateCommentRequest request) {
+        Comment comment = boardService.updateComment(id, request);
+
+        return ResponseEntity.ok()
+                .body(new UpdateCommentResponse(comment));
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/api/comments/{id}")
+    public ResponseEntity<Void> deleteComment(@PathVariable("id") Long id) {
+        boardService.deleteComment(id);
+
+        return ResponseEntity.ok()
+                .build();
+    }
+
+    // 댓글 추천수 +1
+    @PutMapping("/api/comment-recommend/{id}")
+    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id, @RequestBody RecommendCommentRequest request) {
+        Comment comment = boardService.updateCommentRecommend(id, request);
+
+        return ResponseEntity.ok()
+                .body(new RecommendCommentResponse(comment));
     }
 }
