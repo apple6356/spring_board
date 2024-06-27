@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -21,8 +23,11 @@ public class BoardApiController {
 
     // 글 작성(저장)
     @PostMapping("/api/boards")
-    public ResponseEntity<Board> addBoard(@RequestBody @Validated AddBoardRequest request, Principal principal) {
-        Board board = boardService.save(request, principal.getName());
+    public ResponseEntity<Board> addBoard(@RequestPart(value = "board") @Validated AddBoardRequest request,
+                                          @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles,
+                                          Principal principal) throws IOException {
+
+        Board board = boardService.save(request, principal.getName(), multipartFiles);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(board);
@@ -60,7 +65,9 @@ public class BoardApiController {
 
     // 글 수정
     @PutMapping("/api/boards/{id}")
-    public ResponseEntity<Board> updateBoard(@PathVariable("id") Long id, @RequestBody UpdateBoardRequest request) {
+    public ResponseEntity<Board> updateBoard(@PathVariable("id") Long id,
+                                             @RequestPart(value = "board") UpdateBoardRequest request,
+                                             @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles) {
         Board board = boardService.update(id, request);
 
         return ResponseEntity.ok()
@@ -80,7 +87,7 @@ public class BoardApiController {
 
     // 댓글 생성
     @PostMapping("/api/comments")
-    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request, Principal principal) {
+    public ResponseEntity<AddCommentResponse> addComment(@RequestPart AddCommentRequest request, Principal principal) {
         Comment savedComment = boardService.addComment(request, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -89,7 +96,7 @@ public class BoardApiController {
 
     // 댓글 수정
     @PutMapping("/api/comments/{id}")
-    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id, @RequestBody UpdateCommentRequest request) {
+    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id, @RequestPart UpdateCommentRequest request) {
         Comment comment = boardService.updateComment(id, request);
 
         return ResponseEntity.ok()
@@ -107,7 +114,7 @@ public class BoardApiController {
 
     // 댓글 추천수 +1
     @PutMapping("/api/comment-recommend/{id}")
-    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id, @RequestBody RecommendCommentRequest request) {
+    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id, @RequestPart RecommendCommentRequest request) {
         Comment comment = boardService.updateCommentRecommend(id, request);
 
         return ResponseEntity.ok()

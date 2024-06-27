@@ -19,6 +19,10 @@
             <span th:text="${board.hits}"></span>
         </header>
         <section>
+            <div th:each="image: ${board.files}">
+                <!-- webconfig -->
+                <img th:src="@{'/files/' + ${image.storedFileName}}" th:alt="${image.originalFileName}" width="500">
+            </div>
             <p th:text="${board.content}"></p>
         </section>
         <button type="button" id="modify-btn"

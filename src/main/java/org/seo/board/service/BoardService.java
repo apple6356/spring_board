@@ -7,6 +7,7 @@ import org.seo.board.domain.Comment;
 import org.seo.board.dto.*;
 import org.seo.board.repository.BoardRepository;
 import org.seo.board.repository.CommentRepository;
+import org.seo.board.repository.FileRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +15,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor // final이나 @NotNull인 필드의 생성자 추가
 @Service
@@ -23,10 +28,25 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final FileRepository fileRepository;
 
     // 글 작성(저장)
-    public Board save(AddBoardRequest boardDTO, String userName) {
-        return boardRepository.save(boardDTO.toEntity(userName));
+    public Board save(AddBoardRequest request, String userName, List<MultipartFile> multipartFiles) throws IOException {
+        Board board = boardRepository.save(request.toEntity(userName));
+        BoardFileRequest fileRequest = new BoardFileRequest();
+
+        if (multipartFiles != null) {
+            for (MultipartFile multipartFile : multipartFiles) {
+                String originalFileName = multipartFile.getOriginalFilename();
+                String storedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
+                String savePath = "D:/files/" + storedFileName; // 파일 저장 경로
+                multipartFile.transferTo(new File(savePath)); // 경로에 파일 저장
+
+                fileRepository.save(fileRequest.toEntity(board, originalFileName, storedFileName));
+            }
+        }
+
+        return board;
     }
 
     // 글 전체 조회
@@ -107,9 +127,6 @@ public class BoardService {
         Page<Board> boardPage = boardRepository.findByTitleContains(keyword, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
 
         Page<BoardListViewResponse>  boardList = boardPage.map(BoardListViewResponse::new);
-        for (BoardListViewResponse boardListViewResponse : boardList) {
-            System.out.println("boardListViewResponse.getTitle() = " + boardListViewResponse.getTitle());
-        }
 
         return boardList;
     }
@@ -180,4 +197,6 @@ public class BoardService {
 
         return comment;
     }
+
+
 }

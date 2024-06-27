@@ -30,10 +30,23 @@ if (modifyButton) {
         let params = new URLSearchParams(location.search);
         let id = params.get('id') // 주소창의 id 파라미터를 가져옴
 
-        body = JSON.stringify({
+        let formData = new FormData();
+
+        formData.append('board', new Blob([JSON.stringify({
             title: document.getElementById("title").value,
-            content: document.getElementById("content").value,
-        });
+            content: document.getElementById("content").value
+        })], { type: "application/json" }));
+
+        let files = document.getElementById("files").files;
+
+        for(let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+
+//        body = JSON.stringify({
+//            title: document.getElementById("title").value,
+//            content: document.getElementById("content").value,
+//        });
 
         function success() {
             alert("수정 완료");
@@ -45,7 +58,7 @@ if (modifyButton) {
             location.replace("/boards/" + id);
         }
 
-        httpRequest("PUT", "/api/boards/" + id, body, success, fail);
+        httpRequest("PUT", "/api/boards/" + id, formData, success, fail);
     })
 }
 
@@ -54,10 +67,33 @@ const createButton = document.getElementById('create-btn');
 
 if(createButton) {
     createButton.addEventListener('click', event => {
-        body = JSON.stringify({
+        let formData = new FormData();
+
+        // JSON 데이터를 직렬화하여 Blob으로 만들어 FormData에 추가
+//        let boardData = {
+//            title: document.getElementById("title").value,
+//            content: document.getElementById("content").value
+//        };
+//
+//        formData.append('board', new Blob([JSON.stringify(boardData)], { type: "application/json" }));
+
+
+        formData.append('board', new Blob([JSON.stringify({
             title: document.getElementById("title").value,
-            content: document.getElementById("content").value,
-        });
+            content: document.getElementById("content").value
+        })], { type: "application/json" }));
+//
+//        formData.append('title', document.getElementById("title").value);
+//        formData.append('content', document.getElementById("content").value);
+
+        let files = document.getElementById("files").files;
+
+        for(let i = 0; i < files.length; i++) {
+            formData.append('files', files[i]);
+        }
+
+//        body = JSON.stringify({
+//        });
 
         function success() {
             alert("등록 완료");
@@ -69,7 +105,7 @@ if(createButton) {
             location.replace("/boards");
         }
 
-        httpRequest("POST", "/api/boards", body, success, fail);
+        httpRequest("POST", "/api/boards", formData, success, fail);
     });
 }
 
@@ -93,33 +129,6 @@ if (recommendButton) {
         httpRequest("PUT", "/api/recommend/" + id, null, success, fail);
     });
 }
-
-// 글 검색
-//const searchButton = document.getElementById('search-btn');
-//
-//if(searchButton) {
-//    searchButton.addEventListener('click', event => {
-//
-//        let keyword = document.getElementById('keyword').value;
-//        console.log(keyword);
-//
-////        body = JSON.stringify({
-////            keyword: keyword,
-////        });
-//
-//        function success() {
-//            alert("검색 성공");
-//            location.replace("/boards/" + keyword);
-//        }
-//
-//        function fail() {
-//            alert("검색 실패")
-//            location.replace("/boards/" + keyword);
-//        }
-//
-//        httpRequest("GET", "/search/" + keyword, null, success, fail);
-//    });
-//}
 
 // 쿠키를 가져오는 함수
 function getCookie(key) {
@@ -147,7 +156,7 @@ function httpRequest(method, url, body, success, fail) {
         headers : {
             // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
             Authorization: "Bearer " + localStorage.getItem("access_token"),
-            "Content-Type": "application/json",
+//            "Content-Type": "multipart/form-data",
         },
         body: body,
     })
@@ -161,6 +170,7 @@ function httpRequest(method, url, body, success, fail) {
                 method: "POST",
                 headers: {
                     Authorization: "Bearer " + localStorage.getItem("access_token"),
+//                    "Content-Type": "multipart/form-data",
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({

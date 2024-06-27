@@ -51,6 +51,9 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) // 일 대 다, cascade 글(부모) 삭제되면 댓글(자식)도 삭제
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<BoardFile> files;
+
     @Builder // builder 패턴
     public Board(String author, String title, String content) {
         this.author = author;

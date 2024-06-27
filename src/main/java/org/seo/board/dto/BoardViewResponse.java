@@ -3,6 +3,7 @@ package org.seo.board.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.seo.board.domain.Board;
+import org.seo.board.domain.BoardFile;
 import org.seo.board.domain.Comment;
 
 import java.time.LocalDateTime;
@@ -20,6 +21,7 @@ public class BoardViewResponse {
     private List<Comment> comments;
     private Long hits;
     private Long recommend;
+    private List<BoardFile> files;
 
     public BoardViewResponse(Board board) {
         this.id = board.getId();
@@ -30,5 +32,6 @@ public class BoardViewResponse {
         this.comments = board.getComments();
         this.hits = board.getHits();
         this.recommend = board.getRecommend();
+        this.files = board.getFiles();
     }
 }
