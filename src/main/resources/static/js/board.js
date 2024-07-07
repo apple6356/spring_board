@@ -16,7 +16,7 @@ if (deleteButton) {
             location.replace("/boards");
         }
 
-        httpRequest("DELETE", "/api/boards/" + id, null, success, fail);
+        httpRequest("DELETE", "/api/boards/" + id, null, false, success, fail);
     });
 }
 
@@ -30,23 +30,28 @@ if (modifyButton) {
         let params = new URLSearchParams(location.search);
         let id = params.get('id') // 주소창의 id 파라미터를 가져옴
 
-        let formData = new FormData();
-
-        formData.append('board', new Blob([JSON.stringify({
-            title: document.getElementById("title").value,
-            content: document.getElementById("content").value
-        })], { type: "application/json" }));
-
-        let files = document.getElementById("files").files;
-
-        for(let i = 0; i < files.length; i++) {
-            formData.append('files', files[i]);
-        }
-
-//        body = JSON.stringify({
+//        let formData = new FormData();
+//
+//        formData.append('board', new Blob([JSON.stringify({
 //            title: document.getElementById("title").value,
-//            content: document.getElementById("content").value,
-//        });
+//            content: document.getElementById("content").value
+//        })], { type: "application/json" }));
+
+//        let files = document.getElementById("files").files;
+//
+//        let isMultipart = true;
+//        if (files == null) {
+//            isMultipart = false;
+//        }
+//
+//        for(let i = 0; i < files.length; i++) {
+//            formData.append('files', files[i]);
+//        }
+
+        body = JSON.stringify({
+            title: document.getElementById("title").value,
+            content: document.getElementById("content").value,
+        });
 
         function success() {
             alert("수정 완료");
@@ -58,7 +63,7 @@ if (modifyButton) {
             location.replace("/boards/" + id);
         }
 
-        httpRequest("PUT", "/api/boards/" + id, formData, success, fail);
+        httpRequest("PUT", "/api/boards/" + id, body, false, success, fail);
     })
 }
 
@@ -88,6 +93,11 @@ if(createButton) {
 
         let files = document.getElementById("files").files;
 
+        let isMultipart = true;
+        if (files == null) {
+            isMultipart = false;
+        }
+
         for(let i = 0; i < files.length; i++) {
             formData.append('files', files[i]);
         }
@@ -105,7 +115,7 @@ if(createButton) {
             location.replace("/boards");
         }
 
-        httpRequest("POST", "/api/boards", formData, success, fail);
+        httpRequest("POST", "/api/boards", formData, isMultipart, success, fail);
     });
 }
 
@@ -126,7 +136,7 @@ if (recommendButton) {
             location.replace("/boards/" + id);
         }
 
-        httpRequest("PUT", "/api/recommend/" + id, null, success, fail);
+        httpRequest("PUT", "/api/recommend/" + id, null, false, success, fail);
     });
 }
 
@@ -150,14 +160,23 @@ function getCookie(key) {
 }
 
 // Http 요청을 보내는 함수
-function httpRequest(method, url, body, success, fail) {
+function httpRequest(method, url, body, isMultipart, success, fail) {
+    const headers = {
+        Authorization: "Bearer " + localStorage.getItem("access_token"),
+    };
+
+    if (isMultipart == false){
+        headers["Content-Type"] = "application/json";
+    }
+
     fetch(url, {
         method: method,
-        headers : {
-            // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
-            Authorization: "Bearer " + localStorage.getItem("access_token"),
-//            "Content-Type": "multipart/form-data",
-        },
+        headers: headers,
+//        headers : {
+//            // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
+//            Authorization: "Bearer " + localStorage.getItem("access_token"),
+////            "Content-Type": "application/json",
+//        },
         body: body,
     })
     .then((response) => {
@@ -170,7 +189,6 @@ function httpRequest(method, url, body, success, fail) {
                 method: "POST",
                 headers: {
                     Authorization: "Bearer " + localStorage.getItem("access_token"),
-//                    "Content-Type": "multipart/form-data",
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
@@ -197,10 +215,24 @@ if (commentCreateButton) {
     commentCreateButton.addEventListener('click', event => {
         boardId = document.getElementById('board-id').value;
 
+//        let formData = new FormData();
+//
+//        formData.append('comment', new Blob([JSON.stringify({
+//            boardId: boardId,
+//            content: document.getElementById('content').value
+//        })], { type: "application/json" }));
+//
+//        let files = document.getElementById("files").files;
+//
+//        for(let i = 0; i < files.length; i++) {
+//            formData.append('files', files[i]);
+//        }
+
         body = JSON.stringify({
             boardId: boardId,
             content: document.getElementById('content').value
         });
+
         function success() {
             alert('댓글이 작성되었습니다.');
             location.replace('/boards/' + boardId);
@@ -210,7 +242,7 @@ if (commentCreateButton) {
             location.replace('/boards/' + boardId);
         };
 
-        httpRequest('POST', '/api/comments', body, success, fail);
+        httpRequest('POST', '/api/comments', body, false, success, fail);
     });
 }
 
@@ -238,6 +270,12 @@ function commentModify(commentId, button) {
 function updateComment(commentId, commentContent, button) {
     boardId = document.getElementById('board-id').value;
 
+//    let formData = new FormData();
+//
+//    formData.append('comment', new Blob([JSON.stringify({
+//        content: document.getElementById('content').value
+//    })], { type: "application/json" }));
+
     body = JSON.stringify({
         content: commentContent,
     });
@@ -252,7 +290,7 @@ function updateComment(commentId, commentContent, button) {
         location.replace("/boards/" + boardId);
     }
 
-    httpRequest("PUT", "/api/comments/" + commentId, body, success, fail);
+    httpRequest("PUT", "/api/comments/" + commentId, body, false, success, fail);
 }
 
 // 댓글 삭제
@@ -268,13 +306,19 @@ function commentDelete(commentId) {
         location.replace("/boards/" + boardId);
     }
 
-    httpRequest("DELETE", "/api/comments/" + commentId, null, success, fail);
+    httpRequest("DELETE", "/api/comments/" + commentId, null, false, success, fail);
 }
 
 // 댓글 추천+1
 function commentRecommend(commentId) {
     let boardId = document.getElementById('board-id').value;
     let recommend = document.getElementById('comment-recommend-' + commentId).value;
+
+//    let formData = new FormData();
+//
+//    formData.append('comment', new Blob([JSON.stringify({
+//        recommend: recommend,
+//    })], { type: "application/json" }));
 
     body = JSON.stringify({
         recommend: recommend,
@@ -289,7 +333,7 @@ function commentRecommend(commentId) {
         location.replace("/boards/" + boardId);
     }
 
-    httpRequest("PUT", "/api/comment-recommend/" + commentId, body, success, fail);
+    httpRequest("PUT", "/api/comment-recommend/" + commentId, body, false, success, fail);
 }
 
 

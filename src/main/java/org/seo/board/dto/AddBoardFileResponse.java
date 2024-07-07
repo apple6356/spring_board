@@ -8,13 +8,13 @@ import org.seo.board.domain.BoardFile;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class BoardFileResponse {
+public class AddBoardFileResponse {
 
     private Long id;
     private String originalFileName;
     private String storedFileName;
 
-    public BoardFileResponse(BoardFile boardFile) {
+    public AddBoardFileResponse(BoardFile boardFile) {
         this.id = boardFile.getId();
         this.originalFileName = boardFile.getOriginalFileName();
         this.storedFileName = boardFile.getStoredFileName();

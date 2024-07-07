@@ -9,10 +9,23 @@
     <h1>인기 게시판</h1>
 </div>
 
-<div>
-    <button type="button" onclick="location.href='/oauthLogin'">구글 로그인</button>
-    <button type="button" onclick="location.href='/logout'">로그아웃</button>
-</div>
+<nav id="navbar">
+    <span onclick="location.href='/main'">메인</span>
+    <ul id="menu">
+        <li><span>게시판</span>
+            <ul>
+                <li onclick="location.href='/popularBoards'">인기 게시판</li>
+                <li onclick="location.href='/boards'">자유 게시판</li>
+            </ul>
+        </li>
+    </ul>
+
+    <div>
+        <button type="button" onclick="location.href='/login'">로그인</button>
+<!--        <button type="button" onclick="location.href='/oauthLogin'">구글 로그인</button>-->
+        <button type="button" onclick="location.href='/logout'">로그아웃</button>
+    </div>
+</nav>
 
 <div>
     <button type="button" id="create-btn" th:onclick="|location.href='@{/write-board}'|">작성</button>

@@ -33,7 +33,7 @@ public class BoardService {
     // 글 작성(저장)
     public Board save(AddBoardRequest request, String userName, List<MultipartFile> multipartFiles) throws IOException {
         Board board = boardRepository.save(request.toEntity(userName));
-        BoardFileRequest fileRequest = new BoardFileRequest();
+        AddBoardFileRequest fileRequest = new AddBoardFileRequest();
 
         if (multipartFiles != null) {
             for (MultipartFile multipartFile : multipartFiles) {

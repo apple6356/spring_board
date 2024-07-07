@@ -9,7 +9,7 @@ import org.seo.board.domain.BoardFile;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class BoardFileRequest {
+public class AddBoardFileRequest {
 
     private String originalFileName;
     private String storedFileName;

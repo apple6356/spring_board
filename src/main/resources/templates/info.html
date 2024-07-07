@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My</title>
+</head>
+<body>
+
+<h1>내 정보</h1>
+
+<div>
+    <p th:text="'이메일 : ' + ${user.email}"></p>
+    <p th:text="'이름 : ' + ${user.username}"></p>
+</div>
+
+<script src="/js/token.js"></script>
+
+</body>
+</html>

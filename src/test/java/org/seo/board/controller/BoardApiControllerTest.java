@@ -6,13 +6,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.seo.board.config.auth.CustomSecurityUserDetails;
 import org.seo.board.config.error.ErrorCode;
 import org.seo.board.domain.Board;
 import org.seo.board.domain.Comment;
 import org.seo.board.domain.User;
-import org.seo.board.dto.AddBoardRequest;
-import org.seo.board.dto.AddCommentRequest;
-import org.seo.board.dto.UpdateBoardRequest;
+import org.seo.board.dto.*;
 import org.seo.board.repository.BoardRepository;
 import org.seo.board.repository.CommentRepository;
 import org.seo.board.repository.UserRepository;
@@ -76,11 +75,12 @@ class BoardApiControllerTest {
                 .password("test")
                 .build());
 
+        CustomSecurityUserDetails userDetails = new CustomSecurityUserDetails(user);
         SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
+        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), userDetails.getAuthorities()));
     }
 
-    @DisplayName("/write : 글 작성")
+    @DisplayName("/api/boards : 글 작성")
     @Test
     public void write() throws Exception {
         final String url = "/api/boards";
@@ -177,6 +177,22 @@ class BoardApiControllerTest {
 
         System.out.println("board.getTitle() = " + board.getTitle());
         System.out.println("board.getContent() = " + board.getContent());
+    }
+
+    @DisplayName("/api/recommend/{id} : 글 추천")
+    @Test
+    public void recommendBoard() throws Exception {
+        final String url = "/api/recommend/{id}";
+        Board saveBoard = createDefaultBoard();
+
+        ResultActions resultActions = mockMvc.perform(put(url, saveBoard.getId()))
+                .andExpect(status().isOk());
+
+        Board board = boardRepository.findById(saveBoard.getId()).get();
+
+        assertThat(board.getRecommend()).isEqualTo(1L);
+
+        System.out.println("board.getRecommend() = " + board.getRecommend());
     }
 
     @DisplayName("addBoard: 글 생성 시 title이 null이면 실패")
@@ -279,11 +295,83 @@ class BoardApiControllerTest {
         assertThat(comments.get(0).getContent()).isEqualTo(content);
     }
 
+    @DisplayName("/api/comments/{id} : 댓글 수정")
+    @Test
+    public void updateComment() throws Exception {
+        final String url = "/api/comments/{id}";
+
+        Board board = createDefaultBoard();
+        Comment saveComment = createDefaultComment(board);
+        String newContent = "newContent";
+
+        final UpdateCommentRequest commentRequest = new UpdateCommentRequest(newContent);
+
+        ResultActions result = mockMvc.perform(put(url, saveComment.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(commentRequest)));
+
+        result.andExpect(status().isOk());
+
+        Comment comment = commentRepository.findById(saveComment.getId()).get();
+
+        assertThat(comment.getContent()).isEqualTo(newContent);
+
+        System.out.println("comment.getContent() = " + comment.getContent());
+    }
+
+    @DisplayName("/api/comments/{id} : 댓글 삭제")
+    @Test
+    public void deleteComment() throws Exception {
+        final String url = "/api/comments/{id}";
+
+        Board board = createDefaultBoard();
+        Comment saveComment = createDefaultComment(board);
+
+        mockMvc.perform(delete(url, saveComment.getId()))
+                .andExpect(status().isOk());
+
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).isEmpty();
+    }
+
+    @DisplayName("/api/comment-recommend/{id} : 댓글 추천")
+    @Test
+    public void recommendComment() throws Exception {
+        final String url = "/api/comment-recommend/{id}";
+
+        Board board = createDefaultBoard();
+        Comment saveComment = createDefaultComment(board);
+        Long recommend = saveComment.getRecommend();
+
+        final RecommendCommentRequest commentRequest = new RecommendCommentRequest(recommend);
+
+        ResultActions result = mockMvc.perform(put(url, saveComment.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(commentRequest)));
+
+        result.andExpect(status().isOk());
+
+        Comment comment = commentRepository.findById(saveComment.getId()).get();
+
+        assertThat(comment.getRecommend()).isEqualTo(1);
+
+        System.out.println("comment.getRecommend() = " + comment.getRecommend());
+    }
+
     private Board createDefaultBoard() {
         return boardRepository.save(Board.builder()
                 .title("title")
-                .author(user.getUsername())
+                .author(user.getEmail())
                 .content("content")
+                .build());
+    }
+
+    private Comment createDefaultComment(Board board) {
+
+        return commentRepository.save(Comment.builder()
+                .author("author")
+                .content("content")
+                .board(board)
                 .build());
     }
 }

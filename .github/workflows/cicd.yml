@@ -52,14 +52,14 @@ jobs:
       - name: Set artifact
         run: echo "artifact=$(ls ./build/libs)" >> $GITHUB_ENV
 
-      # 빈스토크 배포
-      - name: Beanstalk Deploy
-        uses: einaregilsson/beanstalk-deploy@v20
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: springboot
-          environment_name: springboot-env
-          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
-          region: ap-northeast-2
-          deployment_package: ./build/libs/${{env.artifact}}
+#      # 빈스토크 배포
+#      - name: Beanstalk Deploy
+#        uses: einaregilsson/beanstalk-deploy@v20
+#        with:
+#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          application_name: springboot
+#          environment_name: springboot-env
+#          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+#          region: ap-northeast-2
+#          deployment_package: ./build/libs/${{env.artifact}}

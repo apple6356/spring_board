@@ -66,8 +66,7 @@ public class BoardApiController {
     // 글 수정
     @PutMapping("/api/boards/{id}")
     public ResponseEntity<Board> updateBoard(@PathVariable("id") Long id,
-                                             @RequestPart(value = "board") UpdateBoardRequest request,
-                                             @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles) {
+                                             @RequestBody UpdateBoardRequest request) {
         Board board = boardService.update(id, request);
 
         return ResponseEntity.ok()
@@ -87,7 +86,7 @@ public class BoardApiController {
 
     // 댓글 생성
     @PostMapping("/api/comments")
-    public ResponseEntity<AddCommentResponse> addComment(@RequestPart AddCommentRequest request, Principal principal) {
+    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request, Principal principal) {
         Comment savedComment = boardService.addComment(request, principal.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -96,7 +95,7 @@ public class BoardApiController {
 
     // 댓글 수정
     @PutMapping("/api/comments/{id}")
-    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id, @RequestPart UpdateCommentRequest request) {
+    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id, @RequestBody UpdateCommentRequest request) {
         Comment comment = boardService.updateComment(id, request);
 
         return ResponseEntity.ok()
@@ -114,7 +113,7 @@ public class BoardApiController {
 
     // 댓글 추천수 +1
     @PutMapping("/api/comment-recommend/{id}")
-    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id, @RequestPart RecommendCommentRequest request) {
+    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id, @RequestBody RecommendCommentRequest request) {
         Comment comment = boardService.updateCommentRecommend(id, request);
 
         return ResponseEntity.ok()

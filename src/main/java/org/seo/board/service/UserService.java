@@ -1,6 +1,7 @@
 package org.seo.board.service;
 
 import lombok.RequiredArgsConstructor;
+import org.seo.board.domain.UserRole;
 import org.seo.board.dto.AddUserRequest;
 import org.seo.board.repository.UserRepository;
 import org.seo.board.domain.User;
@@ -13,12 +14,14 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public Long save(AddUserRequest dto) {
+    public Long save(AddUserRequest request) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         return userRepository.save(User.builder()
-                .email(dto.getEmail())
-                .password(encoder.encode(dto.getPassword()))
+                .email(request.getEmail())
+                .password(encoder.encode(request.getPassword()))
+                .username(request.getUsername())
+                .role(UserRole.USER)
                 .build()).getId();
     }
 

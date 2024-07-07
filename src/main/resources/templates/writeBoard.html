@@ -17,7 +17,7 @@
         <header>
             <input type="text" placeholder="제목" id="title" th:value="${board.title}">
         </header>
-        <div>
+        <div th:if="${board.id} == null">
             <input type="file" id="files" accept="image/jpeg, image/png, image/gif" multiple>
         </div>
         <section>
