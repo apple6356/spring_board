@@ -9,11 +9,16 @@
 <h1>내 정보</h1>
 
 <div>
+    <input type="hidden" id="user-id" th:value="${user.id}">
     <p th:text="'이메일 : ' + ${user.email}"></p>
     <p th:text="'이름 : ' + ${user.username}"></p>
 </div>
 
+<input type="text" id="update-username" placeholder="이름 수정"><button type="button" id="update-user-btn">수정</button>
+
+
 <script src="/js/token.js"></script>
+<script src="/js/user.js"></script>
 
 </body>
 </html>

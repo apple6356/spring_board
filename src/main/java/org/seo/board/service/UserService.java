@@ -3,6 +3,7 @@ package org.seo.board.service;
 import lombok.RequiredArgsConstructor;
 import org.seo.board.domain.UserRole;
 import org.seo.board.dto.AddUserRequest;
+import org.seo.board.dto.UpdateUserRequest;
 import org.seo.board.repository.UserRepository;
 import org.seo.board.domain.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,5 +34,16 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+    }
+
+    // user 정보 변경
+    public User update(Long id, UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Unexpected user"));
+
+        user.update(request.getUsername());
+        userRepository.save(user);
+
+        return user;
     }
 }
