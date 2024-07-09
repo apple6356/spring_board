@@ -22,11 +22,18 @@
     </ul>
 
     <div>
-        <button type="button" onclick="location.href='/login'">로그인</button>
-<!--        <button type="button" onclick="location.href='/oauthLogin'">구글 로그인</button>-->
-        <button type="button" onclick="location.href='/logout'">로그아웃</button>
+        <div th:if="${isLogin} == true">
+            <a href="/info">내 정보</a>
+            <button type="button" onclick="location.href='/logout'">로그아웃</button>
+            <!--            <button type="button" onclick="">회원탈퇴</button>-->
+        </div>
+        <div th:if="${isLogin} == false">
+            <button type="button" onclick="location.href='/login'">로그인</button>
+        </div>
     </div>
 </nav>
+
+<hr>
 
 <div>
     <button type="button" id="create-btn" th:onclick="|location.href='@{/write-board}'|">작성</button>

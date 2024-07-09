@@ -18,30 +18,42 @@
     </ul>
 
     <div>
-        <button type="button" onclick="location.href='/login'">로그인</button>
-<!--        <button type="button" onclick="location.href='/oauthLogin'">구글 로그인</button>-->
-        <button type="button" onclick="location.href='/logout'">로그아웃</button>
+        <div th:if="${isLogin} == true">
+            <a href="/info">내 정보</a>
+            <button type="button" onclick="location.href='/logout'">로그아웃</button>
+            <!--            <button type="button" onclick="">회원탈퇴</button>-->
+        </div>
+        <div th:if="${isLogin} == false">
+            <button type="button" onclick="location.href='/login'">로그인</button>
+        </div>
     </div>
 </nav>
+
+<hr>
 
 <div>
     <article>
         <input type="hidden" id="board-id" th:value="${board.id}">
+
         <header>
             <h2 th:text="${board.title}"></h2>
             <div th:text="|작성자 : ${board.author}, 작성 시간 ${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
             <span th:text="${board.hits}"></span>
         </header>
+
         <section>
             <div th:each="image: ${board.files}">
                 <!-- webconfig -->
-                <img th:src="@{'/files/' + ${image.storedFileName}}" th:alt="${image.originalFileName}" width="500">
+                <img th:src="@{'/files/' + ${image.storedFileName}}" th:alt="${image.originalFileName}" width="450">
             </div>
             <p th:text="${board.content}"></p>
         </section>
-        <button type="button" id="modify-btn"
-                th:onclick="|location.href='@{/write-board?id={boardId}(boardId=${board.id})}'|">수정</button>
-        <button type="button" id="delete-btn">삭제</button>
+
+        <div th:if="${user.email} == ${board.author}">
+            <button type="button" id="modify-btn"
+                    th:onclick="|location.href='@{/write-board?id={boardId}(boardId=${board.id})}'|">수정</button>
+            <button type="button" id="delete-btn">삭제</button>
+        </div>
     </article>
 
     <div>
@@ -80,8 +92,10 @@
                 <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
                 <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
                 <!-- this 로 태그 정보 넘김 -->
-                <button type="button" th:id="'modify-comment-btn-' + ${comment.id}" th:onclick="commentModify([[${comment.id}]], this)">수정</button>
-                <button type="button" th:id="'delete-comment-btn-' + ${comment.id}" th:onclick="commentDelete([[${comment.id}]])">삭제</button>
+                <div th:if="${user.email} == ${board.author}">
+                    <button type="button" th:id="'modify-comment-btn-' + ${comment.id}" th:onclick="commentModify([[${comment.id}]], this)">수정</button>
+                    <button type="button" th:id="'delete-comment-btn-' + ${comment.id}" th:onclick="commentDelete([[${comment.id}]])">삭제</button>
+                </div>
             </div>
         </div>
     </section>

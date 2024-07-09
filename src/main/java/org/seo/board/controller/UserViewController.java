@@ -31,12 +31,13 @@ public class UserViewController {
     @GetMapping("/info")
     public String info(Model model, @AuthenticationPrincipal Object principal) {
 
-        if (principal == null) {
-            System.out.println("principal is null");
+        // 비로그인 시 principal은 null이 아닌 anonymousUser로 출력, class는 string
+        if (principal.equals("anonymousUser")) {
+            System.out.println("principal is anonymousUser");
             return "redirect:/login";
         }
 
-        String email = null;
+        String email = "";
 
         // principal의 객체타입이 UserDetails인지 확인
         if (principal instanceof UserDetails) {

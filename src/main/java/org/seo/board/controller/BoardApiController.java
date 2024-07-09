@@ -3,10 +3,15 @@ package org.seo.board.controller;
 import lombok.RequiredArgsConstructor;
 import org.seo.board.domain.Board;
 import org.seo.board.domain.Comment;
+import org.seo.board.domain.User;
 import org.seo.board.dto.*;
 import org.seo.board.service.BoardService;
+import org.seo.board.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,14 +25,25 @@ import java.util.List;
 public class BoardApiController {
 
     private final BoardService boardService;
+    private final UserService userService;
 
     // 글 작성(저장)
     @PostMapping("/api/boards")
     public ResponseEntity<Board> addBoard(@RequestPart(value = "board") @Validated AddBoardRequest request,
                                           @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles,
-                                          Principal principal) throws IOException {
+                                          @AuthenticationPrincipal Object principal) throws IOException {
 
-        Board board = boardService.save(request, principal.getName(), multipartFiles);
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        User user = userService.findByEmail(email);
+
+        Board board = boardService.save(request, user.getUsername(), multipartFiles);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(board);
