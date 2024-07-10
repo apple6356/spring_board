@@ -43,4 +43,14 @@ public class UserApiController {
                 .body(user);
     }
 
+    // username 중복 확인
+    @GetMapping("/api/check")
+    public ResponseEntity<Boolean> nameCheck(@RequestParam("username") String username) {
+        System.out.println("username = " + username);
+        boolean check = userService.existsByUsername(username);
+        System.out.println("check = " + check);
+
+        return ResponseEntity.ok(check);
+    }
+
 }
