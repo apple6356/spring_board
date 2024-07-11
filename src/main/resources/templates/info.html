@@ -34,8 +34,10 @@
 <div>
     <input type="hidden" id="user-id" th:value="${user.id}">
     <p th:text="'이메일 : ' + ${user.email}"></p>
-    <p th:text="'이름 : ' + ${user.username}"></p>
+    <p id="user-name" th:text="'이름 : ' + ${user.username}"></p>
 </div>
+
+<button type="button" id="delete-user-btn">회원 탈퇴</button>
 
 <div>
     <input type="text" id="username" placeholder="이름 수정">

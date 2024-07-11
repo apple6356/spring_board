@@ -53,4 +53,12 @@ public class UserApiController {
         return ResponseEntity.ok(check);
     }
 
+    // 회원 탈퇴
+    @DeleteMapping("/api/user/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+        userService.delete(id);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

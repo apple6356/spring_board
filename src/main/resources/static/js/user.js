@@ -33,8 +33,8 @@ function httpRequest(method, url, body, success, fail) {
     })
     .then((response) => {
         if (response.status === 200 || response.status === 201) {
-//            return success(response);
-            return response.json().then(data => success(data));
+            return success(response);
+//            return response.json().then(data => success(data));
         }
         const refresh_token = getCookie("refresh_token");
         if (response.status === 401 && refresh_token) {
@@ -117,6 +117,28 @@ if (nameCheckButton) {
                 alert("오류 발생");
             }
         });
+
+    });
+}
+
+// 회원 탈퇴
+const deleteUserButton = document.getElementById("delete-user-btn");
+
+if (deleteUserButton) {
+    deleteUserButton.addEventListener('click', event => {
+        let id = document.getElementById("user-id").value;
+
+        function success() {
+            alert("삭제 완료");
+            location.replace("/logout");
+        }
+
+        function fail() {
+            alert("삭제 실패");
+            location.replace("/main");
+        }
+
+        httpRequest("DELETE", "/api/user/" + id, null, success, fail);
 
     });
 }

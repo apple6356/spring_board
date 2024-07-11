@@ -58,7 +58,19 @@ public class UserService {
         return user;
     }
 
+    // username 중복 확인
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public void delete(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Unexpected User"));
+
+        boardRepository.deleteByAuthor(user.getUsername());
+        commentRepository.deleteByAuthor(user.getUsername());
+        userRepository.delete(user);
     }
 }

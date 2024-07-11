@@ -39,4 +39,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query(value = "update Board b set b.author=:newName where b.author=:oldName")
     void updateUsername(@Param("oldName") String oldName, @Param("newName") String newName);
 
+    // 회원 탈퇴 시 작성한 글 삭제
+    void deleteByAuthor(String username);
+
 }

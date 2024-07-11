@@ -16,4 +16,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // 작성한 댓글 목록
     Page<Comment> findByAuthorLike(String username, Pageable pageable);
+
+    // 회원 탈퇴 시 작성한 댓글 삭제
+    void deleteByAuthor(String username);
 }
