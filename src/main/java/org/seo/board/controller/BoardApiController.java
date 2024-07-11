@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.List;
 
 @RestController // @Controller + @ResponseBody 가 합쳐진 형태로 JSON 형태의 객체 데이터를 반환
@@ -102,8 +101,19 @@ public class BoardApiController {
 
     // 댓글 생성
     @PostMapping("/api/comments")
-    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request, Principal principal) {
-        Comment savedComment = boardService.addComment(request, principal.getName());
+    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request, @AuthenticationPrincipal Object principal) {
+
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        User user = userService.findByEmail(email);
+
+        Comment savedComment = boardService.addComment(request, user.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new AddCommentResponse(savedComment));

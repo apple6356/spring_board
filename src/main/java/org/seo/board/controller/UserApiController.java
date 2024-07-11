@@ -44,7 +44,7 @@ public class UserApiController {
     }
 
     // username 중복 확인
-    @GetMapping("/api/check")
+    @GetMapping("/check")
     public ResponseEntity<Boolean> nameCheck(@RequestParam("username") String username) {
         System.out.println("username = " + username);
         boolean check = userService.existsByUsername(username);

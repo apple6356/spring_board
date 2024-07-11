@@ -101,9 +101,10 @@ if (nameCheckButton) {
 
         $.ajax({
             type: "GET",
-            url: "/api/check", // 요청 url
+            url: "/check", // 요청 url
             data: { username: username }, // 보낼 데이터
             success: function(data) {
+                console.log("data : " + data)
                 if (data) {
                     document.getElementById('check-result').textContent = "중복입니다.";
                     document.getElementById('check-result').style.color = "red";
@@ -116,22 +117,6 @@ if (nameCheckButton) {
                 alert("오류 발생");
             }
         });
-
-//        function success(data) {
-//            if (data) {
-//                alert("사용 가능합니다.");
-//                document.getElementById('check-result').textContent = "사용 가능합니다.";
-//            } else {
-//                alert("중복입니다.");
-//                document.getElementById('check-result').textContent = "중복입니다.";
-//            }
-//         }
-//
-//         function fail(error) {
-//            alert("오류 발생");
-//         }
-//
-//         httpRequest("GET", "/api/check/" + username, null, success, fail);
 
     });
 }

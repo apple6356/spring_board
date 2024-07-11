@@ -49,7 +49,7 @@
             <p th:text="${board.content}"></p>
         </section>
 
-        <div th:if="${user.email} == ${board.author}">
+        <div th:if="${user.username} == ${board.author}">
             <button type="button" id="modify-btn"
                     th:onclick="|location.href='@{/write-board?id={boardId}(boardId=${board.id})}'|">수정</button>
             <button type="button" id="delete-btn">삭제</button>
@@ -92,10 +92,8 @@
                 <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
                 <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
                 <!-- this 로 태그 정보 넘김 -->
-                <div th:if="${user.email} == ${board.author}">
-                    <button type="button" th:id="'modify-comment-btn-' + ${comment.id}" th:onclick="commentModify([[${comment.id}]], this)">수정</button>
-                    <button type="button" th:id="'delete-comment-btn-' + ${comment.id}" th:onclick="commentDelete([[${comment.id}]])">삭제</button>
-                </div>
+                <button th:if="${user.username} == ${board.author}" type="button" th:id="'modify-comment-btn-' + ${comment.id}" th:onclick="commentModify([[${comment.id}]], this)">수정</button>
+                <button th:if="${user.username} == ${board.author}" type="button" th:id="'delete-comment-btn-' + ${comment.id}" th:onclick="commentDelete([[${comment.id}]])">삭제</button>
             </div>
         </div>
     </section>

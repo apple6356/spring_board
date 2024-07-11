@@ -6,6 +6,7 @@ import org.seo.board.domain.UserRole;
 import org.seo.board.dto.AddUserRequest;
 import org.seo.board.dto.UpdateUserRequest;
 import org.seo.board.repository.BoardRepository;
+import org.seo.board.repository.CommentRepository;
 import org.seo.board.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
 
     public Long save(AddUserRequest request) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -51,6 +53,7 @@ public class UserService {
         userRepository.save(user);
 
         boardRepository.updateUsername(oldName, request.getUsername());
+        commentRepository.updateUsername(oldName, request.getUsername());
 
         return user;
     }
