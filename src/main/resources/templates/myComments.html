@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>작성 댓글</title>
+</head>
+<body>
+
+<nav id="navbar">
+    <span onclick="location.href='/main'">메인</span>
+    <ul id="menu">
+        <li><span>게시판</span>
+            <ul>
+                <li onclick="location.href='/popularBoards'">인기 게시판</li>
+                <li onclick="location.href='/boards'">자유 게시판</li>
+            </ul>
+        </li>
+    </ul>
+
+    <div>
+        <div th:if="${isLogin} == true">
+            <a href="/info">내 정보</a>
+            <button type="button" onclick="location.href='/logout'">로그아웃</button>
+            <!--            <button type="button" onclick="">회원탈퇴</button>-->
+        </div>
+        <div th:if="${isLogin} == false">
+            <button type="button" onclick="location.href='/login'">로그인</button>
+        </div>
+    </div>
+</nav>
+
+<div th:each="item : ${commentList}">
+    <input type="hidden" id="comment-id" th:value="${item.id}">
+    <div th:onclick="|location.href='@{/boards/{id}(id=${item.boardId})}'|">
+        <span th:text="${item.boardTitle}"></span>
+        <br>
+        <span th:text="${item.content}"></span>
+        <span th:text="${item.author}"></span>
+        <span th:text="${item.recommend}"></span>
+        <span th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+        <hr>
+    </div>
+</div>
+
+<div>
+    <!-- 첫번째 페이지로 이동 -->
+    <a th:href="@{/myComments(username=${username}, page=1)}">First</a>
+
+    <!-- 이전 페이지로 이동 (14 -> 10) -->
+    <span>
+        <a th:if="${prev > 1}" th:href="@{/myComments(username=${username}, page=${prev})}">prev</a>
+        <span th:if="${prev < 1}">prev</span>
+    </span>
+
+    <!-- 페이지 번호 링크(현재 페이지는 숫자만) for(int page=startPage; page<=endPage; page++)-->
+    <span th:each="page: ${#numbers.sequence(startPage, endPage)}">
+        <!-- 현재페이지는 링크 없이 숫자만 -->
+        <span th:if="${page == commentList.number + 1}" th:text="${page}" style="color: red"></span>
+        <!-- 현재페이지 번호가 아닌 다른 페이지번호에는 링크를 보여줌 -->
+        <span th:unless="${page == commentList.number + 1}">
+            <a th:href="@{/myComments(username=${username}, page=${page})}" th:text="${page}"></a>
+        </span>
+    </span>
+
+    <span>
+        <a th:if="${next <= commentList.totalPages}" th:href="@{/myComments(username=${username}, page=${next})}">next</a>
+        <span th:if="${next > commentList.totalPages}">next</span>
+    </span>
+
+    <!-- 마지막 페이지로 이동 -->
+    <a th:href="@{/myComments(username=${username}, page=${commentList.totalPages})}">Last</a>
+</div>
+
+</body>
+</html>

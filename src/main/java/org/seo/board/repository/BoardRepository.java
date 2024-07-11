@@ -31,6 +31,9 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 검색
     Page<Board> findByTitleContains(String keyword, Pageable pageable);
 
+    // 본인니 작성한 글
+    Page<Board> findByAuthorLike(String username, Pageable pageable);
+
     // username 변경 시 기존 작성했던 글의 author 변경
     @Modifying
     @Query(value = "update Board b set b.author=:newName where b.author=:oldName")

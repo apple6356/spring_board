@@ -131,6 +131,31 @@ public class BoardService {
         return boardList;
     }
 
+
+    // 자신이 작성한 글 목록
+    public Page<BoardListViewResponse> myBoards(Pageable pageable, String username) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        Page<Board> boardPage = boardRepository.findByAuthorLike(username, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<BoardListViewResponse>  boardList = boardPage.map(BoardListViewResponse::new);
+
+        return boardList;
+    }
+
+    // 자신이 작성한 댓글 목록
+    public Page<CommentListViewResponse> myComments(Pageable pageable, String username) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        Page<Comment> commentPage = commentRepository.findByAuthorLike(username, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+
+        Page<CommentListViewResponse>  commentList = commentPage.map(CommentListViewResponse::new);
+
+        return commentList;
+    }
+
     // 게시글을 작성한 유저인지 확인
     private static void authorizeBoardAuthor(Board board) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -197,6 +222,5 @@ public class BoardService {
 
         return comment;
     }
-
 
 }
