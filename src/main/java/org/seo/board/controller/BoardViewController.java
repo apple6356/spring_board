@@ -93,11 +93,13 @@ public class BoardViewController {
         }
 
         // 본인이면 게시글을 수정, 삭제 할 수 있게
-        User user = userService.findByEmail(email);
+        if (isLogin) {
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
 
         model.addAttribute("board", new BoardViewResponse(board));
         model.addAttribute("isLogin", isLogin);
-        model.addAttribute("user", user);
 
         return "board";
     }

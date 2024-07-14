@@ -72,19 +72,26 @@ const deleteButton = document.getElementById('delete-btn');
 
 if (deleteButton) {
     deleteButton.addEventListener('click', event => {
-        let id = document.getElementById('board-id').value;
 
-        function success() {
-            alert("삭제 완료");
-            location.replace("/boards");
+        if (confirm("삭제 후 복구할 수 없습니다.\n 정말 삭제하시겠습니까?")) {
+            let id = document.getElementById('board-id').value;
+
+            function success() {
+                alert("삭제 완료");
+                location.replace("/boards");
+            }
+
+            function fail() {
+                alert("삭제 실패");
+                location.replace("/boards");
+            }
+
+            httpRequest("DELETE", "/api/boards/" + id, null, false, success, fail);
+        } else {
+            return;
         }
 
-        function fail() {
-            alert("삭제 실패");
-            location.replace("/boards");
-        }
 
-        httpRequest("DELETE", "/api/boards/" + id, null, false, success, fail);
     });
 }
 
@@ -205,6 +212,7 @@ if (recommendButton) {
         }
 
         httpRequest("PUT", "/api/recommend/" + id, null, false, success, fail);
+
     });
 }
 
@@ -243,6 +251,7 @@ if (commentCreateButton) {
         };
 
         httpRequest('POST', '/api/comments', body, false, success, fail);
+
     });
 }
 
@@ -291,22 +300,29 @@ function updateComment(commentId, commentContent, button) {
     }
 
     httpRequest("PUT", "/api/comments/" + commentId, body, false, success, fail);
+
 }
 
 // 댓글 삭제
 function commentDelete(commentId) {
-    let boardId = document.getElementById('board-id').value; // board 의 id 저장
 
-    function success() {
-        alert("삭제 완료");
-        location.replace("/boards/" + boardId);
-    }
-    function fail() {
-        alert("삭제 실패");
-        location.replace("/boards/" + boardId);
+    if (confirm("삭제 후 복구할 수 없습니다. \n 정말 삭제하시겠습니까?")) {
+        let boardId = document.getElementById('board-id').value; // board 의 id 저장
+
+        function success() {
+            alert("삭제 완료");
+            location.replace("/boards/" + boardId);
+        }
+        function fail() {
+            alert("삭제 실패");
+            location.replace("/boards/" + boardId);
+        }
+
+        httpRequest("DELETE", "/api/comments/" + commentId, null, false, success, fail);
+    } else {
+        return;
     }
 
-    httpRequest("DELETE", "/api/comments/" + commentId, null, false, success, fail);
 }
 
 // 댓글 추천+1
@@ -334,6 +350,7 @@ function commentRecommend(commentId) {
     }
 
     httpRequest("PUT", "/api/comment-recommend/" + commentId, body, false, success, fail);
+
 }
 
 

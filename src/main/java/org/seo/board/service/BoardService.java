@@ -3,6 +3,7 @@ package org.seo.board.service;
 import lombok.RequiredArgsConstructor;
 import org.seo.board.config.error.exception.BoardNotFoundException;
 import org.seo.board.domain.Board;
+import org.seo.board.domain.BoardFile;
 import org.seo.board.domain.Comment;
 import org.seo.board.dto.*;
 import org.seo.board.repository.BoardRepository;
@@ -12,13 +13,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,18 +33,23 @@ public class BoardService {
     private final FileRepository fileRepository;
 
     // 글 작성(저장)
-    public Board save(AddBoardRequest request, String userName, List<MultipartFile> multipartFiles) throws IOException {
+    public Board save(AddBoardRequest request, String userName, List<MultipartFile> multipartFiles) throws Exception {
         Board board = boardRepository.save(request.toEntity(userName));
         AddBoardFileRequest fileRequest = new AddBoardFileRequest();
+
+        String dirPath = "D:/files/" + board.getId();
+        Path path = Paths.get(dirPath);
+        Files.createDirectory(path);
 
         if (multipartFiles != null) {
             for (MultipartFile multipartFile : multipartFiles) {
                 String originalFileName = multipartFile.getOriginalFilename();
                 String storedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
-                String savePath = "D:/files/" + storedFileName; // 파일 저장 경로
+                String savePath = dirPath + "/" + storedFileName; // 파일 저장 경로
+
                 multipartFile.transferTo(new File(savePath)); // 경로에 파일 저장
 
-                fileRepository.save(fileRequest.toEntity(board, originalFileName, storedFileName));
+                fileRepository.save(fileRequest.toEntity(board, originalFileName, storedFileName, dirPath));
             }
         }
 
@@ -71,6 +78,15 @@ public class BoardService {
 //                .orElseThrow(IllegalArgumentException("not found : " + id));
     }
 
+    // 게시글을 작성한 유저인지 확인
+//    private static void authorizeBoardAuthor(Board board) {
+//        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+//
+//        if (!board.getAuthor().equals(userName)) {
+//            throw new IllegalArgumentException("not authorized");
+//        }
+//    }
+
     // 글 삭제
     public void delete(Long id) {
 //        boardRepository.deleteById(id);
@@ -78,7 +94,25 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
 
-        authorizeBoardAuthor(board);
+        if (board.getFiles() != null) { // 게시글의 파일과 폴더 삭제
+            List<BoardFile> boardFiles = board.getFiles();
+
+            for (BoardFile boardFile : boardFiles) {
+                File folder = new File(boardFile.getFilePath());
+
+                while (folder.exists()) { // 폴더가 있는지 확인
+                    File[] files = folder.listFiles();
+
+                    for (File file : files) { // 폴더 내 파일 삭제
+                        file.delete();
+                    }
+
+                    folder.delete(); // 폴더 삭제
+                }
+            }
+        }
+
+//        authorizeBoardAuthor(board);
         boardRepository.delete(board);
     }
 
@@ -88,7 +122,7 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found" + id));
 
-        authorizeBoardAuthor(board); // 추가
+//        authorizeBoardAuthor(board); // 추가
         board.update(request.getTitle(), request.getContent());
 
         return board;
@@ -154,15 +188,6 @@ public class BoardService {
         Page<CommentListViewResponse>  commentList = commentPage.map(CommentListViewResponse::new);
 
         return commentList;
-    }
-
-    // 게시글을 작성한 유저인지 확인
-    private static void authorizeBoardAuthor(Board board) {
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (!board.getAuthor().equals(userName)) {
-            throw new IllegalArgumentException("not authorized");
-        }
     }
 
 

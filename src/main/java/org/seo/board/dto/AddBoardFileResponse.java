@@ -13,10 +13,12 @@ public class AddBoardFileResponse {
     private Long id;
     private String originalFileName;
     private String storedFileName;
+    private String filePath;
 
     public AddBoardFileResponse(BoardFile boardFile) {
         this.id = boardFile.getId();
         this.originalFileName = boardFile.getOriginalFileName();
         this.storedFileName = boardFile.getStoredFileName();
+        this.filePath = boardFile.getFilePath();
     }
 }

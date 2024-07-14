@@ -21,13 +21,17 @@ public class BoardFile {
     @Column(name = "stored_file_name")
     private String storedFileName;
 
+    @Column(name="file_path")
+    private String filePath;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Board board;
 
     @Builder
-    public BoardFile(Board board, String originalFileName, String storedFileName) {
+    public BoardFile(Board board, String originalFileName, String storedFileName, String filePath) {
         this.board = board;
         this.originalFileName = originalFileName;
         this.storedFileName = storedFileName;
+        this.filePath = filePath;
     }
 }

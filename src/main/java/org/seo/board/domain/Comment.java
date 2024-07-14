@@ -1,5 +1,6 @@
 package org.seo.board.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,6 +36,7 @@ public class Comment {
     private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY) // 다 대 일
+    @JsonBackReference // 역직렬화 시 사용되며, 주로 자식 엔티티에 적용, 무한루프 방지
     private Board board;
 
     @Builder

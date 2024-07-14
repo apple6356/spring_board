@@ -16,7 +16,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController // @Controller + @ResponseBody 가 합쳐진 형태로 JSON 형태의 객체 데이터를 반환
@@ -30,7 +29,7 @@ public class BoardApiController {
     @PostMapping("/api/boards")
     public ResponseEntity<Board> addBoard(@RequestPart(value = "board") @Validated AddBoardRequest request,
                                           @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles,
-                                          @AuthenticationPrincipal Object principal) throws IOException {
+                                          @AuthenticationPrincipal Object principal) throws Exception {
 
         String email = "";
 

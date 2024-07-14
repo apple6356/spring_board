@@ -126,6 +126,7 @@ const deleteUserButton = document.getElementById("delete-user-btn");
 
 if (deleteUserButton) {
     deleteUserButton.addEventListener('click', event => {
+
         let id = document.getElementById("user-id").value;
 
         function success() {

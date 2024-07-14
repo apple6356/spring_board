@@ -1,5 +1,6 @@
 package org.seo.board.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -49,6 +50,7 @@ public class Board {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY) // 일 대 다, cascade 글(부모) 삭제되면 댓글(자식)도 삭제
+    @JsonManagedReference // 직렬화 시 사용되며, 주로 부모 엔티티에 적용, 무한루프 방지
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
