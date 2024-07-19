@@ -16,7 +16,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController // @Controller + @ResponseBody 가 합쳐진 형태로 JSON 형태의 객체 데이터를 반환
 @RequiredArgsConstructor // final 필드에 대한 생성자를 자동으로 생성해줌
@@ -27,9 +34,20 @@ public class BoardApiController {
 
     // 글 작성(저장)
     @PostMapping("/api/boards")
-    public ResponseEntity<Board> addBoard(@RequestPart(value = "board") @Validated AddBoardRequest request,
-                                          @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles,
-                                          @AuthenticationPrincipal Object principal) throws Exception {
+    public ResponseEntity<?> addBoard(@RequestBody @Validated AddBoardRequest request,
+//                                      @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles,
+                                      @AuthenticationPrincipal Object principal) throws Exception {
+
+        // 이미지 파일만 업로드 가능하게
+//        if (multipartFiles != null) {
+//            for (MultipartFile multipartFile : multipartFiles) {
+//                System.out.println("multipartFile.getContentType() = " + multipartFile.getContentType());
+//                if (!multipartFile.getContentType().startsWith("image")) {
+//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                            .body("이미지 파일만 가능");
+//                }
+//            }
+//        }
 
         String email = "";
 
@@ -41,10 +59,45 @@ public class BoardApiController {
 
         User user = userService.findByEmail(email);
 
-        Board board = boardService.save(request, user.getUsername(), multipartFiles);
+        Board board = boardService.save(request, user.getUsername());
+
+        // 이미지를 임시 저장소에서 각 게시글 저장소로 이동
+        boardService.imageUpload(board.getId(), request.getContent());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(board);
+    }
+
+    // 이미지 업로드
+    @PostMapping("/api/image-upload")
+    public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) throws Exception {
+
+        if (file.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 파일입니다.");
+        }
+
+        if (!file.getContentType().startsWith("image")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 파일만 업로드 가능합니다.");
+        }
+
+        String tempDir = "/files/temp";
+        Path tempPath = Paths.get(tempDir);
+        if (!Files.exists(tempPath)) {
+            Files.createDirectories(tempPath);
+        }
+
+        String originalFileName = file.getOriginalFilename();
+        String storedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
+
+        Path filePath = tempPath.resolve(storedFileName);
+        Files.write(filePath, file.getBytes());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("url", tempDir + "/" + storedFileName);
+
+        System.out.println("response = " + response);
+
+        return ResponseEntity.ok(response);
     }
 
     // 글 전체 조회
@@ -80,8 +133,11 @@ public class BoardApiController {
     // 글 수정
     @PutMapping("/api/boards/{id}")
     public ResponseEntity<Board> updateBoard(@PathVariable("id") Long id,
-                                             @RequestBody UpdateBoardRequest request) {
+                                             @RequestBody UpdateBoardRequest request) throws IOException {
         Board board = boardService.update(id, request);
+
+        // 이미지를 임시 저장소에서 각 게시글 저장소로 이동
+        boardService.imageUpload(board.getId(), request.getContent());
 
         return ResponseEntity.ok()
                 .body(board);

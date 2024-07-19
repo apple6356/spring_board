@@ -15,14 +15,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor // final이나 @NotNull인 필드의 생성자 추가
 @Service
@@ -33,27 +35,90 @@ public class BoardService {
     private final FileRepository fileRepository;
 
     // 글 작성(저장)
-    public Board save(AddBoardRequest request, String userName, List<MultipartFile> multipartFiles) throws Exception {
+    public Board save(AddBoardRequest request, String userName) throws Exception {
         Board board = boardRepository.save(request.toEntity(userName));
+
+//        AddBoardFileRequest fileRequest = new AddBoardFileRequest();
+//
+//        String dirPath = "D:/files/" + board.getId();
+//        Path path = Paths.get(dirPath);
+//        Files.createDirectory(path);
+//
+//        if (multipartFiles != null) {
+//            for (MultipartFile multipartFile : multipartFiles) {
+//
+//                String originalFileName = multipartFile.getOriginalFilename();
+//                String storedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
+//                String savePath = dirPath + "/" + storedFileName; // 파일 저장 경로
+//
+//                multipartFile.transferTo(new File(savePath)); // 경로에 파일 저장
+//
+//                fileRepository.save(fileRequest.toEntity(board, originalFileName, storedFileName, dirPath));
+//            }
+//        }
+
+        return board;
+    }
+
+    // 이미지를 임시 저장 폴더에서 최종 저장 폴더로 이동
+    @Transactional
+    public void imageUpload(Long id, String content) throws IOException {
+        System.out.println("imageUpload");
+        System.out.println("content = " + content);
+
         AddBoardFileRequest fileRequest = new AddBoardFileRequest();
 
-        String dirPath = "D:/files/" + board.getId();
-        Path path = Paths.get(dirPath);
-        Files.createDirectory(path);
+        Board board = boardRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
 
-        if (multipartFiles != null) {
-            for (MultipartFile multipartFile : multipartFiles) {
-                String originalFileName = multipartFile.getOriginalFilename();
-                String storedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
-                String savePath = dirPath + "/" + storedFileName; // 파일 저장 경로
+        String targetDir = "/files/" + id;
 
-                multipartFile.transferTo(new File(savePath)); // 경로에 파일 저장
+        // 정규식 패턴
+        String imgTagPattern = "<img[^>]+src=\"([^\"]+)\"";
+        Pattern pattern = Pattern.compile(imgTagPattern);
+        Matcher matcher = pattern.matcher(content);
 
-                fileRepository.save(fileRequest.toEntity(board, originalFileName, storedFileName, dirPath));
+        System.out.println("pattern = " + pattern);
+        System.out.println("matcher = " + matcher);
+
+        // 패턴이 일치하는 다음 문자열이 있으면 루프
+        while (matcher.find()) {
+            String src = matcher.group(1);
+            System.out.println("src = " + src);
+
+            // 파일 이름 추출
+            String filename = src.substring(src.lastIndexOf("/") + 1);
+            System.out.println("filename = " + filename);
+
+            if (src.contains("/files/temp/")) {
+                moveFileDirectory(id, filename);
+
+                String originalFilename = filename.substring(filename.indexOf("_") + 1);
+                System.out.println("originalFilename = " + originalFilename);
+
+                fileRepository.save(fileRequest.toEntity(board, originalFilename, filename, targetDir));
             }
         }
 
-        return board;
+        String updateContent = content.replaceAll("/files/temp/", "/files/" + id + "/");
+
+        boardRepository.updateContent(id, updateContent);
+    }
+
+    // 실제 파일 이동
+    public void moveFileDirectory(Long id, String filename) throws IOException {
+        Path tempFilePath = Paths.get("/files/temp/", filename); // 임시 폴더
+        Path boardDirPath = Paths.get("/files/" + id); // 이동할 폴더
+
+        // 해당 디렉토리가 존재하지 않으면 생성
+        if (!Files.exists(boardDirPath)) {
+            Files.createDirectories(boardDirPath);
+        }
+
+        Path targetFilePath = boardDirPath.resolve(filename);
+
+        // StandardCopyOption.REPLACE_EXISTING : 이미 파일이 존재한다면 대체
+        Files.move(tempFilePath, targetFilePath, StandardCopyOption.REPLACE_EXISTING); // 파일 저장
     }
 
     // 글 전체 조회

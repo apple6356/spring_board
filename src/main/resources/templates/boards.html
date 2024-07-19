@@ -43,7 +43,7 @@
     <input type="hidden" id="board-id" th:value="${item.id}">
     <div th:onclick="|location.href='@{/boards/{id}(id=${item.id})}'|">
         <span th:text="${item.title}"></span>
-        <span th:text="${item.content}"></span>
+<!--        <span th:text="${item.content}"></span>-->
         <span th:text="${item.author}"></span>
         <span th:text="${item.hits}"></span>
         <span th:text="${item.recommend}"></span>

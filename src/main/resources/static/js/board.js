@@ -5,7 +5,7 @@ function getCookie(key) {
     var cookie = document.cookie.split(";");
 
     cookie.some(function (item) {
-        item = item.replace(" ", "");
+        item = item.trim();
 
         var dic = item.split("=");
 
@@ -19,23 +19,15 @@ function getCookie(key) {
 }
 
 // Http 요청을 보내는 함수
-function httpRequest(method, url, body, isMultipart, success, fail) {
-    const headers = {
-        Authorization: "Bearer " + localStorage.getItem("access_token"),
-    };
-
-    if (isMultipart == false){
-        headers["Content-Type"] = "application/json";
-    }
-
+function httpRequest(method, url, body, success, fail) {
     fetch(url, {
         method: method,
-        headers: headers,
-//        headers : {
-//            // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
-//            Authorization: "Bearer " + localStorage.getItem("access_token"),
-////            "Content-Type": "application/json",
-//        },
+//        headers: headers,
+        headers : {
+            // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
+            Authorization: "Bearer " + localStorage.getItem("access_token"),
+            "Content-Type": "application/json",
+        },
         body: body,
     })
     .then((response) => {
@@ -60,38 +52,86 @@ function httpRequest(method, url, body, isMultipart, success, fail) {
                 localStorage.setItem("access_token", result.accessToken);
                 httpRequest(method, url, body, false, success, fail);
             })
-            .catch((error) => fail());
+            .catch((error) => fail(error.message));
         } else {
             return fail();
         }
     });
 }
 
-// 글 삭제
-const deleteButton = document.getElementById('delete-btn');
-
-if (deleteButton) {
-    deleteButton.addEventListener('click', event => {
-
-        if (confirm("삭제 후 복구할 수 없습니다.\n 정말 삭제하시겠습니까?")) {
-            let id = document.getElementById('board-id').value;
-
-            function success() {
-                alert("삭제 완료");
-                location.replace("/boards");
+// summernote editor
+$('#summernote').summernote({
+    // 에디터 크기 설정
+    height: 300,
+    // 한글 설정
+    lang: "ko-KR",
+    toolbar: [
+        // 글자 크기 설정
+        ['fontsize', ['fontsize']],
+        // 글자 [굵게, 기울임, 밑줄, 취소 선, 지우기]
+        ['style', ['bold', 'italic', 'underline','strikethrough', 'clear']],
+        // 서식 [글머리 기호, 번호매기기, 문단정렬]
+        ['para', ['ul', 'ol', 'paragraph']],
+        // 이미지 첨부
+        ['insert',['picture']]
+      ],
+      // 추가한 글꼴
+    fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New','맑은 고딕','궁서','굴림체','굴림','돋음체','바탕체'],
+     // 추가한 폰트사이즈
+    fontSizes: ['8','9','10','11','12','14','16','18','20','22','24','28','30','36','50','72','96'],
+    callbacks : {
+        onImageUpload : function(files, editor, welEditable) {
+            // 다중 이미지 처리를 위해 for 문 사용
+            for (var i = 0; i < files.length; i++) {
+                imageUploader(files[i]);
             }
+        }
+    }
+});
 
-            function fail() {
-                alert("삭제 실패");
-                location.replace("/boards");
-            }
+// summernote image upload
+function imageUploader(file) {
+    let formData = new FormData();
+    formData.append('file', file);
 
-            httpRequest("DELETE", "/api/boards/" + id, null, false, success, fail);
-        } else {
-            return;
+    $.ajax({
+        data: formData,
+        type: "POST",
+        url: "/api/image-upload",
+        contentType : false,
+        processData : false,
+        success: function(response) {
+            $('#summernote').summernote('insertImage', response.url);
+        },
+        error: function(response) {
+            alert("이미지 업로드 실패: " + response.responseText);
+        }
+    })
+}
+
+// 글 생성
+const createButton = document.getElementById('create-btn');
+
+if(createButton) {
+    createButton.addEventListener('click', event => {
+
+        body = JSON.stringify({
+            title: document.getElementById("title").value,
+            content: $('#summernote').summernote('code')
+//            content: document.getElementById("content").value
+        });
+
+        function success() {
+            alert("등록 완료");
+            location.replace("/boards");
         }
 
+        function fail(errorMessage) {
+            alert("등록 실패, " + errorMessage);
+//            location.replace("/boards");
+        }
 
+        httpRequest("POST", "/api/boards", body, success, fail);
     });
 }
 
@@ -105,27 +145,10 @@ if (modifyButton) {
         let params = new URLSearchParams(location.search);
         let id = params.get('id') // 주소창의 id 파라미터를 가져옴
 
-//        let formData = new FormData();
-//
-//        formData.append('board', new Blob([JSON.stringify({
-//            title: document.getElementById("title").value,
-//            content: document.getElementById("content").value
-//        })], { type: "application/json" }));
-
-//        let files = document.getElementById("files").files;
-//
-//        let isMultipart = true;
-//        if (files == null) {
-//            isMultipart = false;
-//        }
-//
-//        for(let i = 0; i < files.length; i++) {
-//            formData.append('files', files[i]);
-//        }
-
         body = JSON.stringify({
             title: document.getElementById("title").value,
-            content: document.getElementById("content").value,
+            content: $('#summernote').summernote('code')
+//            content: document.getElementById("content").value,
         });
 
         function success() {
@@ -135,62 +158,39 @@ if (modifyButton) {
 
         function fail() {
             alert("수정 실패");
-            location.replace("/boards/" + id);
+//            location.replace("/boards/" + id);
         }
 
-        httpRequest("PUT", "/api/boards/" + id, body, false, success, fail);
+        httpRequest("PUT", "/api/boards/" + id, body, success, fail);
     })
 }
 
-// 글 생성
-const createButton = document.getElementById('create-btn');
+// 글 삭제
+const deleteButton = document.getElementById('delete-btn');
 
-if(createButton) {
-    createButton.addEventListener('click', event => {
-        let formData = new FormData();
+if (deleteButton) {
+    console.log("delete btn start");
+    deleteButton.addEventListener('click', event => {
+        console.log("delete event start")
 
-        // JSON 데이터를 직렬화하여 Blob으로 만들어 FormData에 추가
-//        let boardData = {
-//            title: document.getElementById("title").value,
-//            content: document.getElementById("content").value
-//        };
-//
-//        formData.append('board', new Blob([JSON.stringify(boardData)], { type: "application/json" }));
+        if (confirm("삭제 후 복구할 수 없습니다.\n 정말 삭제하시겠습니까?")) {
+            let id = document.getElementById('board-id').value;
 
+            function success() {
+                alert("삭제 완료");
+                location.replace("/boards");
+            }
 
-        formData.append('board', new Blob([JSON.stringify({
-            title: document.getElementById("title").value,
-            content: document.getElementById("content").value
-        })], { type: "application/json" }));
-//
-//        formData.append('title', document.getElementById("title").value);
-//        formData.append('content', document.getElementById("content").value);
+            function fail() {
+                alert("삭제 실패");
+//                location.replace("/boards");
+            }
 
-        let files = document.getElementById("files").files;
-
-        let isMultipart = true;
-        if (files == null) {
-            isMultipart = false;
+            httpRequest("DELETE", "/api/boards/" + id, null, success, fail);
+        } else {
+            return;
         }
 
-        for(let i = 0; i < files.length; i++) {
-            formData.append('files', files[i]);
-        }
-
-//        body = JSON.stringify({
-//        });
-
-        function success() {
-            alert("등록 완료");
-            location.replace("/boards");
-        }
-
-        function fail() {
-            alert("등록 실패");
-            location.replace("/boards");
-        }
-
-        httpRequest("POST", "/api/boards", formData, isMultipart, success, fail);
     });
 }
 
@@ -211,7 +211,7 @@ if (recommendButton) {
             location.replace("/boards/" + id);
         }
 
-        httpRequest("PUT", "/api/recommend/" + id, null, false, success, fail);
+        httpRequest("PUT", "/api/recommend/" + id, null, success, fail);
 
     });
 }
@@ -222,19 +222,6 @@ const commentCreateButton = document.getElementById('comment-create-btn');
 if (commentCreateButton) {
     commentCreateButton.addEventListener('click', event => {
         boardId = document.getElementById('board-id').value;
-
-//        let formData = new FormData();
-//
-//        formData.append('comment', new Blob([JSON.stringify({
-//            boardId: boardId,
-//            content: document.getElementById('content').value
-//        })], { type: "application/json" }));
-//
-//        let files = document.getElementById("files").files;
-//
-//        for(let i = 0; i < files.length; i++) {
-//            formData.append('files', files[i]);
-//        }
 
         body = JSON.stringify({
             boardId: boardId,
@@ -250,7 +237,7 @@ if (commentCreateButton) {
             location.replace('/boards/' + boardId);
         };
 
-        httpRequest('POST', '/api/comments', body, false, success, fail);
+        httpRequest('POST', '/api/comments', body, success, fail);
 
     });
 }
@@ -279,12 +266,6 @@ function commentModify(commentId, button) {
 function updateComment(commentId, commentContent, button) {
     boardId = document.getElementById('board-id').value;
 
-//    let formData = new FormData();
-//
-//    formData.append('comment', new Blob([JSON.stringify({
-//        content: document.getElementById('content').value
-//    })], { type: "application/json" }));
-
     body = JSON.stringify({
         content: commentContent,
     });
@@ -299,7 +280,7 @@ function updateComment(commentId, commentContent, button) {
         location.replace("/boards/" + boardId);
     }
 
-    httpRequest("PUT", "/api/comments/" + commentId, body, false, success, fail);
+    httpRequest("PUT", "/api/comments/" + commentId, body, success, fail);
 
 }
 
@@ -318,7 +299,7 @@ function commentDelete(commentId) {
             location.replace("/boards/" + boardId);
         }
 
-        httpRequest("DELETE", "/api/comments/" + commentId, null, false, success, fail);
+        httpRequest("DELETE", "/api/comments/" + commentId, null, success, fail);
     } else {
         return;
     }
@@ -329,12 +310,6 @@ function commentDelete(commentId) {
 function commentRecommend(commentId) {
     let boardId = document.getElementById('board-id').value;
     let recommend = document.getElementById('comment-recommend-' + commentId).value;
-
-//    let formData = new FormData();
-//
-//    formData.append('comment', new Blob([JSON.stringify({
-//        recommend: recommend,
-//    })], { type: "application/json" }));
 
     body = JSON.stringify({
         recommend: recommend,
@@ -349,7 +324,7 @@ function commentRecommend(commentId) {
         location.replace("/boards/" + boardId);
     }
 
-    httpRequest("PUT", "/api/comment-recommend/" + commentId, body, false, success, fail);
+    httpRequest("PUT", "/api/comment-recommend/" + commentId, body, success, fail);
 
 }
 

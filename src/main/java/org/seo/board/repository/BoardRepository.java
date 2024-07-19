@@ -31,7 +31,7 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 검색
     Page<Board> findByTitleContains(String keyword, Pageable pageable);
 
-    // 본인니 작성한 글
+    // 본인이 작성한 글
     Page<Board> findByAuthorLike(String username, Pageable pageable);
 
     // username 변경 시 기존 작성했던 글의 author 변경
@@ -41,5 +41,9 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     // 회원 탈퇴 시 작성한 글 삭제
     void deleteByAuthor(String username);
+
+    @Modifying
+    @Query(value = "update Board b set b.content=:content where b.id=:id")
+    void updateContent(Long id, String content);
 
 }
