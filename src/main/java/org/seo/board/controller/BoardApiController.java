@@ -100,6 +100,15 @@ public class BoardApiController {
         return ResponseEntity.ok(response);
     }
 
+    // 이미지 삭제
+    @DeleteMapping("/api/image-delete")
+    public ResponseEntity<?> deleteImage(@RequestParam("filename") String filename) throws IOException {
+        Path filePath = Paths.get("/files/temp", filename);
+        Files.deleteIfExists(filePath);
+
+        return ResponseEntity.ok().body("임시 저장된 이미지 삭제");
+    }
+
     // 글 전체 조회
     @GetMapping("/api/boards")
     public ResponseEntity<List<BoardResponse>> findALL() {

@@ -74,6 +74,14 @@ public class BoardService {
         String targetDir = "/files/" + id;
 
         // 정규식 패턴
+        /*
+            "<img[^>]+src=\"([^\"]+)\"": 이 정규 표현식은 img 태그의 src 속성 값을 추출하기 위해 설계되었습니다.
+            "<img": 문자열이 <img로 시작하는 것을 찾는다
+            [^>]+: >가 아닌 모든 문자를 1개 이상 포함하는 패턴을 찾는다
+            src=\": src=" 문자열을 찾는다.
+            ([^\"]+): 큰따옴표(")가 아닌 모든 문자를 1개 이상 포함하는 패턴을 찾는다 src 속성 값 자체를 추출하는 역할을 한다
+            \": 닫는 큰따옴표(")를 찾는다
+        */
         String imgTagPattern = "<img[^>]+src=\"([^\"]+)\"";
         Pattern pattern = Pattern.compile(imgTagPattern);
         Matcher matcher = pattern.matcher(content);

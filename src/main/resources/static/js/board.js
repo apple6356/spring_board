@@ -59,56 +59,6 @@ function httpRequest(method, url, body, success, fail) {
     });
 }
 
-// summernote editor
-$('#summernote').summernote({
-    // 에디터 크기 설정
-    height: 300,
-    // 한글 설정
-    lang: "ko-KR",
-    toolbar: [
-        // 글자 크기 설정
-        ['fontsize', ['fontsize']],
-        // 글자 [굵게, 기울임, 밑줄, 취소 선, 지우기]
-        ['style', ['bold', 'italic', 'underline','strikethrough', 'clear']],
-        // 서식 [글머리 기호, 번호매기기, 문단정렬]
-        ['para', ['ul', 'ol', 'paragraph']],
-        // 이미지 첨부
-        ['insert',['picture']]
-      ],
-      // 추가한 글꼴
-    fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New','맑은 고딕','궁서','굴림체','굴림','돋음체','바탕체'],
-     // 추가한 폰트사이즈
-    fontSizes: ['8','9','10','11','12','14','16','18','20','22','24','28','30','36','50','72','96'],
-    callbacks : {
-        onImageUpload : function(files, editor, welEditable) {
-            // 다중 이미지 처리를 위해 for 문 사용
-            for (var i = 0; i < files.length; i++) {
-                imageUploader(files[i]);
-            }
-        }
-    }
-});
-
-// summernote image upload
-function imageUploader(file) {
-    let formData = new FormData();
-    formData.append('file', file);
-
-    $.ajax({
-        data: formData,
-        type: "POST",
-        url: "/api/image-upload",
-        contentType : false,
-        processData : false,
-        success: function(response) {
-            $('#summernote').summernote('insertImage', response.url);
-        },
-        error: function(response) {
-            alert("이미지 업로드 실패: " + response.responseText);
-        }
-    })
-}
-
 // 글 생성
 const createButton = document.getElementById('create-btn');
 
@@ -117,7 +67,7 @@ if(createButton) {
 
         body = JSON.stringify({
             title: document.getElementById("title").value,
-            content: $('#summernote').summernote('code')
+            content: $('#content').summernote('code')
 //            content: document.getElementById("content").value
         });
 
@@ -147,7 +97,7 @@ if (modifyButton) {
 
         body = JSON.stringify({
             title: document.getElementById("title").value,
-            content: $('#summernote').summernote('code')
+            content: $('#content').summernote('code')
 //            content: document.getElementById("content").value,
         });
 
