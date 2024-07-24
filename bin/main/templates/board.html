@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>글</title>
+    <!-- include libraries(bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <!--    include summernote css/js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote-bs4.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav id="navbar">
+    <span onclick="location.href='/main'">메인</span>
+    <ul id="menu">
+        <li><span>게시판</span>
+            <ul>
+                <li onclick="location.href='/popularBoards'">인기 게시판</li>
+                <li onclick="location.href='/boards'">자유 게시판</li>
+            </ul>
+        </li>
+    </ul>
+
+    <div>
+        <div th:if="${isLogin} == true">
+            <a href="/info">내 정보</a>
+            <button type="button" onclick="location.href='/logout'">로그아웃</button>
+            <!--            <button type="button" onclick="">회원탈퇴</button>-->
+        </div>
+        <div th:if="${isLogin} == false">
+            <button type="button" onclick="location.href='/login'">로그인</button>
+        </div>
+    </div>
+</nav>
+
+<hr>
+
+<div>
+    <article>
+        <input type="hidden" id="board-id" th:value="${board.id}">
+
+        <header>
+            <h2 th:text="${board.title}"></h2>
+            <div th:text="|작성자 : ${board.author}, 작성 시간 ${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
+            <span th:text="${board.hits}"></span>
+        </header>
+
+        <section>
+<!--            <div th:each="image: ${board.files}">-->
+<!--                &lt;!&ndash; webconfig &ndash;&gt;-->
+<!--                <img  th:src="@{'/files/' + ${board.id} + '/' + ${image.storedFileName}}" th:alt="${image.originalFileName}" width="450">-->
+<!--            </div>-->
+            <p id="board-content" th:utext="${board.content}"></p>
+        </section>
+
+        <div th:if="${isLogin} == true and ${user.username} == ${board.author}">
+            <button type="button" id="modify-btn"
+                    th:onclick="|location.href='@{/write-board?id={boardId}(boardId=${board.id})}'|">수정</button>
+            <button type="button" id="delete-btn">삭제</button>
+        </div>
+    </article>
+
+    <div>
+        <button id="recommend-btn">추천</button>
+        <span id="recommend" th:text="${board.recommend}"></span>
+    </div>
+
+    <hr>
+
+    <section>
+        <p>인기 댓글</p>
+        <div th:each="comment: ${board.comments}" th:if="${comment.recommend} >= 10">
+            <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
+            <button th:onclick="commentRecommend([[${comment.id}]])">추천</button>
+            <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
+            <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
+        </div>
+
+        <hr>
+
+        <div>
+            <h5>댓글</h5>
+            <div>
+                <textarea id="content" rows="3"></textarea>
+            </div>
+            <button type="button" id="comment-create-btn">등록</button>
+        </div>
+
+        <hr>
+
+        <div th:each="comment : ${board.comments}">
+            <input type="hidden" id="comment-id" th:value="${comment.id}">
+            <div>
+                <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|"></div>
+                <button th:onclick="commentRecommend([[${comment.id}]])">추천</button>
+                <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
+                <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
+                <!-- this 로 태그 정보 넘김 -->
+                <button th:if="${isLogin} == true and ${user.username} == ${comment.author}" type="button" th:id="'modify-comment-btn-' + ${comment.id}" th:onclick="commentModify([[${comment.id}]], this)">수정</button>
+                <button th:if="${isLogin} == true and ${user.username} == ${comment.author}" type="button" th:id="'delete-comment-btn-' + ${comment.id}" th:onclick="commentDelete([[${comment.id}]])">삭제</button>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<script src="/js/summernote.js"></script>
+<script src="/js/board.js"></script>
+
+</body>
+</html>

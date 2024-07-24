@@ -30,17 +30,17 @@ public class BoardViewController {
     private final UserService userService;
 
     // 글 전체 리스트 뷰
-//    @GetMapping("/boards")
-//    public String getBoards(HttpServletRequest request, Model model) {
-//        List<BoardListViewResponse> boardList = boardService.findAll()
-//                .stream()
-//                .map(BoardListViewResponse::new)
-//                .toList();
-//
-//        model.addAttribute("boardList", boardList);
-//
-//        return "boards";
-//    }
+    // @GetMapping("/boards")
+    // public String getBoards(HttpServletRequest request, Model model) {
+    // List<BoardListViewResponse> boardList = boardService.findAll()
+    // .stream()
+    // .map(BoardListViewResponse::new)
+    // .toList();
+    //
+    // model.addAttribute("boardList", boardList);
+    //
+    // return "boards";
+    // }
 
     // 메인 화면 글 리스트
     @GetMapping("/main")
@@ -55,7 +55,6 @@ public class BoardViewController {
                 .stream()
                 .map(BoardListViewResponse::new)
                 .toList();
-
 
         boolean isLogin = false; // 로그인을 안 했을 경우
 
@@ -107,7 +106,8 @@ public class BoardViewController {
     // 수정 화면 뷰
     @GetMapping("/write-board")
     // id 키를 가진 쿼리 파라미터 값을 id 변수에 매핑(id 값이 없을 수도 있음)
-    public String updateBoard(@RequestParam(value = "id", required = false) Long id, Model model, @AuthenticationPrincipal Object principal) {
+    public String updateBoard(@RequestParam(value = "id", required = false) Long id, Model model,
+            @AuthenticationPrincipal Object principal) {
 
         if (id == null) { // id가 없으면 생성
             model.addAttribute("board", new BoardViewResponse());
@@ -130,14 +130,17 @@ public class BoardViewController {
 
     // 페이징
     @GetMapping("/boards")
-    public String paging(@PageableDefault(page = 1) Pageable pageable, Model model, @AuthenticationPrincipal Object principal) {
+    public String paging(@PageableDefault(page = 1) Pageable pageable, Model model,
+            @AuthenticationPrincipal Object principal) {
         Page<BoardListViewResponse> boardList = boardService.paging(pageable);
 
         int blockLimit = 10;
         // 1 11 21 31
-        int startPage = (((int)(Math.ceil((double)pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;;
+        int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
+        ;
         // 10 20 30 40
-        int endPage = ((startPage + blockLimit - 1) < boardList.getTotalPages()) ? startPage + blockLimit - 1 : boardList.getTotalPages();
+        int endPage = ((startPage + blockLimit - 1) < boardList.getTotalPages()) ? startPage + blockLimit - 1
+                : boardList.getTotalPages();
 
         int prev = startPage - 1;
         int next = endPage + 1;
@@ -161,14 +164,17 @@ public class BoardViewController {
 
     // 추천 30 이상 인기 게시판
     @GetMapping("/popularBoards")
-    public String popularBoards(@PageableDefault(page = 1) Pageable pageable, Model model, @AuthenticationPrincipal Object principal) {
+    public String popularBoards(@PageableDefault(page = 1) Pageable pageable, Model model,
+            @AuthenticationPrincipal Object principal) {
         Page<BoardListViewResponse> boardList = boardService.popularPaging(pageable);
 
         int blockLimit = 10;
         // 1 11 21 31
-        int startPage = (((int)(Math.ceil((double)pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;;
+        int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
+        ;
         // 10 20 30 40
-        int endPage = ((startPage + blockLimit - 1) < boardList.getTotalPages()) ? startPage + blockLimit - 1 : boardList.getTotalPages();
+        int endPage = ((startPage + blockLimit - 1) < boardList.getTotalPages()) ? startPage + blockLimit - 1
+                : boardList.getTotalPages();
 
         int prev = startPage - 1;
         int next = endPage + 1;
@@ -192,15 +198,16 @@ public class BoardViewController {
 
     // 글 검색 결과 뷰
     @GetMapping("/search")
-    public String searchBoards(@PageableDefault(page = 1) Pageable pageable, @RequestParam(value = "keyword") String keyword
-            , Model model, @AuthenticationPrincipal Object principal) {
+    public String searchBoards(@PageableDefault(page = 1) Pageable pageable,
+            @RequestParam(value = "keyword") String keyword, Model model, @AuthenticationPrincipal Object principal) {
         Page<BoardListViewResponse> boardList = boardService.searchBoards(pageable, keyword);
 
         int blockLimit = 10;
         // 1 11 21 31
-        int startPage = (((int)(Math.ceil((double)pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
+        int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
         // 10 20 30 40
-        int endPage = ((startPage + blockLimit - 1) < boardList.getTotalPages()) ? startPage + blockLimit - 1 : boardList.getTotalPages();
+        int endPage = ((startPage + blockLimit - 1) < boardList.getTotalPages()) ? startPage + blockLimit - 1
+                : boardList.getTotalPages();
 
         int prev = startPage - 1;
         int next = endPage + 1;

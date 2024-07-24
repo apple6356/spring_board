@@ -34,20 +34,20 @@ public class BoardApiController {
 
     // 글 작성(저장)
     @PostMapping("/api/boards")
-    public ResponseEntity<?> addBoard(@RequestBody @Validated AddBoardRequest request,
-//                                      @RequestPart(value = "files", required = false) List<MultipartFile> multipartFiles,
-                                      @AuthenticationPrincipal Object principal) throws Exception {
+    public ResponseEntity<Board> addBoard(@RequestBody @Validated AddBoardRequest request,
+            @AuthenticationPrincipal Object principal) throws Exception {
 
         // 이미지 파일만 업로드 가능하게
-//        if (multipartFiles != null) {
-//            for (MultipartFile multipartFile : multipartFiles) {
-//                System.out.println("multipartFile.getContentType() = " + multipartFile.getContentType());
-//                if (!multipartFile.getContentType().startsWith("image")) {
-//                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                            .body("이미지 파일만 가능");
-//                }
-//            }
-//        }
+        // if (multipartFiles != null) {
+        // for (MultipartFile multipartFile : multipartFiles) {
+        // System.out.println("multipartFile.getContentType() = " +
+        // multipartFile.getContentType());
+        // if (!multipartFile.getContentType().startsWith("image")) {
+        // return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        // .body("이미지 파일만 가능");
+        // }
+        // }
+        // }
 
         String email = "";
 
@@ -142,7 +142,8 @@ public class BoardApiController {
     // 글 수정
     @PutMapping("/api/boards/{id}")
     public ResponseEntity<Board> updateBoard(@PathVariable("id") Long id,
-                                             @RequestBody UpdateBoardRequest request) throws IOException {
+            @RequestBody UpdateBoardRequest request) throws IOException {
+                
         Board board = boardService.update(id, request);
 
         // 이미지를 임시 저장소에서 각 게시글 저장소로 이동
@@ -165,7 +166,8 @@ public class BoardApiController {
 
     // 댓글 생성
     @PostMapping("/api/comments")
-    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request, @AuthenticationPrincipal Object principal) {
+    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request,
+            @AuthenticationPrincipal Object principal) {
 
         String email = "";
 
@@ -185,7 +187,8 @@ public class BoardApiController {
 
     // 댓글 수정
     @PutMapping("/api/comments/{id}")
-    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id, @RequestBody UpdateCommentRequest request) {
+    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id,
+            @RequestBody UpdateCommentRequest request) {
         Comment comment = boardService.updateComment(id, request);
 
         return ResponseEntity.ok()
@@ -203,7 +206,8 @@ public class BoardApiController {
 
     // 댓글 추천수 +1
     @PutMapping("/api/comment-recommend/{id}")
-    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id, @RequestBody RecommendCommentRequest request) {
+    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id,
+            @RequestBody RecommendCommentRequest request) {
         Comment comment = boardService.updateCommentRecommend(id, request);
 
         return ResponseEntity.ok()

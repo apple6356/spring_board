@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>main</title>
+</head>
+<body>
+
+<nav id="navbar">
+    <span onclick="location.href='/main'">메인</span>
+    <ul id="menu">
+        <li><span>게시판</span>
+            <ul>
+                <li onclick="location.href='/popularBoards'">인기 게시판</li>
+                <li onclick="location.href='/boards'">자유 게시판</li>
+            </ul>
+        </li>
+    </ul>
+
+    <div>
+        <div th:if="${isLogin} == true">
+            <a href="/info">내 정보</a>
+            <button type="button" onclick="location.href='/logout'">로그아웃</button>
+<!--            <button type="button" onclick="">회원탈퇴</button>-->
+        </div>
+        <div th:if="${isLogin} == false">
+            <button type="button" onclick="location.href='/login'">로그인</button>
+        </div>
+    </div>
+</nav>
+
+<hr>
+
+<div>
+    <!--자유 게시판-->
+    <h2><a href="/boards">자유 게시판</a></h2>
+    <ul th:each="item: ${boardList}">
+        <li>
+            <input type="hidden" id="board-id" th:value="${item.id}">
+            <a th:href="@{/boards/{id}(id=${item.id})}" th:text="${item.title}"></a>
+        </li>
+    </ul>
+</div>
+
+<div>
+    <!--인기 게시판-->
+    <h2><a href="/popularBoards">인기 게시판</a></h2>
+    <ul th:each="item: ${popularBoardList}">
+        <li>
+            <input type="hidden" id="popular-board-id" th:value="${item.id}">
+            <a th:href="@{/boards/{id}(id=${item.id})}" th:text="${item.title}"></a>
+        </li>
+    </ul>
+</div>
+
+<script src="/js/token.js"></script>
+<script src="/js/board.js"></script>
+
+</body>
+</html>

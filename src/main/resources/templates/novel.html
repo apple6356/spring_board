@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <!-- 소설 제목을 title로  -->
+    <title th:text="${novel.title}">제목</title>
+</head>
+
+<body>
+
+    <nav id="navbar">
+        <span onclick="location.href='/main'">메인</span>
+        <ul id="menu">
+            <li><span>게시판</span>
+                <ul>
+                    <li onclick="location.href='/popularBoards'">인기 게시판</li>
+                    <li onclick="location.href='/boards'">자유 게시판</li>
+                </ul>
+            </li>
+        </ul>
+
+        <div>
+            <div th:if="${isLogin} == true">
+                <a href="/info">내 정보</a>
+                <button type="button" onclick="location.href='/logout'">로그아웃</button>
+                <!--            <button type="button" onclick="">회원탈퇴</button>-->
+            </div>
+            <div th:if="${isLogin} == false">
+                <button type="button" onclick="location.href='/login'">로그인</button>
+            </div>
+        </div>
+    </nav>
+
+    <div>
+        <section>
+            <h2 th:text="${novel.title}"></h2>
+            <p th:text="${novel.author}"></p>
+            <div th:if="${isLogin} == true and ${novel.author} == ${user.username}">
+                <button type="button" th:onclick="|location.href='@{/novelManage?id={id}(id=${novel.id})}'|">수정하기</button>
+            </div>
+            <p th:text="${novel.content}"></p>
+        </section>
+    </div>
+
+    <div th:if="${isLogin} == true and ${novel.author} == ${user.username}">
+        <button type="button" th:onclick="|location.href='@{/novel-write?novelId={novelId}(novelId = ${novel.id})}'|">새 회차 작성</button>
+    </div>
+    
+    <div>
+        <!-- 최신순으로 정렬 -->
+        <!-- <button type="button" th:onclick="|location.href='@{/novel-write?novelId={novelId}(novelId = ${novel.id})?id={id}(id=${chapter.id})}'|">수정</button> -->
+    </div>
+
+</body>
+
+</html>

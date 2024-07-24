@@ -70,7 +70,7 @@ public class UserViewController {
 
     // 본인이 작성한 글 목록
     @GetMapping("/myWriting")
-    public String myWriting(@PageableDefault(page = 1) Pageable pageable, @RequestParam String username
+    public String myWriting(@PageableDefault(page = 1) Pageable pageable, @RequestParam("username") String username
             , Model model, @AuthenticationPrincipal Object principal) {
 
         Page<BoardListViewResponse> boardList = boardService.myBoards(pageable, username);
@@ -104,7 +104,7 @@ public class UserViewController {
 
     // 본인이 작성한 댓글 목록
     @GetMapping("/myComments")
-    public String myComments(@PageableDefault(page = 1) Pageable pageable, @RequestParam String username
+    public String myComments(@PageableDefault(page = 1) Pageable pageable, @RequestParam("username") String username
             , Model model, @AuthenticationPrincipal Object principal) {
 
         Page<CommentListViewResponse> commentList = boardService.myComments(pageable, username);

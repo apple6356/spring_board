@@ -35,27 +35,8 @@ public class BoardService {
     private final FileRepository fileRepository;
 
     // 글 작성(저장)
-    public Board save(AddBoardRequest request, String userName) throws Exception {
+    public Board save(AddBoardRequest request, String userName) {
         Board board = boardRepository.save(request.toEntity(userName));
-
-//        AddBoardFileRequest fileRequest = new AddBoardFileRequest();
-//
-//        String dirPath = "D:/files/" + board.getId();
-//        Path path = Paths.get(dirPath);
-//        Files.createDirectory(path);
-//
-//        if (multipartFiles != null) {
-//            for (MultipartFile multipartFile : multipartFiles) {
-//
-//                String originalFileName = multipartFile.getOriginalFilename();
-//                String storedFileName = UUID.randomUUID().toString() + "_" + originalFileName;
-//                String savePath = dirPath + "/" + storedFileName; // 파일 저장 경로
-//
-//                multipartFile.transferTo(new File(savePath)); // 경로에 파일 저장
-//
-//                fileRepository.save(fileRequest.toEntity(board, originalFileName, storedFileName, dirPath));
-//            }
-//        }
 
         return board;
     }

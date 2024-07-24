@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>작품 생성</title>
+    <!-- include libraries(bootstrap) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+
+    <nav id="navbar">
+        <span onclick="location.href='/main'">메인</span>
+        <ul id="menu">
+            <li><span>게시판</span>
+                <ul>
+                    <li onclick="location.href='/popularnovels'">인기 게시판</li>
+                    <li onclick="location.href='/novels'">자유 게시판</li>
+                </ul>
+            </li>
+        </ul>
+
+        <div>
+            <div th:if="${isLogin} == true">
+                <a href="/info">내 정보</a>
+                <button type="button" onclick="location.href='/logout'">로그아웃</button>
+                <!--            <button type="button" onclick="">회원탈퇴</button>-->
+            </div>
+            <div th:if="${isLogin} == false">
+                <button type="button" onclick="location.href='/login'">로그인</button>
+            </div>
+        </div>
+    </nav>
+
+    <div>
+        <article>
+            <input type="hidden" id="novel-id" th:value="${novel.id}">
+            <!-- <div>
+                <input type="file" id="coverImage" accept="/image/*">
+                <div th:if="${novel.coverImagePath}">
+                    <img th:src="@{${novel.coverImagePath}" alt="cover image" style="max-width: 200px;">
+                </div>
+            </div> -->
+            <header>
+                <input type="text" placeholder="제목" id="title" th:value="${novel.title}">
+            </header>
+            <section>
+                <textarea rows="15" cols="50" placeholder="작품에 대한 소개" id="content"
+                    th:utext="${novel.content}"></textarea>
+            </section>
+            <!-- id가 있을 때는 수정버튼, 없을 때는 등록 버튼 -->
+            <button th:if="${novel.id} != null" type="button" id="modify-novel-btn">수정</button>
+            <button th:if="${novel.id} == null" type="button" id="create-novel-btn">등록</button>
+        </article>
+    </div>
+
+    <script src="/js/novel.js"></script>
+
+</body>
+
+
+</html>

@@ -18,8 +18,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     void updateHits(@Param("id") Long id);
 
     // 추천 30 이상인 글만 조회 | RecommendGreaterThanEqual -> recommend >= int recommend
-    // GreaterThanEqual >= 조건식 다른 쿼리 메소드 -> https://docs.spring.io/spring-data/relational/reference/jdbc/query-methods.html
-//    @Query(value = "select b from Board b where b.recommend >= 30 order by b.id desc")
     Page<Board> findByRecommendGreaterThanEqualOrderByIdDesc(int recommend, Pageable pageable);
 
     // 상위 10개의 글만 조회
@@ -42,8 +40,9 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     // 회원 탈퇴 시 작성한 글 삭제
     void deleteByAuthor(String username);
 
+    // 이미지를 옮길 때 사용
     @Modifying
     @Query(value = "update Board b set b.content=:content where b.id=:id")
-    void updateContent(Long id, String content);
+    void updateContent(@Param("id") Long id, @Param("content") String content);
 
 }

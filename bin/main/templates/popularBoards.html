@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>인기 게시판</title>
+</head>
+<body>
+<div>
+    <h1>인기 게시판</h1>
+</div>
+
+<nav id="navbar">
+    <span onclick="location.href='/main'">메인</span>
+    <ul id="menu">
+        <li><span>게시판</span>
+            <ul>
+                <li onclick="location.href='/popularBoards'">인기 게시판</li>
+                <li onclick="location.href='/boards'">자유 게시판</li>
+            </ul>
+        </li>
+    </ul>
+
+    <div>
+        <div th:if="${isLogin} == true">
+            <a href="/info">내 정보</a>
+            <button type="button" onclick="location.href='/logout'">로그아웃</button>
+            <!--            <button type="button" onclick="">회원탈퇴</button>-->
+        </div>
+        <div th:if="${isLogin} == false">
+            <button type="button" onclick="location.href='/login'">로그인</button>
+        </div>
+    </div>
+</nav>
+
+<hr>
+
+<div>
+    <button type="button" id="create-btn" th:onclick="|location.href='@{/write-board}'|">작성</button>
+</div>
+
+<div th:each="item : ${boardList}">
+    <input type="hidden" id="board-id" th:value="${item.id}">
+    <div th:onclick="|location.href='@{/boards/{id}(id=${item.id})}'|">
+        <span th:text="${item.title}"></span>
+        <span th:text="${item.content}"></span>
+        <span th:text="${item.author}"></span>
+        <span th:text="${item.hits}"></span>
+        <span th:text="${item.recommend}"></span>
+        <span th:text="${#temporals.format(item.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+    </div>
+</div>
+
+<div>
+    <form action="/search" method="GET">
+        <input type="text" id="keyword" name="keyword" th:value="${keyword}">
+        <button type="submit" id="search-btn">검색</button>
+    </form>
+</div>
+
+<div>
+    <!-- 첫번째 페이지로 이동 -->
+    <a th:href="@{/popularBoards(page=1)}">First</a>
+
+    <!-- 이전 페이지로 이동 (14 -> 10) -->
+    <span>
+        <a th:if="${prev > 1}" th:href="@{/popularBoards(page=${prev})}">prev</a>
+        <span th:if="${prev < 1}">prev</span>
+    </span>
+
+    <!-- 페이지 번호 링크(현재 페이지는 숫자만) for(int page=startPage; page<=endPage; page++)-->
+    <span th:each="page: ${#numbers.sequence(startPage, endPage)}">
+        <!-- 현재페이지는 링크 없이 숫자만 -->
+        <span th:if="${page == boardList.number + 1}" th:text="${page}" style="color: red"></span>
+        <!-- 현재페이지 번호가 아닌 다른 페이지번호에는 링크를 보여줌 -->
+        <span th:unless="${page == boardList.number + 1}">
+            <a th:href="@{/popularBoards(page=${page})}" th:text="${page}"></a>
+        </span>
+    </span>
+
+    <span>
+        <a th:if="${next <= boardList.totalPages}" th:href="@{/popularBoards(page=${next})}">next</a>
+        <span th:if="${next > boardList.totalPages}">next</span>
+    </span>
+
+    <!-- 마지막 페이지로 이동 -->
+    <a th:href="@{/popularBoards(page=${boardList.totalPages})}">Last</a>
+</div>
+
+<script src="/js/token.js"></script>
+<script src="/js/board.js"></script>
+
+</body>
+</html>
