@@ -67,23 +67,17 @@ public class BoardService {
         Pattern pattern = Pattern.compile(imgTagPattern);
         Matcher matcher = pattern.matcher(content);
 
-        System.out.println("pattern = " + pattern);
-        System.out.println("matcher = " + matcher);
-
         // 패턴이 일치하는 다음 문자열이 있으면 루프
         while (matcher.find()) {
             String src = matcher.group(1);
-            System.out.println("src = " + src);
 
             // 파일 이름 추출
             String filename = src.substring(src.lastIndexOf("/") + 1);
-            System.out.println("filename = " + filename);
 
             if (src.contains("/files/temp/")) {
                 moveFileDirectory(id, filename);
 
                 String originalFilename = filename.substring(filename.indexOf("_") + 1);
-                System.out.println("originalFilename = " + originalFilename);
 
                 fileRepository.save(fileRequest.toEntity(board, originalFilename, filename, targetDir));
             }

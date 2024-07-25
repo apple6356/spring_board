@@ -2,13 +2,17 @@ package org.seo.board.controller;
 
 import java.util.List;
 
+import org.seo.board.domain.Chapter;
 import org.seo.board.domain.Novel;
 import org.seo.board.domain.User;
 import org.seo.board.dto.BoardViewResponse;
+import org.seo.board.dto.ChapterViewResponse;
 import org.seo.board.dto.NovelListViewRequest;
 import org.seo.board.dto.NovelViewResponse;
+import org.seo.board.repository.ChapterRepository;
 import org.seo.board.service.NovelService;
 import org.seo.board.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -94,37 +98,58 @@ public class NovelViewController {
 
         if (isLogin) {
             user = userService.findByEmail(email);
-            System.out.println("user username: " + user.getUsername());
+            model.addAttribute("user", user);
         }
 
         Novel novel = novelService.findById(id);
 
+        List<ChapterViewResponse> chapterList = novelService.findByIdAsc(novel.getId());
+
+        model.addAttribute("chapterList", chapterList);
         model.addAttribute("novel", novel);
         model.addAttribute("isLogin", isLogin);
-        model.addAttribute("user", user);
 
         return "novel";
     }
 
-    // 회차 작성/수정 페이지
+    // 회차 정렬 변경 (최신화부터, 1화부터)
+    // @GetMapping("/episode-sort")
+    // public String episodeSort(@RequestParam("novelId") Long novelId,
+    //         @RequestParam("order") String order) {
+        
+    //     List<ChapterViewResponse> chapterList = novelService.findByIdAsc(novelId);
+
+    //     if (order.equals("asc")) {
+
+    //     }
+
+    //     return "novel";
+    // }
+
+    // 회차 작성 or 수정 페이지
     @GetMapping("/novel-write")
-    public String novelUpdateWrite(@RequestParam(value = "novelId") Long novelId, Model model,
+    public String novelUpdateWrite(@RequestParam(value = "novelId", required = false) Long novelId, Model model,
             @RequestParam(value = "id", required = false) Long id, @AuthenticationPrincipal Object principal) {
 
         boolean isLogin = false; // 로그인을 안 했을 경우
+        Chapter chapter;
 
         // 로그인을 했을 경우
         if (!principal.equals("anonymousUser")) {
             isLogin = true;
         }
 
-        model.addAttribute("novelId", novelId);
-        model.addAttribute("isLogin", isLogin);
-
-        // 해당 회차를 수정할 때만
-        if (id != null) {
-            model.addAttribute("chapter", null);
+        if (novelId != null) {
+            // 새 회차 작성 시
+            model.addAttribute("novelId", novelId);
+        } else if (id != null) {
+            // 회차 수정 시
+            chapter = novelService.findByIdChapter(id);
+            model.addAttribute("novelId", chapter.getNovel().getId());
+            model.addAttribute("chapter", chapter);
         }
+
+        model.addAttribute("isLogin", isLogin);
 
         return "novelWrite";
     }

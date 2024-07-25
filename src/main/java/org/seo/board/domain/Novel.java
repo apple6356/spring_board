@@ -3,6 +3,8 @@ package org.seo.board.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,7 +43,12 @@ public class Novel {
     @Column(name = "coverImagePath")
     private String coverImagePath;
 
+    // 추천수
+    @Column(name = "recommend")
+    private Long recommend;
+
     @OneToMany(mappedBy = "novel", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonManagedReference // 직렬화 시 사용되며, 주로 부모 엔티티에 적용, 무한루프 방지
     private List<Chapter> chapters;
 
     @Builder

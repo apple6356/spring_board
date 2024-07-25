@@ -1,9 +1,18 @@
 package org.seo.board.controller;
 
 import org.seo.board.domain.User;
+
+import java.util.List;
+
+import org.seo.board.domain.Chapter;
 import org.seo.board.domain.Novel;
+import org.seo.board.dto.AddChapterRequest;
 import org.seo.board.dto.AddNovelRequest;
+import org.seo.board.dto.ChapterViewResponse;
+import org.seo.board.dto.UpdateChapterRequest;
+import org.seo.board.dto.UpdateChapterResponse;
 import org.seo.board.dto.UpdateNovelRequest;
+import org.seo.board.repository.ChapterRepository;
 import org.seo.board.service.NovelService;
 import org.seo.board.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -12,6 +21,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -71,8 +81,61 @@ public class NovelApiController {
     public ResponseEntity<Void> deleteNovel(@PathVariable("id") Long id) {
         novelService.delete(id);
 
+        System.out.println("id: " + id);
+
         return ResponseEntity.ok()
-        .build();
+                .build();
+    }
+
+    // 새 회차 작성
+    @PostMapping("/api/chapter")
+    public ResponseEntity<Chapter> createChapter(@RequestBody AddChapterRequest request,
+            @AuthenticationPrincipal Object principal) {
+
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        User user = userService.findByEmail(email);
+
+        Chapter chapter = novelService.saveChapter(request, user.getUsername());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(chapter);
+    }
+
+    // 해당 회차 수정
+    @PutMapping("/api/chapter/{id}")
+    public ResponseEntity<UpdateChapterResponse> updateChapter(@RequestBody UpdateChapterRequest request,
+            @AuthenticationPrincipal Object principal, @PathVariable("id") Long id) {
+
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        User user = userService.findByEmail(email);
+
+        Chapter chapter = novelService.updateChapter(request, id, user.getUsername());
+
+        return ResponseEntity.ok()
+                .body(new UpdateChapterResponse(chapter));
+    }
+
+    // 최신 회차 삭제
+    @DeleteMapping("/api/chapter/{novelId}")
+    public ResponseEntity<Void> deleteChapter(@PathVariable("novelId") Long novelId) {
+
+        novelService.deleteChapter(novelId);
+
+        return ResponseEntity.ok().build();
     }
 
 }

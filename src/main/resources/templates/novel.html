@@ -35,23 +35,61 @@
 
     <div>
         <section>
+            <input type="hidden" id="novel-id" th:value="${novel.id}">
+            <input type="hidden" id="username" th:value="${user != null ? user.username : 'Anonymous'}">
             <h2 th:text="${novel.title}"></h2>
             <p th:text="${novel.author}"></p>
             <div th:if="${isLogin} == true and ${novel.author} == ${user.username}">
-                <button type="button" th:onclick="|location.href='@{/novelManage?id={id}(id=${novel.id})}'|">수정하기</button>
+                <button type="button"
+                    th:onclick="|location.href='@{/novelManage?id={id}(id=${novel.id})}'|">수정하기</button>
+                <button type="button" id="delete-novel-btn">작품 삭제</button>
             </div>
             <p th:text="${novel.content}"></p>
         </section>
     </div>
 
     <div th:if="${isLogin} == true and ${novel.author} == ${user.username}">
-        <button type="button" th:onclick="|location.href='@{/novel-write?novelId={novelId}(novelId = ${novel.id})}'|">새 회차 작성</button>
+        <button type="button" th:onclick="|location.href='@{/novel-write?novelId={novelId}(novelId = ${novel.id})}'|">새
+            회차 작성</button>
+        <button type="button" id="delete-lastepisode-btn">최신 회차 삭제</button>
     </div>
-    
-    <div>
-        <!-- 최신순으로 정렬 -->
-        <!-- <button type="button" th:onclick="|location.href='@{/novel-write?novelId={novelId}(novelId = ${novel.id})?id={id}(id=${chapter.id})}'|">수정</button> -->
+
+    <hr>
+
+    <!-- 기본은 최신순, 클릭시 1화부터 정렬 ajax 이용해서 비동기 처리 -->
+    <div id="episode-sort" onclick="episodeSort(this)" value="desc">최신화부터</div>
+
+    <hr>
+
+    <!-- <div th:each="chapter : ${novel.chapters}">
+        <input type="hidden" th:value="${chapter.id}">
+        <div>
+            <span th:text="|Ep${chapter.episode}.|"></span>
+            <span th:text="${chapter.title}"></span><br>
+            <span th:text="|조회수:${chapter.hits}|"></span>
+            <span th:text="|작성 시간:${#temporals.format(chapter.createdAt, 'yyyy-MM-dd HH:mm')}|"></span>
+        </div>
+        <div th:if="${user?.username} == ${chapter.author}">
+            <button type="button" th:onclick="|location.href='@{/novel-write?id={id}(id = ${chapter.id})}'|">수정</button>
+        </div>
+        <hr>
+    </div> -->
+
+    <div id="chapters" th:each="chapter : ${chapterList}">
+        <input type="hidden" th:value="${chapter.id}">
+        <div>
+            <span th:text="|Ep${chapter.episode}.|"></span>
+            <span th:text="${chapter.title}"></span><br>
+            <span th:text="|조회수:${chapter.hits}|"></span>
+            <span th:text="|작성 시간:${#temporals.format(chapter.createdAt, 'yyyy-MM-dd HH:mm')}|"></span>
+        </div>
+        <div th:if="${user?.username} == ${chapter.author}">
+            <button type="button" th:onclick="|location.href='@{/novel-write?id={id}(id = ${chapter.id})}'|">수정</button>
+        </div>
+        <hr>
     </div>
+
+    <script src="/js/novel.js"></script>
 
 </body>
 

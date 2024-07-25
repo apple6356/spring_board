@@ -37,7 +37,7 @@
         <article>
             <!-- 아이디 정보 저장 -->
             <input type="hidden" id="novel-id" th:value="${novelId}">
-            <input type="hidden" id="novel-chapter-id" th:value="${chapter?.id}">
+            <input type="hidden" id="chapter-id" th:value="${chapter?.id}">
 
             <header>
                 <input type="text" placeholder="제목" id="title" th:value="${chapter?.title}">
@@ -46,8 +46,8 @@
                 <textarea rows="15" cols="50" placeholder="내용을 입력해주세요." id="content" th:utext="${chapter?.content}"></textarea>
             </section>
             <!-- id가 있을 때는 수정버튼, 없을 때는 등록 버튼 -->
-            <button th:if="${chapter.id} != null" type="button" id="modify-btn">수정</button>
-            <button th:if="${chapter.id} == null" type="button" id="create-btn">등록</button>
+            <button th:if="${chapter} != null" type="button" id="modify-btn">수정</button>
+            <button th:if="${chapter} == null" type="button" id="create-btn">등록</button>
         </article>
     </div>
 
