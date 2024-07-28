@@ -12,6 +12,9 @@ import org.seo.board.dto.NovelViewResponse;
 import org.seo.board.repository.ChapterRepository;
 import org.seo.board.service.NovelService;
 import org.seo.board.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,7 +59,48 @@ public class NovelViewController {
         return "novelManage";
     }
 
-    // 내 소설 목록
+    // 소설 목록
+    @GetMapping("/novelList")
+    public String novelList(@PageableDefault(page = 1) Pageable pageable, Model model,
+            @AuthenticationPrincipal Object principal) {
+
+        User user;
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
+        
+        Page<NovelViewResponse> novelList = novelService.novelPaging(pageable);
+
+        int blockLimit = 10;
+        // 1 11 21 31
+        int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
+        ;
+        // 10 20 30 40
+        int endPage = ((startPage + blockLimit - 1) < novelList.getTotalPages()) ? startPage + blockLimit - 1
+                : novelList.getTotalPages();
+
+        int prev = startPage - 1;
+        int next = endPage + 1;
+
+        model.addAttribute("novelList", novelList);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("prev", prev);
+        model.addAttribute("next", next);
+
+        return "novelList";
+    }
+
+    // 내가 작성한 소설 목록
     @GetMapping("/myNovels")
     public String myNovels(@RequestParam("username") String username, Model model,
             @AuthenticationPrincipal Object principal) {
@@ -103,7 +147,7 @@ public class NovelViewController {
 
         Novel novel = novelService.findById(id);
 
-        List<ChapterViewResponse> chapterList = novelService.findByIdAsc(novel.getId());
+        List<ChapterViewResponse> chapterList = novelService.findByIdDesc(novel.getId());
 
         model.addAttribute("chapterList", chapterList);
         model.addAttribute("novel", novel);
@@ -113,18 +157,33 @@ public class NovelViewController {
     }
 
     // 회차 정렬 변경 (최신화부터, 1화부터)
-    // @GetMapping("/episode-sort")
-    // public String episodeSort(@RequestParam("novelId") Long novelId,
-    //         @RequestParam("order") String order) {
-        
-    //     List<ChapterViewResponse> chapterList = novelService.findByIdAsc(novelId);
+    @GetMapping("/episode-sort")
+    public String episodeSort(@RequestParam("novelId") Long novelId,
+            @RequestParam("order") String order, Model model, @AuthenticationPrincipal Object principal) {
 
-    //     if (order.equals("asc")) {
+        User user;
+        String email = "";
 
-    //     }
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
 
-    //     return "novel";
-    // }
+        if (!email.equals("")) {
+            user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
+
+        // 정렬 방식 요청에 따라 값 변경
+        List<ChapterViewResponse> chapterList = "1화부터".equals(order) ? chapterList = novelService.findByIdAsc(novelId)
+                : novelService.findByIdDesc(novelId);
+
+        model.addAttribute("chapterList", chapterList);
+
+        // thymeleaf fragment 사용, novel 페이지에 id가 chapters인 요소에만 반환
+        return "novel :: #chapters";
+    }
 
     // 회차 작성 or 수정 페이지
     @GetMapping("/novel-write")
@@ -153,5 +212,76 @@ public class NovelViewController {
 
         return "novelWrite";
     }
+
+    // 해당 회차 조회 페이지
+    @GetMapping("/novelView")
+    public String novelViewPage(@RequestParam(value = "id") Long id, Model model,
+            @AuthenticationPrincipal Object principal) {
+
+        User user;
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
+
+        Chapter chapter = novelService.findByIdChapter(id);
+
+        model.addAttribute("chapter", chapter);
+
+        return "novelView";
+    }
+
+    // 내 서재
+    // @GetMapping("/myLibrary/{username}")
+    // public String myLibrary(@PageableDefault(page = 1) Pageable pageable,
+    // @PathVariable("username") String username, Model model,
+    // @AuthenticationPrincipal Object principal) {
+
+    // User user;
+    // String email = "";
+
+    // if (principal instanceof UserDetails) {
+    // email = ((UserDetails) principal).getUsername();
+    // } else if (principal instanceof OAuth2User) {
+    // email = (String) ((OAuth2User) principal).getAttributes().get("email");
+    // }
+
+    // if (!email.equals("")) {
+    // user = userService.findByEmail(email);
+    // model.addAttribute("user", user);
+    // }
+
+    // Page<NovelViewResponse> novelList = novelService.myLibrary(username,
+    // pageable);
+
+    // int blockLimit = 10;
+    // // 1 11 21 31
+    // int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() /
+    // blockLimit))) - 1) * blockLimit + 1;
+    // ;
+    // // 10 20 30 40
+    // int endPage = ((startPage + blockLimit - 1) < novelList.getTotalPages()) ?
+    // startPage + blockLimit - 1
+    // : novelList.getTotalPages();
+
+    // int prev = startPage - 1;
+    // int next = endPage + 1;
+
+    // model.addAttribute("novelList", novelList);
+    // model.addAttribute("startPage", startPage);
+    // model.addAttribute("endPage", endPage);
+    // model.addAttribute("prev", prev);
+    // model.addAttribute("next", next);
+
+    // return "myLibrary";
+    // }
 
 }

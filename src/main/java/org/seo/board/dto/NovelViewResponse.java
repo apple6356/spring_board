@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class NovelViewResponse {
 
-    private Long id;
+    private Long id; 
     private String title;
     private String content;
     private String author;

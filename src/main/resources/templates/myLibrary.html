@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
+    
 <head>
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-    <title>내 작품</title>
+    <title>내 서재</title>
 </head>
-
 <body>
-
-    <h1>내 작품</h1>
 
     <nav id="navbar">
         <span onclick="location.href='/main'">메인</span>
@@ -18,6 +15,10 @@
                 <ul>
                     <li onclick="location.href='/popularBoards'">인기 게시판</li>
                     <li onclick="location.href='/boards'">자유 게시판</li>
+                </ul>
+                <ul>
+                    <li onclick="location.href='/novelList'">소설 게시판</li>
+                    <!-- <li th:if="${user != null}" th:onclick="|location.href='@{/myLibrary/{username}(username = ${user.username})}'|">내 서재</li> -->
                 </ul>
             </li>
         </ul>
@@ -34,16 +35,18 @@
         </div>
     </nav>
 
-    <a href="/novelManage">신규 작품 등록</a>
-
+    <hr>
+    
     <div th:each="novel : ${novelList}">
         <input type="hidden" id="board-id" th:value="${novel.id}">
-        <div th:onclh3ick="|location.href='@{/novel/{id}(id=${novel.id})}'|">
+        <div th:onclick="|location.href='@{/novel/{id}(id=${novel.id})}'|">
             <h3 th:text="${novel.title}"></h3>
-            <span th:text="${novel.author}"></span>
+            <span th:text="|작가: ${novel.author}|"></span>
         </div>
+        <hr>
     </div>
 
+    <script src="/js/novel.js"></script>
+    
 </body>
-
 </html>

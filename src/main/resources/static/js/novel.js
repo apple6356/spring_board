@@ -216,28 +216,27 @@ if (deleteButton) {
 }
 
 // 최신순, 1화부터 정렬 기능
-function episodeSort(obj) {
+function episodeSort(e) {
 
-    console.log("obj.value: " + obj.value);
-    let order = obj.value == 'desc' ? 'asc' : 'desc';
+    console.log("order: " + e);
+    console.log("order value: " + e.value);
+    let order = e.value === '최신화부터' ? '1화부터' : '최신화부터';
 
     $.ajax({
         type: "GET",
         url: "/episode-sort", // 요청 url
         data: { 
             novelId: document.getElementById("novel-id").value,
-            order: order 
+            order: order
         }, // 보낼 데이터
-        success: function(data) {
-            console.log("data : " + data)
-            $('#chapters').replaceWith(data);
+        success: function(fragment) {
+            console.log("fragment : " + fragment);
+            $('#chapters').replaceWith(fragment);
 
-            if (obj.value == 'desc') {
-                document.getElementById('episode-sort').textContent = "1화부터";
-                document.getElementById('episode-sort').value = "asc";
+            if (order === '1화부터') {
+                e.value = "1화부터";
             } else {
-                document.getElementById('episode-sort').textContent = "최신화부터";
-                document.getElementById('episode-sort').value = "desc";
+                e.value = "최신화부터";
             }
 
         },

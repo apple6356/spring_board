@@ -6,7 +6,9 @@ import org.seo.board.domain.Board;
 import org.seo.board.domain.User;
 import org.seo.board.dto.BoardListViewResponse;
 import org.seo.board.dto.BoardViewResponse;
+import org.seo.board.dto.NovelViewResponse;
 import org.seo.board.service.BoardService;
+import org.seo.board.service.NovelService;
 import org.seo.board.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ public class BoardViewController {
 
     private final BoardService boardService;
     private final UserService userService;
+    private final NovelService novelService;
 
     // 글 전체 리스트 뷰
     // @GetMapping("/boards")
@@ -56,6 +59,11 @@ public class BoardViewController {
                 .map(BoardListViewResponse::new)
                 .toList();
 
+        List<NovelViewResponse> novelList = novelService.findTop()
+                .stream()
+                .map(NovelViewResponse::new)
+                .toList();
+
         boolean isLogin = false; // 로그인을 안 했을 경우
 
         // 로그인을 했을 경우
@@ -63,8 +71,22 @@ public class BoardViewController {
             isLogin = true;
         }
 
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
+
         model.addAttribute("boardList", boardList);
         model.addAttribute("popularBoardList", popularBoardList);
+        model.addAttribute("novelList", novelList);
         model.addAttribute("isLogin", isLogin);
 
         return "main";

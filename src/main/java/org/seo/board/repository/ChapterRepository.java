@@ -13,5 +13,8 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
 
     // 최신순 정렬
     List<Chapter> findByNovelIdOrderByEpisodeDesc(Long novelId);
+
+    // 오래된 순으로 정렬
+    List<Chapter> findByNovelIdOrderByEpisodeAsc(Long novelId);
     
 }

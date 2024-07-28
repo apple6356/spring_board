@@ -1,11 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+    
 <head>
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-    <title th:text="">episode</title>
+    <title th:text="|Ep${chapter.episode}.${chapter.title}|">episode</title>
 </head>
 <body>
+
+    <div>
+        <span id="title" th:text="|${chapter.title}|"></span>
+    </div>
+
+    <article>
+        <textarea id="content" th:utext="${chapter.content}" cols="100" rows="30" style="resize: none;" readonly></textarea>
+    </article>
+
+    <!-- 이하 댓글 영역 -->
     
 </body>
 </html>

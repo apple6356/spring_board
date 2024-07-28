@@ -1,6 +1,7 @@
 package org.seo.board.domain;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -47,6 +48,10 @@ public class Novel {
     @Column(name = "recommend")
     private Long recommend;
 
+    // 마지막으로 업데이트한 시간
+    @Column(name = "last_updated_at")
+    private LocalDateTime lastUpdatedAt;
+
     @OneToMany(mappedBy = "novel", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JsonManagedReference // 직렬화 시 사용되며, 주로 부모 엔티티에 적용, 무한루프 방지
     private List<Chapter> chapters;
@@ -65,6 +70,11 @@ public class Novel {
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    // 업데이트 시간 최신화
+    public void updateTime(LocalDateTime time) {
+        this.lastUpdatedAt = time;
     }
 
 }
