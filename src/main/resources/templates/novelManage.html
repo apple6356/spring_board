@@ -36,13 +36,15 @@
 
     <div>
         <article>
-            <input type="hidden" id="novel-id" th:value="${novel.id}">
-            <!-- <div>
-                <input type="file" id="coverImage" accept="/image/*">
-                <div th:if="${novel.coverImagePath}">
-                    <img th:src="@{${novel.coverImagePath}" alt="cover image" style="max-width: 200px;">
-                </div>
+            <!-- <div th:if="${novel.id != null}">
+                <form method="post" action="/api/coverImage" enctype="multipart/form-data">
+                    <input type="file" id="file" value="표지 선택">
+                    <input type="hidden" id="novel-id" th:value="${novel.id}">
+                    <button type="submit">표지 업로드</button>
+                </form>
             </div> -->
+
+            <input type="hidden" id="novel-id" th:value="${novel.id}">
             <header>
                 <input type="text" placeholder="제목" id="title" th:value="${novel.title}">
             </header>

@@ -2,17 +2,13 @@ package org.seo.board.controller;
 
 import org.seo.board.domain.User;
 
-import java.util.List;
-
 import org.seo.board.domain.Chapter;
 import org.seo.board.domain.Novel;
 import org.seo.board.dto.AddChapterRequest;
 import org.seo.board.dto.AddNovelRequest;
-import org.seo.board.dto.ChapterViewResponse;
 import org.seo.board.dto.UpdateChapterRequest;
 import org.seo.board.dto.UpdateChapterResponse;
 import org.seo.board.dto.UpdateNovelRequest;
-import org.seo.board.repository.ChapterRepository;
 import org.seo.board.service.NovelService;
 import org.seo.board.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -20,18 +16,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -138,5 +128,22 @@ public class NovelApiController {
 
         return ResponseEntity.ok().build();
     }
+
+    // 표지 업로드
+    // @PostMapping("/api/coverImage")
+    // public ResponseEntity<String> coverImageUpload(@RequestParam MultipartFile file, @RequestParam("novel-id") Long novelId) throws Exception {
+        
+    //     if (!file.isEmpty()) {
+    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 파일입니다.");
+    //     }
+
+    //     if (!file.getContentType().startsWith("image")) {
+    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 파일만 업로드 가능합니다.");
+    //     }
+
+    //     novelService.coverImage(file, novelId);
+
+    //     return ResponseEntity.ok().build();
+    // }
 
 }

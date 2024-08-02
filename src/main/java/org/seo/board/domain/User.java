@@ -1,5 +1,10 @@
 package org.seo.board.domain;
 
+
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +40,11 @@ public class User { // UserDetails를 상속받아 인증 객체로 사용
 
     @Column(name = "provider_id")
     private String providerId;
+
+    // 내 서재
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<UserShelf> userShelfs;
 
     @Builder
     public User(String email, String password, String username, UserRole role, String provider, String providerId) {

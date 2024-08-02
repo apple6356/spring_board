@@ -1,31 +1,29 @@
 package org.seo.board.service;
 
-import java.io.File;
-import java.util.Collection;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.seo.board.domain.Board;
-import org.seo.board.domain.BoardFile;
 import org.seo.board.domain.Chapter;
 import org.seo.board.domain.Novel;
+import org.seo.board.domain.User;
+import org.seo.board.domain.UserShelf;
 import org.seo.board.dto.AddChapterRequest;
 import org.seo.board.dto.AddNovelRequest;
-import org.seo.board.dto.BoardListViewResponse;
 import org.seo.board.dto.ChapterViewResponse;
-import org.seo.board.dto.NovelListViewRequest;
 import org.seo.board.dto.NovelViewResponse;
 import org.seo.board.dto.UpdateChapterRequest;
 import org.seo.board.dto.UpdateNovelRequest;
+import org.seo.board.dto.UserShelfViewResponse;
 import org.seo.board.repository.ChapterRepository;
 import org.seo.board.repository.NovelRepository;
+import org.seo.board.repository.UserShelfRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +33,7 @@ public class NovelService {
 
     private final NovelRepository novelRepository;
     private final ChapterRepository chapterRepository;
+    private final UserShelfRepository userShelfRepository;
 
     // 소설 생성
     public Novel save(AddNovelRequest request, String username) {
@@ -168,17 +167,65 @@ public class NovelService {
         return novelRepository.findTop10ByOrderByIdDesc();
     }
 
+    // 로그인 된 상태로 회차 조회시 usershelf에 저장
+    public void saveUserShelf(User user, Chapter chapter, Novel novel) {
+
+        Optional<UserShelf> userShelfOp = userShelfRepository.findByUserAndNovel(user, novel);
+        UserShelf userShelf;
+
+        if(userShelfOp.isPresent()) {
+            // usershelf 존재하면
+            userShelf = userShelfOp.get();
+            userShelf.update(chapter.getId(), LocalDateTime.now(), chapter.getEpisode());
+        } else {
+            // usershelf 존재하지 않는다면
+            userShelf = new UserShelf(chapter.getId(), novel, user, LocalDateTime.now(), chapter.getEpisode());
+        }
+
+        // 다음 회차 ( 다음 회차가 존재하면 다음화 보기 기능을 활성화 )
+        Optional<Chapter> nextChapterOp = chapterRepository.findFirstByNovelAndEpisodeGreaterThanOrderByEpisode(novel, chapter.getEpisode());
+        Chapter nextChapter;
+
+        if (nextChapterOp.isPresent()) {
+            nextChapter = nextChapterOp.get();
+            userShelf.nextChapterId(nextChapter.getId());
+        } else {
+            userShelf.nextChapterId(null);
+        }
+
+        userShelfRepository.save(userShelf);
+    }
+    
     // 내 서재
-	// public Page<NovelViewResponse> myLibrary(String username, Pageable pageable) {
+    public Page<UserShelfViewResponse> myShelf(User user, Pageable pageable) {
 
-    //     int page = pageable.getPageNumber() - 1;
-    //     int pageLimit = 20; // 한페이지에 보여줄 글 갯수
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 20; // 한페이지에 보여줄 글 갯수
 
-    //     Page<Novel> novelPage = novelRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastUpdatedAt")));
+        Page<UserShelf> userShelfPage = userShelfRepository.findByUser(user, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastReadDate")));
+        Page<UserShelfViewResponse> userShelfs = userShelfPage.map(UserShelfViewResponse::new);
 
-    //     Page<NovelViewResponse> novelList = novelPage.map(NovelViewResponse::new);
+        return userShelfs;
+    }
 
-    //     return novelList;
-	// }
+    // 표지 이미지 업로드
+    // @Transactional
+    // public void coverImage(MultipartFile file, Long id) throws IOException {
+
+    //     String novelDir = "/cover/" + id;
+    //     Path novelPath = Paths.get(novelDir);
+    //     if (!Files.exists(novelPath)) {
+    //         Files.createDirectories(novelPath);
+    //     }
+
+    //     String filename = file.getOriginalFilename();
+
+    //     String fileDir = novelDir + "/" + filename;
+    //     Path filePath = novelPath.resolve(filename);
+    //     Files.write(filePath, file.getBytes());
+
+    //     novelRepository.updateCoverImage(fileDir, id);
+    // }
+
 
 }

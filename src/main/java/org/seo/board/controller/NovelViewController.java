@@ -1,21 +1,20 @@
 package org.seo.board.controller;
 
 import java.util.List;
+import java.util.stream.Collector;
 
 import org.seo.board.domain.Chapter;
 import org.seo.board.domain.Novel;
 import org.seo.board.domain.User;
-import org.seo.board.dto.BoardViewResponse;
+import org.seo.board.domain.UserShelf;
 import org.seo.board.dto.ChapterViewResponse;
-import org.seo.board.dto.NovelListViewRequest;
 import org.seo.board.dto.NovelViewResponse;
-import org.seo.board.repository.ChapterRepository;
+import org.seo.board.dto.UserShelfViewResponse;
 import org.seo.board.service.NovelService;
 import org.seo.board.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
@@ -77,7 +75,7 @@ public class NovelViewController {
             user = userService.findByEmail(email);
             model.addAttribute("user", user);
         }
-        
+
         Page<NovelViewResponse> novelList = novelService.novelPaging(pageable);
 
         int blockLimit = 10;
@@ -218,6 +216,10 @@ public class NovelViewController {
     public String novelViewPage(@RequestParam(value = "id") Long id, Model model,
             @AuthenticationPrincipal Object principal) {
 
+        Chapter chapter = novelService.findByIdChapter(id);
+
+        Novel novel = chapter.getNovel();
+
         User user;
         String email = "";
 
@@ -230,9 +232,14 @@ public class NovelViewController {
         if (!email.equals("")) {
             user = userService.findByEmail(email);
             model.addAttribute("user", user);
-        }
 
-        Chapter chapter = novelService.findByIdChapter(id);
+            System.out.println("user: " + user.getUsername());
+            System.out.println("chapter: " + chapter.getTitle());
+            System.out.println("novel: " + novel.getTitle());
+
+            // 소설 회차 조회 시 로그인되어 있다면 usershelf에 소설 저장
+            novelService.saveUserShelf(user, chapter, novel);
+        }
 
         model.addAttribute("chapter", chapter);
 
@@ -240,48 +247,44 @@ public class NovelViewController {
     }
 
     // 내 서재
-    // @GetMapping("/myLibrary/{username}")
-    // public String myLibrary(@PageableDefault(page = 1) Pageable pageable,
-    // @PathVariable("username") String username, Model model,
-    // @AuthenticationPrincipal Object principal) {
+    @GetMapping("/myShelf")
+    public String myShelf(Model model, @AuthenticationPrincipal Object principal, @PageableDefault(page = 1) Pageable pageable) {
+        User user;
+        String email = "";
 
-    // User user;
-    // String email = "";
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
 
-    // if (principal instanceof UserDetails) {
-    // email = ((UserDetails) principal).getUsername();
-    // } else if (principal instanceof OAuth2User) {
-    // email = (String) ((OAuth2User) principal).getAttributes().get("email");
-    // }
+        if (!email.equals("")) {
+            user = userService.findByEmail(email);
 
-    // if (!email.equals("")) {
-    // user = userService.findByEmail(email);
-    // model.addAttribute("user", user);
-    // }
+            Page<UserShelfViewResponse> userShelfs = novelService.myShelf(user, pageable);
+            
+            // List<Novel> novelList
 
-    // Page<NovelViewResponse> novelList = novelService.myLibrary(username,
-    // pageable);
+            int blockLimit = 10;
+            // 1 11 21 31
+            int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
+            ;
+            // 10 20 30 40
+            int endPage = ((startPage + blockLimit - 1) < userShelfs.getTotalPages()) ? startPage + blockLimit - 1
+                    : userShelfs.getTotalPages();
+    
+            int prev = startPage - 1;
+            int next = endPage + 1;
 
-    // int blockLimit = 10;
-    // // 1 11 21 31
-    // int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() /
-    // blockLimit))) - 1) * blockLimit + 1;
-    // ;
-    // // 10 20 30 40
-    // int endPage = ((startPage + blockLimit - 1) < novelList.getTotalPages()) ?
-    // startPage + blockLimit - 1
-    // : novelList.getTotalPages();
+            model.addAttribute("userShelfs", userShelfs);
+            model.addAttribute("user", user);
+            model.addAttribute("startPage", startPage);
+            model.addAttribute("endPage", endPage);
+            model.addAttribute("prev", prev);
+            model.addAttribute("next", next);
+        }
 
-    // int prev = startPage - 1;
-    // int next = endPage + 1;
-
-    // model.addAttribute("novelList", novelList);
-    // model.addAttribute("startPage", startPage);
-    // model.addAttribute("endPage", endPage);
-    // model.addAttribute("prev", prev);
-    // model.addAttribute("next", next);
-
-    // return "myLibrary";
-    // }
+        return "myShelf";
+    }
 
 }

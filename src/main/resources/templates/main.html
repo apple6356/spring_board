@@ -18,7 +18,7 @@
         <li><span>소설</span>
             <ul>
                 <li onclick="location.href='/novelList'">소설 게시판</li>
-                <!-- <li th:if="${isLogin} == true" th:onclick="location.href='@{/myLibrary/{username}(username = ${user.username})}'">내 서재</li> -->
+                <li th:if="${isLogin} == true" onclick="location.href='/myShelf'">내 서재</li>
             </ul>
         </li>
     </ul>

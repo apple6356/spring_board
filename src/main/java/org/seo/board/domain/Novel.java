@@ -41,7 +41,7 @@ public class Novel {
     private String author;
 
     // 표지
-    @Column(name = "coverImagePath")
+    @Column(name = "cover_image_path")
     private String coverImagePath;
 
     // 추천수
@@ -52,9 +52,15 @@ public class Novel {
     @Column(name = "last_updated_at")
     private LocalDateTime lastUpdatedAt;
 
+    // 해당 소설의 회차
     @OneToMany(mappedBy = "novel", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JsonManagedReference // 직렬화 시 사용되며, 주로 부모 엔티티에 적용, 무한루프 방지
     private List<Chapter> chapters;
+
+    // 내 서재
+    @OneToMany(mappedBy = "novel", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<UserShelf> userShelfs;
 
     @Builder
     public Novel(String author, String content, String title, String coverImagePath) {
