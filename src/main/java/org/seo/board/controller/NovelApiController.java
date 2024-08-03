@@ -3,9 +3,16 @@ package org.seo.board.controller;
 import org.seo.board.domain.User;
 
 import org.seo.board.domain.Chapter;
+import org.seo.board.domain.ChapterComment;
 import org.seo.board.domain.Novel;
+import org.seo.board.dto.AddChapterCommentRequest;
 import org.seo.board.dto.AddChapterRequest;
+import org.seo.board.dto.AddCommentRequest;
+import org.seo.board.dto.AddCommentResponse;
 import org.seo.board.dto.AddNovelRequest;
+import org.seo.board.dto.RecommendChapCommentResponse;
+import org.seo.board.dto.UpdateChapterCommentRequest;
+import org.seo.board.dto.UpdateChapterCommentResponse;
 import org.seo.board.dto.UpdateChapterRequest;
 import org.seo.board.dto.UpdateChapterResponse;
 import org.seo.board.dto.UpdateNovelRequest;
@@ -129,21 +136,69 @@ public class NovelApiController {
         return ResponseEntity.ok().build();
     }
 
+    // 댓글 작성
+    @PostMapping("/api/chapter-comments")
+    public ResponseEntity<ChapterComment> chapterComment(@RequestBody AddChapterCommentRequest request,
+            @AuthenticationPrincipal Object principal) {
+
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        User user = userService.findByEmail(email);
+
+        ChapterComment chapterComment = novelService.saveComment(request, user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(chapterComment);
+    }
+
+    // 댓글 수정
+    @PutMapping("/api/chapter-comments/{commentId}")
+    public ResponseEntity<UpdateChapterCommentResponse> updateChapterComment(@PathVariable("commentId") Long id,
+            @RequestBody UpdateChapterCommentRequest request, @AuthenticationPrincipal Object principal) {
+
+        ChapterComment chapterComment = novelService.updateComment(id, request);
+        
+        return ResponseEntity.ok().body(new UpdateChapterCommentResponse(chapterComment));
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/api/chapter-comments/{commentId}")
+    public ResponseEntity<Void> deleteChapterComment(@PathVariable("commentId") Long id) {
+        novelService.deleteComment(id);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // 댓글 추천
+    @PutMapping("/api/chapter-comments-recommend/{commentId}")
+    public ResponseEntity<RecommendChapCommentResponse> recommendChapterComment(@PathVariable("commentId") Long id) {
+        ChapterComment chapterComment = novelService.recommendComment(id);
+
+        return ResponseEntity.ok().body(new RecommendChapCommentResponse(chapterComment));
+    }
+
     // 표지 업로드
     // @PostMapping("/api/coverImage")
-    // public ResponseEntity<String> coverImageUpload(@RequestParam MultipartFile file, @RequestParam("novel-id") Long novelId) throws Exception {
-        
-    //     if (!file.isEmpty()) {
-    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 파일입니다.");
-    //     }
+    // public ResponseEntity<String> coverImageUpload(@RequestParam MultipartFile
+    // file, @RequestParam("novel-id") Long novelId) throws Exception {
 
-    //     if (!file.getContentType().startsWith("image")) {
-    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 파일만 업로드 가능합니다.");
-    //     }
+    // if (!file.isEmpty()) {
+    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 파일입니다.");
+    // }
 
-    //     novelService.coverImage(file, novelId);
+    // if (!file.getContentType().startsWith("image")) {
+    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 파일만 업로드
+    // 가능합니다.");
+    // }
 
-    //     return ResponseEntity.ok().build();
+    // novelService.coverImage(file, novelId);
+
+    // return ResponseEntity.ok().build();
     // }
 
 }

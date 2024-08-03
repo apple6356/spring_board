@@ -6,17 +6,24 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.seo.board.domain.Chapter;
+import org.seo.board.domain.ChapterComment;
+import org.seo.board.domain.Comment;
 import org.seo.board.domain.Novel;
 import org.seo.board.domain.User;
 import org.seo.board.domain.UserShelf;
+import org.seo.board.dto.AddChapterCommentRequest;
 import org.seo.board.dto.AddChapterRequest;
+import org.seo.board.dto.AddCommentRequest;
 import org.seo.board.dto.AddNovelRequest;
 import org.seo.board.dto.ChapterViewResponse;
 import org.seo.board.dto.NovelViewResponse;
+import org.seo.board.dto.UpdateChapterCommentRequest;
 import org.seo.board.dto.UpdateChapterRequest;
 import org.seo.board.dto.UpdateNovelRequest;
 import org.seo.board.dto.UserShelfViewResponse;
+import org.seo.board.repository.ChapterCommentRepository;
 import org.seo.board.repository.ChapterRepository;
+import org.seo.board.repository.CommentRepository;
 import org.seo.board.repository.NovelRepository;
 import org.seo.board.repository.UserShelfRepository;
 import org.springframework.data.domain.Page;
@@ -34,6 +41,7 @@ public class NovelService {
     private final NovelRepository novelRepository;
     private final ChapterRepository chapterRepository;
     private final UserShelfRepository userShelfRepository;
+    private final ChapterCommentRepository chapterCommentRepository;
 
     // 소설 생성
     public Novel save(AddNovelRequest request, String username) {
@@ -64,7 +72,8 @@ public class NovelService {
         int page = pageable.getPageNumber() - 1;
         int pageLimit = 10; // 한페이지에 보여줄 글 갯수
 
-        Page<Novel> novelPage = novelRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastUpdatedAt")));
+        Page<Novel> novelPage = novelRepository
+                .findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastUpdatedAt")));
 
         Page<NovelViewResponse> novelList = novelPage.map(NovelViewResponse::new);
 
@@ -74,10 +83,11 @@ public class NovelService {
     // 최신순(desc)
     public List<ChapterViewResponse> findByIdDesc(Long novelId) {
         System.out.println("desc");
-        
+
         List<Chapter> chapters = chapterRepository.findByNovelIdOrderByEpisodeDesc(novelId);
 
-        List<ChapterViewResponse> chapterList = chapters.stream().map(ChapterViewResponse::new).collect(Collectors.toList());
+        List<ChapterViewResponse> chapterList = chapters.stream().map(ChapterViewResponse::new)
+                .collect(Collectors.toList());
 
         return chapterList;
     }
@@ -88,7 +98,8 @@ public class NovelService {
 
         List<Chapter> chapters = chapterRepository.findByNovelIdOrderByEpisodeAsc(novelId);
 
-        List<ChapterViewResponse> chapterList = chapters.stream().map(ChapterViewResponse::new).collect(Collectors.toList());
+        List<ChapterViewResponse> chapterList = chapters.stream().map(ChapterViewResponse::new)
+                .collect(Collectors.toList());
 
         return chapterList;
     }
@@ -123,19 +134,19 @@ public class NovelService {
         System.out.println("novel: " + novel.getId());
         System.out.println("requset novelId: " + request.getNovelId());
 
-        
         Long topEpisode = 0L;
-        
+
         // 제일 높은 회차를 가져온다
-        Optional<Chapter> episodeChapter = chapterRepository.findTopEpisodeByNovelIdOrderByEpisodeDesc(request.getNovelId());
-        
+        Optional<Chapter> episodeChapter = chapterRepository
+                .findTopEpisodeByNovelIdOrderByEpisodeDesc(request.getNovelId());
+
         if (episodeChapter.isPresent()) {
             topEpisode = episodeChapter.get().getEpisode();
         }
-        
+
         System.out.println("topEpisode: " + topEpisode);
         Chapter chapter = chapterRepository.save(request.toEntity(novel, username, topEpisode));
-        
+
         novel.updateTime(chapter.getCreatedAt());
         novelRepository.save(novel);
 
@@ -173,7 +184,7 @@ public class NovelService {
         Optional<UserShelf> userShelfOp = userShelfRepository.findByUserAndNovel(user, novel);
         UserShelf userShelf;
 
-        if(userShelfOp.isPresent()) {
+        if (userShelfOp.isPresent()) {
             // usershelf 존재하면
             userShelf = userShelfOp.get();
             userShelf.update(chapter.getId(), LocalDateTime.now(), chapter.getEpisode());
@@ -183,7 +194,8 @@ public class NovelService {
         }
 
         // 다음 회차 ( 다음 회차가 존재하면 다음화 보기 기능을 활성화 )
-        Optional<Chapter> nextChapterOp = chapterRepository.findFirstByNovelAndEpisodeGreaterThanOrderByEpisode(novel, chapter.getEpisode());
+        Optional<Chapter> nextChapterOp = chapterRepository.findFirstByNovelAndEpisodeGreaterThanOrderByEpisode(novel,
+                chapter.getEpisode());
         Chapter nextChapter;
 
         if (nextChapterOp.isPresent()) {
@@ -195,37 +207,75 @@ public class NovelService {
 
         userShelfRepository.save(userShelf);
     }
-    
+
     // 내 서재
     public Page<UserShelfViewResponse> myShelf(User user, Pageable pageable) {
 
         int page = pageable.getPageNumber() - 1;
         int pageLimit = 20; // 한페이지에 보여줄 글 갯수
 
-        Page<UserShelf> userShelfPage = userShelfRepository.findByUser(user, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastReadDate")));
+        Page<UserShelf> userShelfPage = userShelfRepository.findByUser(user,
+                PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastReadDate")));
         Page<UserShelfViewResponse> userShelfs = userShelfPage.map(UserShelfViewResponse::new);
 
         return userShelfs;
+    }
+
+    // 댓글 작성
+    public ChapterComment saveComment(AddChapterCommentRequest request, User user) {
+        Chapter chapter = chapterRepository.findById(request.getChapterId())
+                .orElseThrow(() -> new IllegalArgumentException("not found" + request.getChapterId()));
+
+        ChapterComment chaptercomment = chapterCommentRepository.save(request.toEntity(chapter, user.getUsername()));
+
+        return chaptercomment;
+    }
+
+    // 댓글 수정
+    public ChapterComment updateComment(Long id, UpdateChapterCommentRequest request) {
+        ChapterComment chapterComment = chapterCommentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+
+        chapterComment.update(request.getContent());
+
+        chapterCommentRepository.save(chapterComment);
+
+        return chapterComment;
+    }
+
+    // 댓글 삭제
+    public void deleteComment(Long id) {
+        chapterCommentRepository.deleteById(id);
+    }
+
+    // 댓글 추천
+    public ChapterComment recommendComment(Long id) {
+        ChapterComment chapterComment = chapterCommentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+
+        chapterComment.updateRecommend();
+        chapterCommentRepository.save(chapterComment);
+
+        return chapterComment;
     }
 
     // 표지 이미지 업로드
     // @Transactional
     // public void coverImage(MultipartFile file, Long id) throws IOException {
 
-    //     String novelDir = "/cover/" + id;
-    //     Path novelPath = Paths.get(novelDir);
-    //     if (!Files.exists(novelPath)) {
-    //         Files.createDirectories(novelPath);
-    //     }
-
-    //     String filename = file.getOriginalFilename();
-
-    //     String fileDir = novelDir + "/" + filename;
-    //     Path filePath = novelPath.resolve(filename);
-    //     Files.write(filePath, file.getBytes());
-
-    //     novelRepository.updateCoverImage(fileDir, id);
+    // String novelDir = "/cover/" + id;
+    // Path novelPath = Paths.get(novelDir);
+    // if (!Files.exists(novelPath)) {
+    // Files.createDirectories(novelPath);
     // }
 
+    // String filename = file.getOriginalFilename();
+
+    // String fileDir = novelDir + "/" + filename;
+    // Path filePath = novelPath.resolve(filename);
+    // Files.write(filePath, file.getBytes());
+
+    // novelRepository.updateCoverImage(fileDir, id);
+    // }
 
 }
