@@ -26,7 +26,7 @@ function httpRequest(method, url, body, success, fail) {
         headers: {
             // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
             Authorization: "Bearer " + localStorage.getItem("access_token"),
-            "Content-Type": "application/json",
+            // "Content-Type": "application/json",
         },
         body: body,
     })
@@ -65,10 +65,21 @@ const createNovelButton = document.getElementById('create-novel-btn');
 if (createNovelButton) {
     createNovelButton.addEventListener('click', event => {
 
-        body = JSON.stringify({
-            title: document.getElementById("title").value,
-            content: document.getElementById("content").value
-        });
+        const formData = new FormData();
+
+        formData.append("title", document.getElementById("title").value);
+        formData.append("content", document.getElementById("content").value);
+
+        const file = document.getElementById("file");
+
+        if (file.files.length > 0) {
+            formData.append("file", file.files[0]);
+        }
+
+        // body = JSON.stringify({
+        //     title: document.getElementById("title").value,
+        //     content: document.getElementById("content").value
+        // });
 
         function success() {
             alert("등록 완료");
@@ -79,7 +90,7 @@ if (createNovelButton) {
             alert("등록 실패, " + errorMessage);
         }
 
-        httpRequest("POST", "/api/novel", body, success, fail);
+        httpRequest("POST", "/api/novel", formData, success, fail);
     });
 }
 
@@ -91,10 +102,21 @@ if (modifyNovelButton) {
 
         let id = document.getElementById("novel-id").value;
 
-        body = JSON.stringify({
-            title: document.getElementById("title").value,
-            content: document.getElementById("content").value
-        });
+        const formData = new FormData();
+
+        formData.append("title", document.getElementById("title").value);
+        formData.append("content", document.getElementById("content").value);
+
+        const file = document.getElementById("file");
+
+        if (file.files.length > 0) {
+            formData.append("file", file.files[0]);
+        }
+
+        // body = JSON.stringify({
+        //     title: document.getElementById("title").value,
+        //     content: document.getElementById("content").value
+        // });
 
         function success() {
             alert("수정 완료");
@@ -105,7 +127,7 @@ if (modifyNovelButton) {
             alert("수정 실패");
         }
 
-        httpRequest("PUT", "/api/novel/" + id, body, success, fail);
+        httpRequest("PUT", "/api/novel/" + id, formData, success, fail);
     });
 }
 

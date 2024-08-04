@@ -1,5 +1,7 @@
 package org.seo.board.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,4 +18,5 @@ public class UpdateNovelRequest {
     @Size(min = 1, max = 200)
     private String content;
     
+    private MultipartFile coverImage;
 }

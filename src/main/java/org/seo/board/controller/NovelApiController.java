@@ -2,6 +2,8 @@ package org.seo.board.controller;
 
 import org.seo.board.domain.User;
 
+import java.io.IOException;
+
 import org.seo.board.domain.Chapter;
 import org.seo.board.domain.ChapterComment;
 import org.seo.board.domain.Novel;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -42,7 +45,7 @@ public class NovelApiController {
     // 작품 생성
     @PostMapping("/api/novel")
     public ResponseEntity<Novel> addNovel(@AuthenticationPrincipal Object principal,
-            @RequestBody AddNovelRequest request) {
+            @RequestParam AddNovelRequest request) throws IllegalStateException, IOException {
 
         String email = "";
 
@@ -54,9 +57,7 @@ public class NovelApiController {
 
         User user = userService.findByEmail(email);
 
-        Novel novel;
-
-        novel = novelService.save(request, user.getUsername());
+        Novel novel = novelService.save(request, user.getUsername());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(novel);
@@ -66,9 +67,19 @@ public class NovelApiController {
     @PutMapping("/api/novel/{id}")
     public ResponseEntity<Novel> updateNovel(@AuthenticationPrincipal Object principal,
             @PathVariable("id") Long id,
-            @RequestBody UpdateNovelRequest request) {
+            @RequestParam UpdateNovelRequest request) throws IllegalStateException, IOException {
 
-        Novel novel = novelService.update(id, request);
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        User user = userService.findByEmail(email);
+
+        Novel novel = novelService.update(id, request, user.getUsername());
 
         return ResponseEntity.ok()
                 .body(novel);
@@ -162,7 +173,7 @@ public class NovelApiController {
             @RequestBody UpdateChapterCommentRequest request, @AuthenticationPrincipal Object principal) {
 
         ChapterComment chapterComment = novelService.updateComment(id, request);
-        
+
         return ResponseEntity.ok().body(new UpdateChapterCommentResponse(chapterComment));
     }
 

@@ -83,4 +83,9 @@ public class Novel {
         this.lastUpdatedAt = time;
     }
 
+    // 표지 이미지 업데이트
+    public void updateCoverImage(String coverImagePath) {
+        this.coverImagePath = coverImagePath;
+    }
+
 }

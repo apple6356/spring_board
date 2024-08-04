@@ -1,5 +1,7 @@
 package org.seo.board.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -44,18 +46,61 @@ public class NovelService {
     private final ChapterCommentRepository chapterCommentRepository;
 
     // 소설 생성
-    public Novel save(AddNovelRequest request, String username) {
+    public Novel save(AddNovelRequest request, String username) throws IllegalStateException, IOException {
 
-        Novel novel = novelRepository.save(request.toEntity(username));
+        Novel novel;
+
+        if (request.getCoverImage() != null && !request.getCoverImage().isEmpty()) {
+            // 표지 이미지 저장
+            String novelDirPath = "/cover_image/" + username + "/" + request.getTitle();
+            File novelDir = new File(novelDirPath);
+
+            if (!novelDir.exists()) {
+                novelDir.mkdirs();
+            }
+
+            String filePath = novelDirPath + "/" + request.getCoverImage().getOriginalFilename();
+            // request의 file을 filePath의 경로에 저장
+            request.getCoverImage().transferTo(new File(filePath));
+
+            novel = novelRepository.save(request.toEntity(username, filePath));
+        } else {
+            novel = novelRepository.save(request.toEntity(username));
+        }
 
         return novel;
     }
 
+    // 오류 해결 및 마무리 해야함
     // 소설 수정
-    public Novel update(Long id, UpdateNovelRequest request) {
+    public Novel update(Long id, UpdateNovelRequest request, String username) throws IllegalStateException, IOException {
 
         Novel novel = novelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+
+        if (request.getCoverImage() != null && !request.getCoverImage().isEmpty()) {
+            // 기존 표지 삭제
+            if (novel.getCoverImagePath() != null) {
+                File deleteFile = new File(novel.getCoverImagePath());
+                if (deleteFile.exists()) {
+                    deleteFile.delete();
+                }
+            }
+
+            // 표지 이미지 저장
+            String novelDirPath = "/cover_image/" + username + "/" + request.getTitle();
+            File novelDir = new File(novelDirPath);
+
+            if (!novelDir.exists()) {
+                novelDir.mkdirs();
+            }
+
+            String filePath = novelDirPath + "/" + request.getCoverImage().getOriginalFilename();
+            // request의 file을 filePath의 경로에 저장
+            request.getCoverImage().transferTo(new File(filePath));
+
+            novel.updateCoverImage(filePath);;
+        }
 
         novel.update(request.getTitle(), request.getContent());
 
