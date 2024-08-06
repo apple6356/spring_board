@@ -25,8 +25,8 @@ function httpRequest(method, url, body, success, fail) {
         //        headers: headers,
         headers: {
             // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
-            Authorization: "Bearer " + localStorage.getItem("access_token"),
-            // "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("access_token")
+            // "Content-Type": "application/json"
         },
         body: body,
     })
@@ -83,14 +83,47 @@ if (createNovelButton) {
 
         function success() {
             alert("등록 완료");
-            location.replace("/novelBoard");
+            location.replace("/novelList");
         }
 
         function fail(errorMessage) {
             alert("등록 실패, " + errorMessage);
         }
 
-        httpRequest("POST", "/api/novel", formData, success, fail);
+        // httpRequest("POST", "/api/novel", formData, success, fail);
+
+        fetch("/api/novel", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                if (response.status === 200 || response.status === 201) {
+                    return success();
+                }
+                const refresh_token = getCookie("refresh_token");
+                if (response.status === 401 && refresh_token) {
+                    fetch("/api/token", {
+                        method: "POST",
+                        headers: {
+                            Authorization: "Bearer " + localStorage.getItem("access_token"),
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            refreshToken: getCookie("refresh_token"),
+                        }),
+                    })
+                        .then((res) => res.json()) // 응답을 JSON으로 파싱
+                        .then((result) => {
+                            // 재발급이 성공하면 로컬 스토리지값을 새 액세스 토큰으로 교체
+                            localStorage.setItem("access_token", result.accessToken);
+                            httpRequest(method, url, body, false, success, fail);
+                        })
+                        .catch((error) => fail(error.message));
+                } else {
+                    return fail();
+                }
+            });
+            
     });
 }
 
@@ -113,6 +146,11 @@ if (modifyNovelButton) {
             formData.append("file", file.files[0]);
         }
 
+        // 모든 FormData 항목 출력
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
         // body = JSON.stringify({
         //     title: document.getElementById("title").value,
         //     content: document.getElementById("content").value
@@ -127,7 +165,40 @@ if (modifyNovelButton) {
             alert("수정 실패");
         }
 
-        httpRequest("PUT", "/api/novel/" + id, formData, success, fail);
+        // httpRequest("PUT", "/api/novel/" + id, formData, success, fail);
+
+        fetch("/api/novel/" + id, {
+            method: "PUT",
+            body: formData,
+        })
+            .then((response) => {
+                if (response.status === 200 || response.status === 201) {
+                    return success();
+                }
+                const refresh_token = getCookie("refresh_token");
+                if (response.status === 401 && refresh_token) {
+                    fetch("/api/token", {
+                        method: "POST",
+                        headers: {
+                            Authorization: "Bearer " + localStorage.getItem("access_token"),
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            refreshToken: getCookie("refresh_token"),
+                        }),
+                    })
+                        .then((res) => res.json()) // 응답을 JSON으로 파싱
+                        .then((result) => {
+                            // 재발급이 성공하면 로컬 스토리지값을 새 액세스 토큰으로 교체
+                            localStorage.setItem("access_token", result.accessToken);
+                            httpRequest(method, url, body, false, success, fail);
+                        })
+                        .catch((error) => fail(error.message));
+                } else {
+                    return fail();
+                }
+            });
+
     });
 }
 
@@ -247,11 +318,11 @@ function episodeSort(e) {
     $.ajax({
         type: "GET",
         url: "/episode-sort", // 요청 url
-        data: { 
+        data: {
             novelId: document.getElementById("novel-id").value,
             order: order
         }, // 보낼 데이터
-        success: function(fragment) {
+        success: function (fragment) {
             console.log("fragment : " + fragment);
             $('#chapters').replaceWith(fragment);
 
@@ -262,7 +333,7 @@ function episodeSort(e) {
             }
 
         },
-        error: function() {
+        error: function () {
             alert("오류 발생");
         }
     });
@@ -309,7 +380,7 @@ function commentModify(commentId, button) {
 
     button.innerText = '등록'; // 버튼 등록으로 변경
 
-    button.onclick = function() { // 등록 버튼 누르면 댓글 수정
+    button.onclick = function () { // 등록 버튼 누르면 댓글 수정
         updateComment(commentId, textarea.value, button);
     }
 }

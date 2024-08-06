@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -46,13 +47,14 @@ public class NovelService {
     private final ChapterCommentRepository chapterCommentRepository;
 
     // 소설 생성
-    public Novel save(AddNovelRequest request, String username) throws IllegalStateException, IOException {
+    public Novel save(AddNovelRequest request, String username)
+            throws IllegalStateException, IOException {
 
         Novel novel;
 
         if (request.getCoverImage() != null && !request.getCoverImage().isEmpty()) {
             // 표지 이미지 저장
-            String novelDirPath = "/cover_image/" + username + "/" + request.getTitle();
+            String novelDirPath = "d:/cover_image/" + username + "/" + request.getTitle();
             File novelDir = new File(novelDirPath);
 
             if (!novelDir.exists()) {
@@ -71,9 +73,9 @@ public class NovelService {
         return novel;
     }
 
-    // 오류 해결 및 마무리 해야함
     // 소설 수정
-    public Novel update(Long id, UpdateNovelRequest request, String username) throws IllegalStateException, IOException {
+    public Novel update(Long id, UpdateNovelRequest request, String username)
+            throws IllegalStateException, IOException {
 
         Novel novel = novelRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
@@ -88,8 +90,14 @@ public class NovelService {
             }
 
             // 표지 이미지 저장
-            String novelDirPath = "/cover_image/" + username + "/" + request.getTitle();
+            String novelDirPath = "d:/cover_image/" + username + "/" + request.getTitle();
             File novelDir = new File(novelDirPath);
+
+            // 소설 제목이 변경되면 폴더의 이름도 변경
+            if (!(novel.getTitle().equals(request.getTitle()))) {
+                File oldDir = new File("d:/cover_image/" + username + "/" + novel.getTitle());
+                oldDir.renameTo(novelDir);
+            }
 
             if (!novelDir.exists()) {
                 novelDir.mkdirs();
@@ -99,12 +107,31 @@ public class NovelService {
             // request의 file을 filePath의 경로에 저장
             request.getCoverImage().transferTo(new File(filePath));
 
-            novel.updateCoverImage(filePath);;
+            novel.updateCoverImage(filePath);
         }
 
         novel.update(request.getTitle(), request.getContent());
 
         return novelRepository.save(novel);
+    }
+
+    // 소설 삭제
+    public void delete(Long id) {
+        Novel novel = novelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
+
+        // 소설 삭제 될 때 저장된 coverimage도 함께
+        String novelDirPath = "d:/cover_image/" + novel.getAuthor() + "/" + novel.getTitle();
+        File novelDir = new File(novelDirPath);
+
+        if (novelDir.exists()) {
+            for (File file : novelDir.listFiles()) {
+                file.delete();
+            }
+            novelDir.delete();
+        }
+
+        novelRepository.delete(novel);
     }
 
     public Novel findById(Long id) {
@@ -161,14 +188,6 @@ public class NovelService {
         List<Novel> novelList = novelRepository.findByAuthor(username);
 
         return novelList;
-    }
-
-    // 소설 삭제
-    public void delete(Long id) {
-        Novel novel = novelRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
-
-        novelRepository.delete(novel);
     }
 
     // 새 회차 등록

@@ -26,12 +26,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,7 +48,10 @@ public class NovelApiController {
     // 작품 생성
     @PostMapping("/api/novel")
     public ResponseEntity<Novel> addNovel(@AuthenticationPrincipal Object principal,
-            @RequestParam AddNovelRequest request) throws IllegalStateException, IOException {
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestPart(value = "file", required = false) MultipartFile file)
+            throws IllegalStateException, IOException {
 
         String email = "";
 
@@ -56,6 +62,8 @@ public class NovelApiController {
         }
 
         User user = userService.findByEmail(email);
+
+        AddNovelRequest request = new AddNovelRequest(title, content, file);
 
         Novel novel = novelService.save(request, user.getUsername());
 
@@ -67,7 +75,10 @@ public class NovelApiController {
     @PutMapping("/api/novel/{id}")
     public ResponseEntity<Novel> updateNovel(@AuthenticationPrincipal Object principal,
             @PathVariable("id") Long id,
-            @RequestParam UpdateNovelRequest request) throws IllegalStateException, IOException {
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam(value = "file", required = false) MultipartFile file)
+            throws IllegalStateException, IOException {
 
         String email = "";
 
@@ -78,6 +89,12 @@ public class NovelApiController {
         }
 
         User user = userService.findByEmail(email);
+
+        UpdateNovelRequest request = new UpdateNovelRequest(title, content, file);
+
+        System.out.println("request.title: " + request.getTitle());
+        System.out.println("request.content: " + request.getContent());
+        System.out.println("file.name: " + file.getOriginalFilename());
 
         Novel novel = novelService.update(id, request, user.getUsername());
 

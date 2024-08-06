@@ -1,6 +1,11 @@
 package org.seo.board.service;
 
 import lombok.RequiredArgsConstructor;
+
+import java.io.File;
+import java.util.List;
+
+import org.seo.board.domain.Novel;
 import org.seo.board.domain.User;
 import org.seo.board.domain.UserRole;
 import org.seo.board.dto.AddUserRequest;
@@ -63,6 +68,28 @@ public class UserService {
         novelRepository.updateUsername(oldName, request.getUsername());
         chapterRepository.updateUsername(oldName, request.getUsername());
         chapterCommentRepository.updateUsername(oldName, request.getUsername());
+
+        // username 변경 시 coverimage 저장된 폴더의 이름도 변경
+        String oldDirPath = "d:/cover_image/" + oldName;
+        String newDirPath = "d:/cover_image/" + request.getUsername();
+
+        File oldDir = new File(oldDirPath);
+        File newDir = new File(newDirPath);
+        
+        if (oldDir.exists()) {
+            oldDir.renameTo(newDir);
+        }
+
+        List<Novel> novels = novelRepository.findByAuthor(request.getUsername());
+        for (Novel novel : novels) {
+            String oldCoverImagePath = novel.getCoverImagePath();
+            if (oldCoverImagePath != null) {
+                String newCoverImagePath = oldCoverImagePath.replace(oldName, request.getUsername());
+                System.out.println("newCoverImagePath: " + newCoverImagePath);
+                novel.updateCoverImage(newCoverImagePath);
+                novelRepository.save(novel);
+            }
+        }
 
         return user;
     }
