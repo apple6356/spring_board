@@ -25,12 +25,13 @@ public class AddNovelRequest {
     private MultipartFile coverImage;
 
     // 표지 이미지가 있을 경우
-    public Novel toEntity(String author, String coverImagePath) {
+    public Novel toEntity(String author, String coverImagePath, String filename) {
         return Novel.builder()
                 .title(title)
                 .content(content)
                 .author(author)
                 .coverImagePath(coverImagePath)
+                .filename(filename)
                 .build();
     }
 

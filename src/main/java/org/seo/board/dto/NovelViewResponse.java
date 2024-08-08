@@ -14,6 +14,7 @@ public class NovelViewResponse {
     private String content;
     private String author;
     private String coverImagePath;
+    private String filename;
 
     public NovelViewResponse(Novel novel) {
         this.id = novel.getId();
@@ -21,5 +22,6 @@ public class NovelViewResponse {
         this.content = novel.getContent();
         this.author = novel.getAuthor();
         this.coverImagePath = novel.getCoverImagePath();
+        this.filename = novel.getFilename();
     }
 }

@@ -70,8 +70,8 @@ public class UserService {
         chapterCommentRepository.updateUsername(oldName, request.getUsername());
 
         // username 변경 시 coverimage 저장된 폴더의 이름도 변경
-        String oldDirPath = "d:/cover_image/" + oldName;
-        String newDirPath = "d:/cover_image/" + request.getUsername();
+        String oldDirPath = "D:/cover_image/" + oldName;
+        String newDirPath = "D:/cover_image/" + request.getUsername();
 
         File oldDir = new File(oldDirPath);
         File newDir = new File(newDirPath);
@@ -86,7 +86,7 @@ public class UserService {
             if (oldCoverImagePath != null) {
                 String newCoverImagePath = oldCoverImagePath.replace(oldName, request.getUsername());
                 System.out.println("newCoverImagePath: " + newCoverImagePath);
-                novel.updateCoverImage(newCoverImagePath);
+                novel.updateUsername(newCoverImagePath);
                 novelRepository.save(novel);
             }
         }

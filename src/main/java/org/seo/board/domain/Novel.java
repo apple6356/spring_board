@@ -40,9 +40,13 @@ public class Novel {
     @Column(name = "author", nullable = false)
     private String author;
 
-    // 표지
+    // 표지 경로
     @Column(name = "cover_image_path")
     private String coverImagePath;
+
+    // 표지 파일 이름
+    @Column(name = "filename")
+    private String filename;
 
     // 추천수
     @Column(name = "recommend")
@@ -63,12 +67,13 @@ public class Novel {
     private List<UserShelf> userShelfs;
 
     @Builder
-    public Novel(String author, String content, String title, String coverImagePath) {
+    public Novel(String author, String content, String title, String coverImagePath, String filename) {
         this.author = author;
         this.content = content;
         this.title = title;
-        if (coverImagePath != null) {
+        if (coverImagePath != null && filename != null) {
             this.coverImagePath = coverImagePath;
+            this.filename = filename;
         }
     }
 
@@ -84,7 +89,13 @@ public class Novel {
     }
 
     // 표지 이미지 업데이트
-    public void updateCoverImage(String coverImagePath) {
+    public void updateCoverImage(String coverImagePath, String filename) {
+        this.coverImagePath = coverImagePath;
+        this.filename = filename;
+    }
+
+    // username 변경시
+    public void updateUsername(String coverImagePath) {
         this.coverImagePath = coverImagePath;
     }
 

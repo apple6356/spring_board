@@ -54,7 +54,7 @@ public class NovelService {
 
         if (request.getCoverImage() != null && !request.getCoverImage().isEmpty()) {
             // 표지 이미지 저장
-            String novelDirPath = "d:/cover_image/" + username + "/" + request.getTitle();
+            String novelDirPath = "D:/cover_image/" + username + "/" + request.getTitle();
             File novelDir = new File(novelDirPath);
 
             if (!novelDir.exists()) {
@@ -65,7 +65,7 @@ public class NovelService {
             // request의 file을 filePath의 경로에 저장
             request.getCoverImage().transferTo(new File(filePath));
 
-            novel = novelRepository.save(request.toEntity(username, filePath));
+            novel = novelRepository.save(request.toEntity(username, novelDirPath, request.getCoverImage().getOriginalFilename()));
         } else {
             novel = novelRepository.save(request.toEntity(username));
         }
@@ -90,12 +90,12 @@ public class NovelService {
             }
 
             // 표지 이미지 저장
-            String novelDirPath = "d:/cover_image/" + username + "/" + request.getTitle();
+            String novelDirPath = "D:/cover_image/" + username + "/" + request.getTitle();
             File novelDir = new File(novelDirPath);
 
             // 소설 제목이 변경되면 폴더의 이름도 변경
             if (!(novel.getTitle().equals(request.getTitle()))) {
-                File oldDir = new File("d:/cover_image/" + username + "/" + novel.getTitle());
+                File oldDir = new File("D:/cover_image/" + username + "/" + novel.getTitle());
                 oldDir.renameTo(novelDir);
             }
 
@@ -107,7 +107,7 @@ public class NovelService {
             // request의 file을 filePath의 경로에 저장
             request.getCoverImage().transferTo(new File(filePath));
 
-            novel.updateCoverImage(filePath);
+            novel.updateCoverImage(novelDirPath, request.getCoverImage().getOriginalFilename());
         }
 
         novel.update(request.getTitle(), request.getContent());
@@ -121,7 +121,7 @@ public class NovelService {
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
 
         // 소설 삭제 될 때 저장된 coverimage도 함께
-        String novelDirPath = "d:/cover_image/" + novel.getAuthor() + "/" + novel.getTitle();
+        String novelDirPath = "D:/cover_image/" + novel.getAuthor() + "/" + novel.getTitle();
         File novelDir = new File(novelDirPath);
 
         if (novelDir.exists()) {

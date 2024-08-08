@@ -37,6 +37,9 @@
     <div>
         <section>
             <input type="hidden" id="novel-id" th:value="${novel.id}">
+            <img id="coverImage" alt="thumbnail"
+                th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
+                style="width: 100px; height: 100px; object-fit: cover;">
             <input type="hidden" id="username" th:value="${user != null ? user.username : 'Anonymous'}">
             <h2 th:text="${novel.title}"></h2>
             <p th:text="${novel.author}"></p>

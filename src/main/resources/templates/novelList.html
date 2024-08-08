@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-    
+
 <head>
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <title>소설 목록</title>
 </head>
+
 <body>
 
     <nav id="navbar">
@@ -35,9 +36,14 @@
     </nav>
 
     <hr>
-    
+
     <div th:each="novel : ${novelList}">
         <input type="hidden" id="board-id" th:value="${novel.id}">
+        <div th:if="${novel.filename != null}">
+            <img id="coverImage" alt="thumbnail"
+                th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
+                style="width: 100px; height: 100px; object-fit: cover;">
+        </div>
         <div th:onclick="|location.href='@{/novel/{id}(id=${novel.id})}'|">
             <h3 th:text="${novel.title}"></h3>
             <span th:text="|작가: ${novel.author}|"></span>
@@ -46,6 +52,7 @@
     </div>
 
     <script src="/js/novel.js"></script>
-    
+
 </body>
+
 </html>
