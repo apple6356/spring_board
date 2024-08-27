@@ -15,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -29,6 +30,10 @@ public class UserShelf {
     // 마지막으로 읽은 회차id
     @Column(name = "last_read_chapter_id")
     private Long lastReadChapterId;
+
+    // 첫 회차
+    @Column(name = "first_chapter_id")
+    private Long firstChapterId;
 
     // 다음 회차
     @Column(name = "next_chapter_id")
@@ -124,6 +129,10 @@ public class UserShelf {
         } else {
             this.favorite = true;
         }
+    }
+
+    public void setFirstChapterId(Long firstChapterId) {
+        this.firstChapterId = firstChapterId;
     }
 
 }

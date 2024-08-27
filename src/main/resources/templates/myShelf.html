@@ -48,7 +48,7 @@
     <hr>
 
     <!-- 선호작 -->
-    <div th:if="${userShelfs != null}">
+    <div th:if="${userShelfs != null && viewpage == 'favorite'}">
         <div th:each="userShelf : ${userShelfs}" th:if="${userShelf.favorite}">
             <input type="hidden" id="userShelf-id" th:value="${userShelf.id}">
             <div th:onclick="|location.href='@{/novel/{id}(id=${userShelf.novel.id})}'|">
@@ -63,42 +63,57 @@
                 </div>
             </div>
 
-            <br>
+            <!-- 다음화를 봐야하는 경우 이어보기 대신 다음화보기 제공 -->
+            <div>
+                <span th:if="${userShelf.firstChapterId != null}"
+                    th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf.firstChapterId})}'|">첫화보기</span>
 
-            <button
-                th:onclick="|location.href='@{/novelView?id={id}(id = ${userShelf.lastReadChapterId})}'|">이어보기</button>
-            <button th:if="${userShelf.nextChapterId != null}"
-                th:onclick="|location.href='@{/novelView?id={id}(id = ${userShelf.nextChapterId})}'|">다음화보기</button>
+                <!-- 이어보기 -->
+                <span
+                    th:if="${userShelf.lastReadChapterId != null && userShelf.readPosition < (userShelf.maxScroll - 2)}"
+                    th:unless="${userShelf.firstChapterId != null && userShelf.lastReadChapterId == null}"
+                    th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf.lastReadChapterId})}'|">이어보기</span>
+
+                <!-- 다음화가 없는 경우에도 마지막 읽은 회차로 이어보기 -->
+                <span
+                    th:if="${userShelf.lastReadChapterId != null && userShelf.readPosition >= (userShelf.maxScroll - 2)}"
+                    th:unless="${userShelf.nextChapterId != null}"
+                    th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf.lastReadChapterId})}'|">이어보기</span>
+
+                <span th:if="${userShelf.nextChapterId != null && userShelf.readPosition >= (userShelf.maxScroll - 2)}"
+                    th:unless="${userShelf.firstChapterId != null}"
+                    th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf.nextChapterId})}'|">다음화보기</span>
+            </div>
 
             <hr>
         </div>
 
         <div th:if="${viewpage == 'favorite'}">
             <a th:href="@{/myShelf(page=1)}">First</a>
-    
+
             <span>
                 <a th:if="${prev > 1}" th:href="@{/myShelf(page=${prev})}">prev</a>
                 <span th:if="${prev < 1}">prev</span>
             </span>
-    
+
             <span th:each="page: ${#numbers.sequence(startPage, endPage)}">
                 <span th:if="${page == userShelfs.number + 1}" th:text="${page}" style="color: red"></span>
                 <span th:unless="${page == userShelfs.number + 1}">
                     <a th:href="@{/myShelf(page=${page})}" th:text="${page}"></a>
                 </span>
             </span>
-    
+
             <span>
                 <a th:if="${next <= userShelfs.totalPages}" th:href="@{/myShelf(page=${next})}">next</a>
                 <span th:if="${next > userShelfs.totalPages}">next</span>
             </span>
-    
+
             <a th:href="@{/myShelf(page=${userShelfs.totalPages})}">Last</a>
         </div>
     </div>
 
     <!-- 이어보기 -->
-    <div th:if="${userShelfs != null}">
+    <div th:if="${userShelfs != null && viewpage == 'continue'}">
         <div th:each="userShelf : ${userShelfs}" th:if="${userShelf.lastReadChapterId}">
             <input type="hidden" id="userShelf-id" th:value="${userShelf.id}">
             <div th:onclick="|location.href='@{/novel/{id}(id=${userShelf.novel.id})}'|">
@@ -113,41 +128,47 @@
                 </div>
             </div>
 
-            <br>
+            <!-- 다음화를 봐야하는 경우 이어보기 대신 다음화보기 제공 -->
+            <div>
+                <span
+                    th:if="${userShelf.lastReadChapterId != null && userShelf.readPosition < (userShelf.maxScroll - 2)}"
+                    th:unless="${userShelf.firstChapterId != null || userShelf.nextChapterId != null}"
+                    th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf.lastReadChapterId})}'|">이어보기</span>
 
-            <button
-                th:onclick="|location.href='@{/novelView?id={id}(id = ${userShelf.lastReadChapterId})}'|">이어보기</button>
-            <button th:if="${userShelf.nextChapterId != null}"
-                th:onclick="|location.href='@{/novelView?id={id}(id = ${userShelf.nextChapterId})}'|">다음화보기</button>
+                <span th:if="${userShelf.nextChapterId != null && userShelf.readPosition >= (userShelf.maxScroll - 2)}"
+                    th:unless="${userShelf.firstChapterId != null}"
+                    th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf.nextChapterId})}'|">다음화보기</span>
+            </div>
 
             <hr>
         </div>
 
         <div th:if="${viewpage == 'continue'}">
             <a th:href="@{/myShelf?viewpage=continue(page=1)}">First</a>
-    
+
             <span>
                 <a th:if="${prev > 1}" th:href="@{/myShelf?viewpage=continue(page=${prev})}">prev</a>
                 <span th:if="${prev < 1}">prev</span>
             </span>
-    
+
             <span th:each="page: ${#numbers.sequence(startPage, endPage)}">
                 <span th:if="${page == userShelfs.number + 1}" th:text="${page}" style="color: red"></span>
                 <span th:unless="${page == userShelfs.number + 1}">
                     <a th:href="@{/myShelf?viewpage=continue(page=${page})}" th:text="${page}"></a>
                 </span>
             </span>
-    
+
             <span>
-                <a th:if="${next <= userShelfs.totalPages}" th:href="@{/myShelf?viewpage=continue(page=${next})}">next</a>
+                <a th:if="${next <= userShelfs.totalPages}"
+                    th:href="@{/myShelf?viewpage=continue(page=${next})}">next</a>
                 <span th:if="${next > userShelfs.totalPages}">next</span>
             </span>
-    
+
             <a th:href="@{/myShelf?viewpage=continue(page=${userShelfs.totalPages})}">Last</a>
         </div>
     </div>
 
-    
+    <hr>
 
     <script src="/js/novel.js"></script>
 

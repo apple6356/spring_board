@@ -284,11 +284,12 @@ public class NovelService {
         int pageLimit = 10; // 한페이지에 보여줄 글 갯수
 
         if (viewpage.equals("favorite")) {
-            userShelfList = userShelfRepository.findByUserAndFavoriteTrue(user, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastReadDate")));
+            userShelfList = userShelfRepository.findByUserAndFavoriteTrue(user,
+                    PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastReadDate")));
         } else {
-            userShelfList = userShelfRepository.findByUserAndLastReadChapterIdIsNotNull(user, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastReadDate")));
+            userShelfList = userShelfRepository.findByUserAndLastReadChapterIdIsNotNull(user,
+                    PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastReadDate")));
         }
-
 
         return userShelfList;
     }
@@ -424,6 +425,19 @@ public class NovelService {
         userShelfRepository.save(userShelf);
 
         return userShelf;
+    }
+
+    // 첫 화의 id 저장
+    public void saveFirstChapterID(UserShelf userShelf, Novel novel) {
+        if (userShelf.getLastReadChapterId() != null) {
+            userShelf.setFirstChapterId(null);
+            userShelfRepository.save(userShelf);
+        } else {
+            List<ChapterViewResponse> chapters = findByIdDesc(novel.getId());
+
+            userShelf.setFirstChapterId(chapters.get(chapters.size() - 1).getId());
+            userShelfRepository.save(userShelf);
+        }
     }
 
 }

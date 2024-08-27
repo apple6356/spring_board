@@ -309,9 +309,14 @@ public class NovelViewController {
 
             Page<UserShelf> userShelfs = novelService.myShelf(user, viewpage, pageable);
 
+            for (UserShelf userShelf : userShelfs) {
+                novelService.saveFirstChapterID(userShelf, userShelf.getNovel());
+            }
+
             int blockLimit = 10;
             int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
-            int endPage = ((startPage + blockLimit - 1) < userShelfs.getTotalPages()) ? startPage + blockLimit - 1 : userShelfs.getTotalPages();
+            int endPage = ((startPage + blockLimit - 1) < userShelfs.getTotalPages()) ? startPage + blockLimit - 1
+                    : userShelfs.getTotalPages();
 
             int prev = startPage - 1;
             int next = endPage + 1;
