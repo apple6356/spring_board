@@ -16,19 +16,25 @@
         <ul id="menu">
             <li><span>게시판</span>
                 <ul>
-                    <li onclick="location.href='/popularnovels'">인기 게시판</li>
-                    <li onclick="location.href='/novels'">자유 게시판</li>
+                    <li onclick="location.href='/popularBoards'">인기 게시판</li>
+                    <li onclick="location.href='/boards'">자유 게시판</li>
+                </ul>
+            </li>
+            <li><span>소설</span>
+                <ul>
+                    <li onclick="location.href='/novelList'">소설 게시판</li>
+                    <li th:if="${user} != null" onclick="location.href='/myShelf'">내 서재</li>
                 </ul>
             </li>
         </ul>
 
         <div>
-            <div th:if="${isLogin} == true">
+            <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
                 <button type="button" onclick="location.href='/logout'">로그아웃</button>
                 <!--            <button type="button" onclick="">회원탈퇴</button>-->
             </div>
-            <div th:if="${isLogin} == false">
+            <div th:if="${user} == null">
                 <button type="button" onclick="location.href='/login'">로그인</button>
             </div>
         </div>
@@ -36,7 +42,18 @@
 
     <div>
         <article>
-            <input type="file" id="file" value="표지 선택">
+            <div th:if="${novel.filename != null}">
+                <!-- null일 경우 기본 이미지 띄우기 -->
+                <img id="coverImage" alt="thumbnail"
+                    th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
+                    style="width: 100px; height: 100px; object-fit: cover;">
+            </div>
+
+            <!-- 미리보기 -->
+            <img id="imagePreview" alt="Image Preview"
+                style="width: 100px; height: 100px; object-fit: cover; display:none;">
+
+            표지 : <input type="file" id="file" value="표지 선택" accept="image/*">
 
             <input type="hidden" id="novel-id" th:value="${novel.id}">
             <header>

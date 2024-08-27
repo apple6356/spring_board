@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <!-- 소설 제목을 title로  -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title th:text="${novel.title}">제목</title>
 </head>
 
@@ -19,37 +20,101 @@
                     <li onclick="location.href='/boards'">자유 게시판</li>
                 </ul>
             </li>
+            <li><span>소설</span>
+                <ul>
+                    <li onclick="location.href='/novelList'">소설 게시판</li>
+                    <li th:if="${user} != null" onclick="location.href='/myShelf'">내 서재</li>
+                </ul>
+            </li>
         </ul>
 
         <div>
-            <div th:if="${isLogin} == true">
+            <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
                 <button type="button" onclick="location.href='/logout'">로그아웃</button>
                 <!--            <button type="button" onclick="">회원탈퇴</button>-->
             </div>
-            <div th:if="${isLogin} == false">
+            <div th:if="${user} == null">
                 <button type="button" onclick="location.href='/login'">로그인</button>
             </div>
         </div>
     </nav>
 
+    <hr>
+
     <div>
         <section>
-            <h1 th:text="${novel.title}"></h1>
+            <input type="hidden" id="novel-id" th:value="${novel.id}">
+            <div th:if="${novel.filename != null}">
+                <!-- null일 경우 기본 이미지 띄우기 -->
+                <img id="coverImage" alt="thumbnail"
+                    th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
+                    style="width: 100px; height: 100px; object-fit: cover;">
+            </div>
+            <input type="hidden" id="username" th:value="${user != null ? user.username : 'Anonymous'}">
+            <h2 th:text="${novel.title}"></h2>
             <p th:text="${novel.author}"></p>
-            <button th:if="${isLogin} == true and novel.author == user.username" type="button"
-                th:onclick="|location.href='@{/novelManage{id}(id=${novel.id})}'|"></span>
-            작품 소개:<p th:text="${novel.content}"></p>
+
+            <span th:text="'추천수 : ' + (${novel.recommend})"></span>
+            <button id="novel-recommend-btn" th:if="${user != null}" th:data-status="${userShelf != null and userShelf.recommend ? 'recommended' : 'not_recommended'}">
+                <span id="recommend-span" th:text="${userShelf != null and userShelf?.recommend ? '추천 취소' : '추천'}"></span>
+            </button>
+
+            <button id="favorite-btn" th:if="${user != null}" th:data-status="${userShelf != null and userShelf?.favorite ? 'favorite' : 'not_favorite'}">
+                <span id="favorite-span" th:text="${userShelf != null and userShelf?.favorite ? '선호작 취소' : '선호작'}"></span>
+            </button>
+
+            <div th:if="${user} != null and ${novel.author} == ${user.username}">
+                <button type="button"
+                    th:onclick="|location.href='@{/novelManage?id={id}(id=${novel.id})}'|">수정하기</button>
+                <button type="button" id="delete-novel-btn">작품 삭제</button>
+            </div>
+            <p th:text="${novel.content}"></p>
         </section>
     </div>
 
-    <div th:if="${isLogin} == true and novel.author == user.username">
-        <button type="button" th:onclick="|location.href='@{/novel-write{novelId}(novelId = ${novel.id})}'|">새 회차 작성</button>
+    <div th:if="${user} != null and ${novel.author} == ${user.username}">
+        <button type="button" th:onclick="|location.href='@{/novel-write?novelId={novelId}(novelId = ${novel.id})}'|">새
+            회차 작성</button>
+        <button type="button" id="delete-lastepisode-btn">최신 회차 삭제</button>
     </div>
 
-    <div>
-        <!-- 최신순으로 정렬 -->
+    <hr>
+
+    <!-- 기본은 최신순, 클릭시 1화부터 정렬 ajax 이용해서 비동기 처리 -->
+    <input type="button" id="episode-sort" value="최신화부터" onclick="episodeSort(this)">
+
+    <hr>
+
+    <!-- 다음화를 봐야하는 경우 이어보기 대신 다음화보기 제공 -->
+    <div th:if="${user} != null and ${chapterList} != null">
+        <span th:if="${firstChapterId != null}"
+            th:onclick="|location.href='@{/novelView?id={id}(id=${firstChapterId})}'|">첫화보기</span>
+        <span th:if="${userShelf != null && nextChapter == null}"
+            th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf?.lastReadChapterId})}'|">이어보기</span>
+        <span th:if="${nextChapter != null}" th:onclick="|location.href='@{/novelView?id={id}(id=${nextChapter.id})}'|">다음화보기</span>
     </div>
+
+    <hr>
+
+    <div id="chapters">
+        <div th:each="chapter : ${chapterList}">
+            <input type="hidden" th:value="${chapter.id}">
+            <div th:onclick="|location.href='@{/novelView?id={id}(id = ${chapter.id})}'|">
+                <span th:text="|Ep${chapter.episode}.|"></span>
+                <span th:text="${chapter.title}"></span> <br>
+                <span th:text="|조회수:${chapter.hits}|"></span>
+                <span th:text="|작성 시간:${#temporals.format(chapter.createdAt, 'yyyy-MM-dd HH:mm')}|"></span>
+            </div>
+            <div th:if="${user?.username} == ${chapter.author}">
+                <button type="button"
+                    th:onclick="|location.href='@{/novel-write?id={id}(id = ${chapter.id})}'|">수정</button>
+            </div>
+            <hr>
+        </div>
+    </div>
+
+    <script src="/js/novel.js"></script>
 
 </body>
 

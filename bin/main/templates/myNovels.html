@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
@@ -19,29 +20,46 @@
                     <li onclick="location.href='/boards'">자유 게시판</li>
                 </ul>
             </li>
+            <li><span>소설</span>
+                <ul>
+                    <li onclick="location.href='/novelList'">소설 게시판</li>
+                    <li th:if="${user} != null" onclick="location.href='/myShelf'">내 서재</li>
+                </ul>
+            </li>
         </ul>
 
         <div>
-            <div th:if="${isLogin} == true">
+            <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
                 <button type="button" onclick="location.href='/logout'">로그아웃</button>
                 <!--            <button type="button" onclick="">회원탈퇴</button>-->
             </div>
-            <div th:if="${isLogin} == false">
+            <div th:if="${user} == null">
                 <button type="button" onclick="location.href='/login'">로그인</button>
             </div>
         </div>
     </nav>
 
+    <hr>
+
     <a href="/novelManage">신규 작품 등록</a>
 
-    <div th:each="item : ${novelList}">
-            <input type="hidden" id="board-id" th:value="${item.id}">
-            <div th:onclick="|location.href='@{/novel/{id}(id=${item.id})}'|">
-                <span th:text="${item.title}"></span>
-                <span th:text="${item.author}"></span>
+    <hr>
+
+    <div th:each="novel : ${novelList}">
+        <input type="hidden" id="board-id" th:value="${novel.id}">
+        <div th:onclick="|location.href='@{/novel/{id}(id=${novel.id})}'|">
+            <div th:if="${novel.filename != null}">
+                <img id="coverImage" alt="thumbnail"
+                    th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
+                    style="width: 100px; height: 100px; object-fit: cover;">
+            </div>
+            <div>
+                <h3 th:text="${novel.title}"></h3>
+                <span th:text="|작가: ${novel.author}|"></span>
             </div>
         </div>
+        <hr>
     </div>
 
 </body>

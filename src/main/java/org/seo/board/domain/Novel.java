@@ -71,6 +71,7 @@ public class Novel {
         this.author = author;
         this.content = content;
         this.title = title;
+        this.recommend = 0L;
         if (coverImagePath != null && filename != null) {
             this.coverImagePath = coverImagePath;
             this.filename = filename;
@@ -97,6 +98,16 @@ public class Novel {
     // username 변경시
     public void updateUsername(String coverImagePath) {
         this.coverImagePath = coverImagePath;
+    }
+
+    // 추천 +1
+    public void recommendNovel() {
+        this.recommend++;
+    }
+
+    // 추천 -1
+    public void recommendCancle() {
+        this.recommend--;
     }
 
 }

@@ -25,8 +25,8 @@ function httpRequest(method, url, body, success, fail) {
         //        headers: headers,
         headers: {
             // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
-            Authorization: "Bearer " + localStorage.getItem("access_token")
-            // "Content-Type": "application/json"
+            Authorization: "Bearer " + localStorage.getItem("access_token"),
+            "Content-Type": "application/json"
         },
         body: body,
     })
@@ -57,6 +57,48 @@ function httpRequest(method, url, body, success, fail) {
                 return fail();
             }
         });
+}
+
+// 표지 선택 시 미리 보기 제공
+const fileChange = document.getElementById('file');
+
+if (fileChange) {
+    fileChange.addEventListener('change', event => {
+        // 파일 입력에서 선택된 파일
+        const file = event.target.files[0];
+
+        const preview = document.getElementById('imagePreview');
+        const coverImage = document.getElementById('coverImage');
+
+        // 파일을 선택하면
+        if (file) {
+            // filereader는 비동기적으로 동작함
+            const reader = new FileReader();
+
+            // 파일을 읽으면 실행
+            reader.onload = function (e) {
+                // 미리보기에 파일의 url을 설정하여 표시
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+
+                // coverimage 안 보이게
+                if (coverImage) {
+                    coverImage.style.display = 'none';
+                }
+            }
+
+            // 파일을 읽고 데이터 url로 변환 (이후 onload 이벤트 발생)
+            reader.readAsDataURL(file);
+        } else {
+            // 파일 선택을 취소하거나 삭제하면
+            preview.style.display = 'none';
+
+            // coverimage 보이게
+            if (coverImage) {
+                coverImage.style.display = 'block';
+            }
+        }
+    });
 }
 
 // 소설 등록
@@ -123,7 +165,7 @@ if (createNovelButton) {
                     return fail();
                 }
             });
-            
+
     });
 }
 
@@ -340,6 +382,66 @@ function episodeSort(e) {
 
 }
 
+// novel 추천
+const novelRecommendButton = document.getElementById('novel-recommend-btn');
+
+novelRecommendButton.addEventListener('click', function() {
+    const novelId = document.getElementById('novel-id').value;
+
+    body = JSON.stringify({
+        novelId: novelId
+    });
+
+    function success(data) {
+        const recommended = novelRecommendButton.getAttribute('data-status');
+        if (recommended === 'recommended') {
+            alert("추천 취소");
+            novelRecommendButton.setAttribute('data-status', 'not_recommended');
+            document.getElementById('recommend-span').innerText = '추천';
+        } else {
+            alert("추천 완료");
+            novelRecommendButton.setAttribute('data-status', 'recommended');
+            document.getElementById('recommend-span').innerText = '추천 취소';
+        }
+    }
+
+    function fail(data) {
+        alert("추천을 실패하였습니다.");
+    }
+
+    httpRequest("POST", "/api/novel-recommend/" + novelId, body, success, fail);
+});
+
+// 선호작 등록 / 해제
+const favoriteButton = document.getElementById('favorite-btn');
+
+favoriteButton.addEventListener('click', function() {
+    const novelId = document.getElementById('novel-id').value;
+
+    body = JSON.stringify({
+        novelId: novelId
+    });
+
+    function success(data) {
+        const favorited = favoriteButton.getAttribute('data-status');
+        if (favorited === 'favorite') {
+            alert("선호작에서 해제되었습니다.");
+            favoriteButton.setAttribute('data-status', 'not_favorite');
+            document.getElementById('favorite-span').innerText = '선호작';
+        } else {
+            alert("선호작에 등록되었습니다.");
+            favoriteButton.setAttribute('data-status', 'favorite');
+            document.getElementById('favorite-span').innerText = '선호작 취소';
+        }
+    }
+
+    function fail(data) {
+        alert("에러 발생")
+    }
+
+    httpRequest("POST", "/api/favorite/" + novelId, body, success, fail);
+});
+
 // 댓글 작성
 const commentCreateButton = document.getElementById('comment-create-btn');
 
@@ -352,9 +454,11 @@ if (commentCreateButton) {
             content: document.getElementById('comment-content').value
         });
 
-        function success() {
+        function success(data) {
             alert('댓글이 작성되었습니다.');
             location.replace('/novelView?id=' + chapterId);
+            // updateCommentList(data);
+            // document.getElementById('comment-content').value = '';
         };
         function fail() {
             alert('댓글 작성에 실패했습니다.');
@@ -443,24 +547,48 @@ function commentRecommend(commentId) {
 
 }
 
-
-// $.ajax({
-//     type: "GET",
-//     url: "/check", // 요청 url
-//     data: { username: username }, // 보낼 데이터
-//     success: function(data) {
-//         console.log("data : " + data)
-//         if (data) {
-//             document.getElementById('check-result').textContent = "중복입니다.";
-//             document.getElementById('check-result').style.color = "red";
-//         } else {
-//             document.getElementById('check-result').textContent = "사용 가능합니다.";
-//             document.getElementById('check-result').style.color = "green";
+// 회차 로드
+// function loadChapter(chapterId) {
+//     $.ajax({
+//         type: "GET",
+//         url: "/novelView?id=" + chapterId,
+//         contentType: "application/json",
+//         success: function (data) {
+//             // content.innerHTML = $(data).find('#content').html();
+//             // console.log("data #content: " + $(data).find('#content').html);
+//             $('#content').html($(data).find('#content').html());
+//             $('#title').text($(data).find('#title').text());
+//             $('#pre-chapter-btn').replaceWith($(data).find('#pre-chapter-btn'));
+//             $('#next-chapter-btn').replaceWith($(data).find('#next-chapter-btn'));
+//             $('#readPosition').val($(data).find('#readPosition').val());
+//             $('#comment-section').html($(data).find('#comment-section').html());
+//         },
+//         error: function () {
+//             console.log('failed chapter load');
 //         }
-//     },
-//     error: function() {
-//         alert("오류 발생");
-//     }
-// });
+//     });
+// }
+
+// 이전화 클릭 시
+// const preChapterButton = document.getElementById('pre-chapter-btn');
+
+// if(preChapterButton){
+//     preChapterButton.addEventListener('click', function() {
+//         const chapterId = preChapterButton.value;
+//         loadChapter(chapterId);
+//     });
+// }
+
+// 다음화 클릭 시
+// const nextChapterButton = document.getElementById('next-chapter-btn');
+
+// if(nextChapterButton){
+//     nextChapterButton.addEventListener('click', function() {
+//         const chapterId = preChapterButton.value;
+//         loadChapter(chapterId);
+//     });
+// }
+
+
 
 

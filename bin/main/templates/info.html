@@ -1,63 +1,72 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>My</title>
 </head>
+
 <body>
 
-<h1>내 정보</h1>
+    <h1>내 정보</h1>
 
-<nav id="navbar">
-    <span onclick="location.href='/main'">메인</span>
-    <ul id="menu">
-        <li><span>게시판</span>
-            <ul>
-                <li onclick="location.href='/popularBoards'">인기 게시판</li>
-                <li onclick="location.href='/boards'">자유 게시판</li>
-            </ul>
-        </li>
-    </ul>
+    <nav id="navbar">
+        <span onclick="location.href='/main'">메인</span>
+        <ul id="menu">
+            <li><span>게시판</span>
+                <ul>
+                    <li onclick="location.href='/popularBoards'">인기 게시판</li>
+                    <li onclick="location.href='/boards'">자유 게시판</li>
+                </ul>
+            </li>
+            <li><span>소설</span>
+                <ul>
+                    <li onclick="location.href='/novelList'">소설 게시판</li>
+                    <li th:if="${user} != null" onclick="location.href='/myShelf'">내 서재</li>
+                </ul>
+            </li>
+        </ul>
+
+        <div>
+            <div th:if="${user} != null">
+                <a href="/info">내 정보</a>
+                <button type="button" onclick="location.href='/logout'">로그아웃</button>
+                <!--            <button type="button" onclick="">회원탈퇴</button>-->
+            </div>
+            <div th:if="${user} == null">
+                <button type="button" onclick="location.href='/login'">로그인</button>
+            </div>
+        </div>
+    </nav>
 
     <div>
-        <div th:if="${isLogin} == true">
-            <a href="/info">내 정보</a>
-            <button type="button" onclick="location.href='/logout'">로그아웃</button>
-            <!--            <button type="button" onclick="">회원탈퇴</button>-->
-        </div>
-        <div th:if="${isLogin} == false">
-            <button type="button" onclick="location.href='/login'">로그인</button>
-        </div>
+        <input type="hidden" id="user-id" th:value="${user.id}">
+        <p th:text="'이메일 : ' + ${user.email}"></p>
+        <p id="user-name" th:text="'이름 : ' + ${user.username}"></p>
     </div>
-</nav>
 
-<div>
-    <input type="hidden" id="user-id" th:value="${user.id}">
-    <p th:text="'이메일 : ' + ${user.email}"></p>
-    <p id="user-name" th:text="'이름 : ' + ${user.username}"></p>
-</div>
+    <button type="button" id="delete-user-btn">회원 탈퇴</button>
 
-<button type="button" id="delete-user-btn">회원 탈퇴</button>
+    <div>
+        <input type="text" id="username" placeholder="이름 수정">
+        <button type="button" id="name-check-btn">중복 확인</button>
+        <span id="check-result"></span><br>
+        <button type="button" id="update-user-btn">수정</button>
+    </div>
 
-<div>
-    <input type="text" id="username" placeholder="이름 수정">
-    <button type="button" id="name-check-btn">중복 확인</button>
-    <span id="check-result"></span><br>
-    <button type="button" id="update-user-btn">수정</button>
-</div>
+    <a th:href="@{/myWriting(username=${user.username})}">작성 글 보기</a>
 
-<a th:href="@{/myWriting(username=${user.username})}">작성 글 보기</a>
+    <br>
 
-<br>
+    <a th:href="@{/myComments(username=${user.username})}">작성 댓글 보기</a>
 
-<a th:href="@{/myComments(username=${user.username})}">작성 댓글 보기</a>
+    <!-- 내 작품 가는 링크 -->
+    <br>
+    <a th:href="@{/myNovels(username=${user.username})}">내 작품</a>
 
-<!-- 내 작품 가는 링크 -->
-<br>
-<a th:href="@{/myNovels(username=${user.username})}">내 작품</a>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="/js/user.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/user.js"></script>
 
 </body>
+
 </html>

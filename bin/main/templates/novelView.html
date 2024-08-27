@@ -1,11 +1,299 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
-    <title th:text="">episode</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title th:text="|Ep${chapter.episode}.${chapter.title}|">episode</title>
+
+    <!-- 복사 방지 -->
+    <style>
+        #content {
+            width: 1000px;
+            height: 650px;
+            /* max-height: 650px; */
+            resize: none;
+            user-select: none;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            white-space: pre-wrap;
+            /* 줄 바꿈 보존 */
+            /* Prevent text selection in textarea */
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const content = document.getElementById('content');
+            const chapterId = document.getElementById('chapter-id');
+
+            const fontSizeSelect = document.getElementById('font-size-select');
+            const bgColorSelect = document.getElementById('bg-color-select');
+
+            const savedFontSize = localStorage.getItem('fontSize');
+            const savedColor = localStorage.getItem('bgColor');
+
+            const readPositionData = document.getElementById("readPosition");
+
+            // 현재 페이지 오기 전의 url
+            const referrerUrl = document.referrer;
+
+            console.log("referrerUrl: " + referrerUrl);
+            console.log('history.state: ' + history.state);
+            // console.log('history.state.initialReferrer: ' + history.state.initialReferrer);
+            console.log('window.location.hostname: ' + window.location.hostname);
+
+            // 최초로 novelView 들어온 경우만 history에 저장
+            if (!history.state || !history.state.initialReferrer) {
+                console.log("최초로 novelVIew 들어오면");
+                // 같은 도메인인 경우만 pushState
+                if (referrerUrl && referrerUrl.includes(window.location.hostname)) {
+                    history.replaceState({ initialReferrer: referrerUrl }, '', window.location.href);
+                    console.log("같은 도메인만 history.state: " + history.state);
+                }
+            }
+
+            // 뒤로가기 시 작동
+            window.addEventListener('popstate', function (event) {
+                console.log('popstate event: ', event.state);
+                if (event.state && event.state.initialReferrer) {
+                    window.location.href = event.state.initialReferrer;
+                }
+            });
+
+            // 이전화 클릭 시
+            const preChapterButton = document.getElementById('pre-chapter-btn');
+
+            if (preChapterButton) {
+                preChapterButton.addEventListener('click', function () {
+                    const chapterId = preChapterButton.value;
+                    const nextUrl = '/novelView?id=' + chapterId;
+                    history.pushState({ initialReferrer: history.state.initialReferrer }, '', nextUrl);
+                    window.location.href = nextUrl;
+                });
+            }
+
+            // 다음화 클릭 시
+            const nextChapterButton = document.getElementById('next-chapter-btn');
+
+            if (nextChapterButton) {
+                nextChapterButton.addEventListener('click', function () {
+                    const chapterId = nextChapterButton.value;
+                    const nextUrl = '/novelView?id=' + chapterId;
+                    history.pushState({ initialReferrer: history.state.initialReferrer }, '', nextUrl);
+                    window.location.href = nextUrl;
+                });
+            }
+
+            // 마지막으로 읽던 위치로
+            if (readPositionData != null) {
+                const position = parseInt(readPositionData.value, 10);
+                content.scrollTop = position;
+            }
+
+            // 화면을 닫거나 이동 시 읽던 위치 저장
+            window.addEventListener('beforeunload', function () {
+                const readPosition = content.scrollTop;
+                const maxScroll = content.scrollHeight - content.clientHeight;
+                const chapterId = document.getElementById("chapter-id").value;
+
+                saveReadPosition(chapterId, readPosition, maxScroll);
+            });
+
+            // 읽은 위치 저장
+            function saveReadPosition(chapterId, readPosition, maxScroll) {
+                $.ajax({
+                    type: "PUT",
+                    url: "/api/saveReadPosition", // 요청 url
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        chapterId: chapterId,
+                        readPosition: readPosition,
+                        maxScroll: maxScroll
+                    }),
+                    success: function () {
+                        console.log('위치 저장 성공');
+                    },
+                    error: function () {
+                        console.log('위치 저장 실패');
+                    }
+                });
+            }
+
+            // 댓글 버튼 클릭시 이벤트
+            document.getElementById('comment-btn').addEventListener('click', function () {
+                const commentSection = document.getElementById('comment-section');
+                commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+            });
+
+            // 설정 버튼 클릭시 이벤트
+            document.getElementById('setting-btn').addEventListener('click', function () {
+                const settingPanel = document.getElementById('setting-panel');
+                settingPanel.style.display = settingPanel.style.display === 'none' ? 'block' : 'none';
+            });
+
+            // 기존 저장된 폰트 사이즈 적용
+            if (savedFontSize) {
+                content.style.fontSize = savedFontSize;
+                fontSizeSelect.value = savedFontSize;
+            }
+
+            // 기존 저장된 배경색 적용
+            if (savedColor) {
+                content.style.backgroundColor = savedColor;
+                bgColorSelect.value = savedColor;
+
+                // 배경색이 검은색이면 글자를 흰색으로
+                if (savedColor === 'black') {
+                    content.style.color = 'white';
+                } else {
+                    content.style.color = 'black';
+                }
+            }
+
+            // 폰트 크기 변경
+            fontSizeSelect.addEventListener('change', function () {
+                const selectedSize = fontSizeSelect.value;
+                content.style.fontSize = selectedSize
+                localStorage.setItem('fontSize', selectedSize);
+            });
+
+            // 배경색 변경
+            bgColorSelect.addEventListener('change', function () {
+                const selectedColor = bgColorSelect.value;
+                content.style.backgroundColor = selectedColor;
+                localStorage.setItem('bgColor', selectedColor);
+
+                // 배경색이 검은색이면 글자를 흰색으로
+                if (selectedColor === 'black') {
+                    content.style.color = 'white';
+                } else {
+                    content.style.color = 'black';
+                }
+            });
+
+            // 복사 방지
+            content.addEventListener('selectstart', function (e) {
+                e.preventDefault();
+            });
+
+            // 복사 방지
+            content.addEventListener('mousedown', function (e) {
+                e.preventDefault();
+            });
+        });
+    </script>
 </head>
+
 <body>
-    
+
+    <div>
+        <input type="hidden" id="chapter-id" th:value="${chapter.id}">
+        <input type="hidden" id="novel-id" th:value="${chapter.novel.id}">
+        <input type="hidden" id="readPosition" th:value="${readPosition}">
+        <span id="title" th:text="|${chapter.title}|"></span>
+
+        <button id="setting-btn">설정</button>
+
+        <div id="setting-panel" style="display: none;">
+            <label for="font-size-select">폰트 조절</label>
+            <select id="font-size-select">
+                <option value="8px">8px</option>
+                <option value="10px">10px</option>
+                <option value="12px">12px</option>
+                <option value="14px">14px</option>
+                <option value="16px">16px</option>
+                <option value="18px">18px</option>
+                <option value="20px">20px</option>
+                <option value="22px">22px</option>
+                <option value="24px">24px</option>
+                <option value="26px">26px</option>
+                <option value="28px">28px</option>
+                <option value="30px">30px</option>
+                <option value="32px">32px</option>
+                <option value="34px">34px</option>
+                <option value="36px">36px</option>
+                <option value="38px">38px</option>
+                <option value="40px">40px</option>
+            </select>
+
+            <label for="bg-color">배경색 설정</label>
+            <!-- <input type="color" id="bg-color"> -->
+            <select id="bg-color-select">
+                <option value="white">흰색</option>
+                <option value="lightgreen">연녹색</option>
+                <option value="peachpuff">살구색</option>
+                <option value="black">검은색</option>
+            </select>
+        </div>
+    </div>
+
+    <hr>
+
+    <article>
+        <div id="content" th:utext="${chapter.content}" cols="100" rows="30" readonly></div>
+    </article>
+
+    <!-- 버튼 박스 -->
+    <div id="button-box">
+        <button id="pre-chapter-btn" th:if="${preChapter != null}" th:value="${preChapter?.id}">이전화</button>
+        <button id="novel-recommend-btn" th:if="${user != null}">추천</button>
+        <button id="next-chapter-btn" th:if="${nextChapter != null}" th:value="${nextChapter?.id}">다음화</button>
+    </div>
+
+    <hr>
+
+    <button type="button" id="comment-btn">댓글</button>
+
+    <!-- 댓글 -->
+    <section id="comment-section" style="display: none;">
+        <p>인기 댓글</p>
+        <div th:each="comment: ${chapter.chapterComments}" th:if="${comment.recommend} >= 10">
+            <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|">
+            </div>
+            <button th:onclick="commentRecommend([[${comment.id}]])">추천</button>
+            <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
+            <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
+            <hr>
+        </div>
+
+        <hr>
+
+        <div>
+            <h5>댓글</h5>
+            <div>
+                <textarea id="comment-content" rows="3"></textarea>
+            </div>
+            <button type="button" id="comment-create-btn">등록</button>
+        </div>
+
+        <hr>
+
+        <div id="comment-list">
+            <div th:each="comment : ${chapter.chapterComments}">
+                <input type="hidden" id="comment-id" th:value="${comment.id}">
+                <div>
+                    <div
+                        th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|">
+                    </div>
+                    <button th:onclick="commentRecommend([[${comment.id}]])">추천</button>
+                    <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
+                    <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
+                    <!-- this 로 태그 정보 넘김 -->
+                    <button th:if="${user?.username} == ${comment.author}" type="button"
+                        th:id="'modify-comment-btn-' + ${comment.id}"
+                        th:onclick="commentModify([[${comment.id}]], this)">수정</button>
+                    <button th:if="${user?.username} == ${comment.author}" type="button"
+                        th:id="'delete-comment-btn-' + ${comment.id}"
+                        th:onclick="commentDelete([[${comment.id}]])">삭제</button>
+                </div>
+                <hr>
+            </div>
+        </div>
+    </section>
+
+    <script src="/js/novel.js"></script>
+
 </body>
+
 </html>

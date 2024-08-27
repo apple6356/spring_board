@@ -64,13 +64,6 @@ public class BoardViewController {
                 .map(NovelViewResponse::new)
                 .toList();
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
-
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
-        }
-
         String email = "";
 
         if (principal instanceof UserDetails) {
@@ -87,7 +80,6 @@ public class BoardViewController {
         model.addAttribute("boardList", boardList);
         model.addAttribute("popularBoardList", popularBoardList);
         model.addAttribute("novelList", novelList);
-        model.addAttribute("isLogin", isLogin);
 
         return "main";
     }
@@ -98,13 +90,6 @@ public class BoardViewController {
         Board board = boardService.findById(id);
         boardService.updateHits(id); // 조회수 +1
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
-
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
-        }
-
         String email = "";
 
         if (principal instanceof UserDetails) {
@@ -113,14 +98,13 @@ public class BoardViewController {
             email = (String) ((OAuth2User) principal).getAttributes().get("email");
         }
 
-        // 본인이면 게시글을 수정, 삭제 할 수 있게
-        if (isLogin) {
+        // 본인이면 게시글 수정, 삭제 가능
+        if (!email.equals("")) {
             User user = userService.findByEmail(email);
             model.addAttribute("user", user);
         }
 
         model.addAttribute("board", new BoardViewResponse(board));
-        model.addAttribute("isLogin", isLogin);
 
         return "board";
     }
@@ -138,14 +122,18 @@ public class BoardViewController {
             model.addAttribute("board", board);
         }
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
+        String email = "";
 
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
         }
 
-        model.addAttribute("isLogin", isLogin);
+        if (!email.equals("")) {
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
 
         return "writeBoard";
     }
@@ -167,11 +155,17 @@ public class BoardViewController {
         int prev = startPage - 1;
         int next = endPage + 1;
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
+        String email = "";
 
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
         }
 
         model.addAttribute("boardList", boardList);
@@ -179,7 +173,6 @@ public class BoardViewController {
         model.addAttribute("endPage", endPage);
         model.addAttribute("prev", prev);
         model.addAttribute("next", next);
-        model.addAttribute("isLogin", isLogin);
 
         return "boards";
     }
@@ -201,11 +194,17 @@ public class BoardViewController {
         int prev = startPage - 1;
         int next = endPage + 1;
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
+        String email = "";
 
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
         }
 
         model.addAttribute("boardList", boardList);
@@ -213,7 +212,6 @@ public class BoardViewController {
         model.addAttribute("endPage", endPage);
         model.addAttribute("prev", prev);
         model.addAttribute("next", next);
-        model.addAttribute("isLogin", isLogin);
 
         return "popularBoards";
     }
@@ -234,11 +232,17 @@ public class BoardViewController {
         int prev = startPage - 1;
         int next = endPage + 1;
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
+        String email = "";
 
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
         }
 
         model.addAttribute("boardList", boardList);
@@ -247,7 +251,6 @@ public class BoardViewController {
         model.addAttribute("prev", prev);
         model.addAttribute("next", next);
         model.addAttribute("keyword", keyword);
-        model.addAttribute("isLogin", isLogin);
 
         return "search";
     }

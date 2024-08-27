@@ -29,4 +29,12 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     @Query(value = "update Chapter c set c.author=:newName where c.author=:oldName")
     void updateUsername(@Param("oldName") String oldName, @Param("newName") String newName);
 
+    // 다음화 정보
+    @Query("select c from Chapter c where c.novel.id =:novelId and c.episode > :episode order by c.episode asc limit 1")
+    Optional<Chapter> findNextChapter(@Param("novelId")Long novelId, @Param("episode")Long episode);
+    
+    // 이전화 정보
+    @Query("select c from Chapter c where c.novel.id =:novelId and c.episode < :episode order by c.episode desc limit 1")
+    Optional<Chapter> findPreChapter(@Param("novelId")Long novelId, @Param("episode")Long episode);
+
 }

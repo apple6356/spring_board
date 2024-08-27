@@ -55,15 +55,7 @@ public class UserViewController {
 
         User user = userService.findByEmail(email);
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
-
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
-        }
-
         model.addAttribute("user", user);
-        model.addAttribute("isLogin", isLogin);
 
         return "info";
     }
@@ -84,11 +76,17 @@ public class UserViewController {
         int prev = startPage - 1;
         int next = endPage + 1;
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
+        String email = "";
 
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
         }
 
         model.addAttribute("boardList", boardList);
@@ -97,7 +95,6 @@ public class UserViewController {
         model.addAttribute("prev", prev);
         model.addAttribute("next", next);
         model.addAttribute("username", username);
-        model.addAttribute("isLogin", isLogin);
 
         return "myWriting";
     }
@@ -118,11 +115,17 @@ public class UserViewController {
         int prev = startPage - 1;
         int next = endPage + 1;
 
-        boolean isLogin = false; // 로그인을 안 했을 경우
+        String email = "";
 
-        // 로그인을 했을 경우
-        if (!principal.equals("anonymousUser")) {
-            isLogin = true;
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            User user = userService.findByEmail(email);
+            model.addAttribute("user", user);
         }
 
         model.addAttribute("commentList", commentList);
@@ -131,7 +134,6 @@ public class UserViewController {
         model.addAttribute("prev", prev);
         model.addAttribute("next", next);
         model.addAttribute("username", username);
-        model.addAttribute("isLogin", isLogin);
 
         return "myComments";
     }

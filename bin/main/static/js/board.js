@@ -121,7 +121,6 @@ const deleteButton = document.getElementById('delete-btn');
 if (deleteButton) {
     console.log("delete btn start");
     deleteButton.addEventListener('click', event => {
-        console.log("delete event start")
 
         if (confirm("삭제 후 복구할 수 없습니다.\n 정말 삭제하시겠습니까?")) {
             let id = document.getElementById('board-id').value;

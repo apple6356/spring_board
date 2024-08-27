@@ -3,6 +3,7 @@ package org.seo.board.domain;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.google.protobuf.BoolValue;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,6 +30,7 @@ public class UserShelf {
     @Column(name = "last_read_chapter_id")
     private Long lastReadChapterId;
 
+    // 다음 회차
     @Column(name = "next_chapter_id")
     private Long nextChapterId;
 
@@ -39,6 +41,22 @@ public class UserShelf {
     // 읽은 시간
     @Column(name = "last_read_date")
     private LocalDateTime lastReadDate;
+
+    // 마지막으로 읽던 위치
+    @Column(name = "read_position")
+    private Integer readPosition;
+
+    // readPosition의 위치 확인을 위해
+    @Column(name = "max-scroll")
+    private Integer maxScroll;
+
+    // 해당 소설을 추천했는지
+    @Column(name = "recommend")
+    private Boolean recommend = false;
+
+    // 해당 소설이 선호작품인지
+    @Column(name = "favorite")
+    private Boolean favorite;
 
     // 한번이라도 읽은 소설
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,6 +84,15 @@ public class UserShelf {
         this.user = user;
         this.lastReadDate = lastReadDate;
         this.lastReadEpisode = lastReadEpisode;
+        this.recommend = false;
+        this.favorite = false;
+    }
+
+    public UserShelf(User user, Novel novel) {
+        this.user = user;
+        this.novel = novel;
+        this.recommend = false;
+        this.favorite = false;
     }
 
     public void update(Long lastReadChapterId, LocalDateTime lastReadDate, Long lastReadEpisode) {
@@ -76,6 +103,27 @@ public class UserShelf {
 
     public void nextChapterId(Long nextChapterId) {
         this.nextChapterId = nextChapterId;
+    }
+
+    public void updateReadPosition(Integer readPosition, Integer maxScroll) {
+        this.readPosition = readPosition;
+        this.maxScroll = maxScroll;
+    }
+
+    public void recommendNovel() {
+        this.recommend = true;
+    }
+
+    public void recommendCancle() {
+        this.recommend = false;
+    }
+
+    public void favorite() {
+        if (this.favorite) {
+            this.favorite = false;
+        } else {
+            this.favorite = true;
+        }
     }
 
 }

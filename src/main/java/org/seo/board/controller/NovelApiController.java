@@ -1,6 +1,7 @@
 package org.seo.board.controller;
 
 import org.seo.board.domain.User;
+import org.seo.board.domain.UserShelf;
 
 import java.io.IOException;
 
@@ -12,12 +13,15 @@ import org.seo.board.dto.AddChapterRequest;
 import org.seo.board.dto.AddCommentRequest;
 import org.seo.board.dto.AddCommentResponse;
 import org.seo.board.dto.AddNovelRequest;
+import org.seo.board.dto.ChapterCommentViewResponse;
 import org.seo.board.dto.RecommendChapCommentResponse;
 import org.seo.board.dto.UpdateChapterCommentRequest;
 import org.seo.board.dto.UpdateChapterCommentResponse;
 import org.seo.board.dto.UpdateChapterRequest;
 import org.seo.board.dto.UpdateChapterResponse;
 import org.seo.board.dto.UpdateNovelRequest;
+import org.seo.board.dto.UpdateUserShelfRequest;
+import org.seo.board.dto.UpdateUserShelfResponse;
 import org.seo.board.service.NovelService;
 import org.seo.board.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -35,6 +39,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 
@@ -91,10 +100,6 @@ public class NovelApiController {
         User user = userService.findByEmail(email);
 
         UpdateNovelRequest request = new UpdateNovelRequest(title, content, file);
-
-        System.out.println("request.title: " + request.getTitle());
-        System.out.println("request.content: " + request.getContent());
-        System.out.println("file.name: " + file.getOriginalFilename());
 
         Novel novel = novelService.update(id, request, user.getUsername());
 
@@ -164,9 +169,9 @@ public class NovelApiController {
         return ResponseEntity.ok().build();
     }
 
-    // 댓글 작성
-    @PostMapping("/api/chapter-comments")
-    public ResponseEntity<ChapterComment> chapterComment(@RequestBody AddChapterCommentRequest request,
+    // 소설 추천
+    @PostMapping("/api/novel-recommend/{novelId}")
+    public ResponseEntity<UserShelf> recommendNovel(@PathVariable("novelId") Long novelId,
             @AuthenticationPrincipal Object principal) {
 
         String email = "";
@@ -179,7 +184,58 @@ public class NovelApiController {
 
         User user = userService.findByEmail(email);
 
+        UserShelf userShelf = novelService.recommendNovel(novelId, user);
+
+        return ResponseEntity.ok().body(userShelf);
+    }
+
+    // 선호작 등록 / 해제
+    @PostMapping("/api/favorite/{novelId}")
+    public ResponseEntity<UserShelf> favoriteNovel(@PathVariable("novelId") Long novelId,
+            @AuthenticationPrincipal Object principal) {
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        User user = userService.findByEmail(email);
+
+        UserShelf userShelf = novelService.favoriteNovel(user, novelId);
+
+        return ResponseEntity.ok().body(userShelf);
+    }
+
+    // 댓글 작성
+    @PostMapping("/api/chapter-comments")
+    public ResponseEntity<ChapterComment> chapterComment(
+            @RequestBody AddChapterCommentRequest request,
+            @AuthenticationPrincipal Object principal) throws JsonProcessingException {
+
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        User user = userService.findByEmail(email);
+
         ChapterComment chapterComment = novelService.saveComment(request, user);
+
+        // List<ChapterCommentViewResponse> comments =
+        // novelService.getChapterComments(request.getChapterId())
+        // .stream()
+        // .map(ChapterCommentViewResponse::new)
+        // .toList();
+
+        // System.out.println("Comments returned: " + comments);
+
+        // System.out.println("Comments returned: " + new
+        // ObjectMapper().writeValueAsString(comments));
 
         return ResponseEntity.status(HttpStatus.CREATED).body(chapterComment);
     }
@@ -210,23 +266,13 @@ public class NovelApiController {
         return ResponseEntity.ok().body(new RecommendChapCommentResponse(chapterComment));
     }
 
-    // 표지 업로드
-    // @PostMapping("/api/coverImage")
-    // public ResponseEntity<String> coverImageUpload(@RequestParam MultipartFile
-    // file, @RequestParam("novel-id") Long novelId) throws Exception {
+    // 마지막으로 읽던 위치 저장
+    @PutMapping("/api/saveReadPosition")
+    public ResponseEntity<UpdateUserShelfResponse> saveReadPosition(@RequestBody UpdateUserShelfRequest request,
+            @AuthenticationPrincipal Object principal) {
+        UserShelf userShelf = novelService.updateReadPosition(request);
 
-    // if (!file.isEmpty()) {
-    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("유효하지 않은 파일입니다.");
-    // }
-
-    // if (!file.getContentType().startsWith("image")) {
-    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미지 파일만 업로드
-    // 가능합니다.");
-    // }
-
-    // novelService.coverImage(file, novelId);
-
-    // return ResponseEntity.ok().build();
-    // }
+        return ResponseEntity.ok().body(new UpdateUserShelfResponse(userShelf));
+    }
 
 }

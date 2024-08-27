@@ -40,6 +40,8 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-validation' // 자바 빈 밸리데이션
     testImplementation 'net.datafaker:datafaker:2.0.2' // faker 테스트 중 가짜 데이터를 생성해주는 오픈소스 라이브러리
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.3' // Jackson 버전에 맞게 변경
 }
 
 test {
