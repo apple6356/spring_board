@@ -47,11 +47,9 @@
                 <img id="coverImage" alt="thumbnail"
                     th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
                     style="width: 100px; height: 100px; object-fit: cover;">
+                    <h3 th:text="${novel.title}"></h3>
             </div>
-            <div>
-                <h3 th:text="${novel.title}"></h3>
-                <span th:text="|작가: ${novel.author}|"></span>
-            </div>
+            <span th:text="|작가: ${novel.author}|" th:onclick="|location.href='@{/userpage/{username}(username=${novel.author})}'|"></span>
         </div>
         <hr>
     </div>

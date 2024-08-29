@@ -333,4 +333,28 @@ public class NovelViewController {
         return "myShelf";
     }
 
+    // 유저 페이지
+    @GetMapping("/userpage/{username}")
+    public String userpage(@PathVariable("username") String username, Model model, @AuthenticationPrincipal Object principal) {
+        User user;
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
+
+        List<Novel> novelList = novelService.findNovelsByAuthor(username);
+
+        model.addAttribute("novelList", novelList);
+
+        return "userpage";
+    }
+
 }

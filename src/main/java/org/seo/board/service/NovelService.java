@@ -440,4 +440,11 @@ public class NovelService {
         }
     }
 
+    // 작가의 작품 모아 보기
+    public List<Novel> findNovelsByAuthor(String username) {
+        List<Novel> novelList = novelRepository.findByAuthor(username);
+
+        return novelList;
+    }
+
 }

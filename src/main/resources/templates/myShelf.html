@@ -57,11 +57,9 @@
                         th:src="@{'/cover_image/' + ${userShelf.novel.author} + '/' + ${userShelf.novel.title} + '/' + ${userShelf.novel.filename}}"
                         style="width: 100px; height: 100px; object-fit: cover;">
                 </div>
-                <div>
-                    <h3 th:text="${userShelf.novel.title}"></h3>
-                    <span th:text="|작가: ${userShelf.novel.author}|"></span>
-                </div>
+                <h3 th:text="${userShelf.novel.title}"></h3>
             </div>
+            <span th:text="|작가: ${userShelf.novel.author}|" th:onclick="|location.href='@{/userpage/{username}(username=${userShelf.novel.author})}'|"></span>
 
             <!-- 다음화를 봐야하는 경우 이어보기 대신 다음화보기 제공 -->
             <div>
@@ -122,17 +120,22 @@
                         th:src="@{'/cover_image/' + ${userShelf.novel.author} + '/' + ${userShelf.novel.title} + '/' + ${userShelf.novel.filename}}"
                         style="width: 100px; height: 100px; object-fit: cover;">
                 </div>
-                <div>
-                    <h3 th:text="${userShelf.novel.title}"></h3>
-                    <span th:text="|작가: ${userShelf.novel.author}|"></span>
-                </div>
+                <h3 th:text="${userShelf.novel.title}"></h3>
             </div>
+            <span th:text="|작가: ${userShelf.novel.author}|" th:onclick="|location.href='@{/userpage/{username}(username=${userShelf.novel.author})}'|"></span>
 
             <!-- 다음화를 봐야하는 경우 이어보기 대신 다음화보기 제공 -->
             <div>
+                <!-- 이어보기 -->
                 <span
                     th:if="${userShelf.lastReadChapterId != null && userShelf.readPosition < (userShelf.maxScroll - 2)}"
-                    th:unless="${userShelf.firstChapterId != null || userShelf.nextChapterId != null}"
+                    th:unless="${userShelf.firstChapterId != null && userShelf.lastReadChapterId == null}"
+                    th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf.lastReadChapterId})}'|">이어보기</span>
+
+                <!-- 다음화가 없는 경우에도 마지막 읽은 회차로 이어보기 -->
+                <span
+                    th:if="${userShelf.lastReadChapterId != null && userShelf.readPosition >= (userShelf.maxScroll - 2)}"
+                    th:unless="${userShelf.nextChapterId != null}"
                     th:onclick="|location.href='@{/novelView?id={id}(id=${userShelf.lastReadChapterId})}'|">이어보기</span>
 
                 <span th:if="${userShelf.nextChapterId != null && userShelf.readPosition >= (userShelf.maxScroll - 2)}"

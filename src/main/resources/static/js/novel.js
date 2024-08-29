@@ -436,7 +436,7 @@ favoriteButton.addEventListener('click', function() {
     }
 
     function fail(data) {
-        alert("에러 발생")
+        alert("오류 발생")
     }
 
     httpRequest("POST", "/api/favorite/" + novelId, body, success, fail);
@@ -566,26 +566,6 @@ function commentRecommend(commentId) {
 //         error: function () {
 //             console.log('failed chapter load');
 //         }
-//     });
-// }
-
-// 이전화 클릭 시
-// const preChapterButton = document.getElementById('pre-chapter-btn');
-
-// if(preChapterButton){
-//     preChapterButton.addEventListener('click', function() {
-//         const chapterId = preChapterButton.value;
-//         loadChapter(chapterId);
-//     });
-// }
-
-// 다음화 클릭 시
-// const nextChapterButton = document.getElementById('next-chapter-btn');
-
-// if(nextChapterButton){
-//     nextChapterButton.addEventListener('click', function() {
-//         const chapterId = preChapterButton.value;
-//         loadChapter(chapterId);
 //     });
 // }
 
