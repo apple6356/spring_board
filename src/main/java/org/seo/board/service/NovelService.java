@@ -381,11 +381,6 @@ public class NovelService {
         return userShelfRepository.findByUserIdAndNovelId(userId, novelId).orElse(null);
     }
 
-    // chapterComment list 반환
-    public List<ChapterComment> getChapterComments(Long chapterId) {
-        return chapterCommentRepository.findByChapterId(chapterId);
-    }
-
     // 소설 추천
     @Transactional
     public UserShelf recommendNovel(Long novelId, User user) {
@@ -445,6 +440,28 @@ public class NovelService {
         List<Novel> novelList = novelRepository.findByAuthor(username);
 
         return novelList;
+    }
+
+    // 소설 검색
+    public Page<Novel> novelSearch(String keyword, Pageable pageable) {
+        int page = pageable.getPageNumber() - 1;
+        int pageLimit = 10; // 한페이지에 보여줄 글 갯수
+
+        Page<Novel> novelPage = novelRepository.findByTitleContainingOrAuthorContaining(keyword, keyword, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "lastUpdatedAt")));
+        return novelPage;
+    }
+
+    // 댓글 목록 가져오기
+    public List<ChapterComment> findCommentByChapterId(Long chapterId) {
+        List<ChapterComment> chapterComments = chapterCommentRepository.findByChapterIdOrderByRecommendDescCreatedAtAsc(chapterId);
+
+        return chapterComments;
+    }
+
+    // chapterComment 리턴
+    public ChapterComment findChapterCommentBycommentId(Long id) {
+        return chapterCommentRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("not found commentId: " + id));
     }
 
 }

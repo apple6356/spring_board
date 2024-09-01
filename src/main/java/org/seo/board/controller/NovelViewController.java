@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collector;
 
 import org.seo.board.domain.Chapter;
+import org.seo.board.domain.ChapterComment;
 import org.seo.board.domain.Novel;
 import org.seo.board.domain.User;
 import org.seo.board.domain.UserShelf;
@@ -283,9 +284,12 @@ public class NovelViewController {
         Chapter nextChapter = novelService.getNextChapter(chapter);
         Chapter preChapter = novelService.getPreChapterId(chapter);
 
+        List<ChapterComment> chapterComments = novelService.findCommentByChapterId(chapter.getId());
+
         model.addAttribute("nextChapter", nextChapter);
         model.addAttribute("preChapter", preChapter);
         model.addAttribute("chapter", chapter);
+        model.addAttribute("chapterComments", chapterComments);
 
         return "novelView";
     }
@@ -335,7 +339,8 @@ public class NovelViewController {
 
     // 유저 페이지
     @GetMapping("/userpage/{username}")
-    public String userpage(@PathVariable("username") String username, Model model, @AuthenticationPrincipal Object principal) {
+    public String userpage(@PathVariable("username") String username, Model model,
+            @AuthenticationPrincipal Object principal) {
         User user;
         String email = "";
 
@@ -355,6 +360,47 @@ public class NovelViewController {
         model.addAttribute("novelList", novelList);
 
         return "userpage";
+    }
+
+    // 소설 검색
+    @GetMapping("/novelSearch")
+    public String novelSearch(@PageableDefault(page = 1) Pageable pageable,
+            @RequestParam(name = "keyword", required = false) String keyword, Model model,
+            @AuthenticationPrincipal Object principal) {
+        User user;
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
+
+        Page<Novel> novelPage = novelService.novelSearch(keyword, pageable);
+
+        int blockLimit = 10;
+        int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
+        int endPage = ((startPage + blockLimit - 1) < novelPage.getTotalPages()) ? startPage + blockLimit - 1
+                : novelPage.getTotalPages();
+
+        int prev = startPage - 1;
+        int next = endPage + 1;
+
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        model.addAttribute("prev", prev);
+        model.addAttribute("next", next);
+        model.addAttribute("novelPage", novelPage);
+        model.addAttribute("keyword", keyword);
+
+        System.out.println("keyword: " + keyword);
+
+        return "novelSearch";
     }
 
 }

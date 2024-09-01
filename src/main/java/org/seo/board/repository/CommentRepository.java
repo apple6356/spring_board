@@ -1,5 +1,7 @@
 package org.seo.board.repository;
 
+import java.util.List;
+
 import org.seo.board.domain.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,4 +21,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // 회원 탈퇴 시 작성한 댓글 삭제
     void deleteByAuthor(String username);
+
+    // 댓글 목록 리턴
+    List<Comment> findByBoardId(Long boardId);
 }

@@ -210,7 +210,7 @@ public class NovelApiController {
 
     // 댓글 작성
     @PostMapping("/api/chapter-comments")
-    public ResponseEntity<ChapterComment> chapterComment(
+    public ResponseEntity<List<ChapterComment>> chapterComment(
             @RequestBody AddChapterCommentRequest request,
             @AuthenticationPrincipal Object principal) throws JsonProcessingException {
 
@@ -224,46 +224,43 @@ public class NovelApiController {
 
         User user = userService.findByEmail(email);
 
-        ChapterComment chapterComment = novelService.saveComment(request, user);
+        novelService.saveComment(request, user);
 
-        // List<ChapterCommentViewResponse> comments =
-        // novelService.getChapterComments(request.getChapterId())
-        // .stream()
-        // .map(ChapterCommentViewResponse::new)
-        // .toList();
+        List<ChapterComment> chapterComments = novelService.findCommentByChapterId(request.getChapterId());
 
-        // System.out.println("Comments returned: " + comments);
-
-        // System.out.println("Comments returned: " + new
-        // ObjectMapper().writeValueAsString(comments));
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(chapterComment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(chapterComments);
     }
 
     // 댓글 수정
     @PutMapping("/api/chapter-comments/{commentId}")
-    public ResponseEntity<UpdateChapterCommentResponse> updateChapterComment(@PathVariable("commentId") Long id,
+    public ResponseEntity<List<ChapterComment>> updateChapterComment(@PathVariable("commentId") Long id,
             @RequestBody UpdateChapterCommentRequest request, @AuthenticationPrincipal Object principal) {
 
         ChapterComment chapterComment = novelService.updateComment(id, request);
 
-        return ResponseEntity.ok().body(new UpdateChapterCommentResponse(chapterComment));
+        List<ChapterComment> chapterComments = novelService.findCommentByChapterId(chapterComment.getChapter().getId());
+
+        return ResponseEntity.ok().body(chapterComments);
     }
 
     // 댓글 삭제
     @DeleteMapping("/api/chapter-comments/{commentId}")
-    public ResponseEntity<Void> deleteChapterComment(@PathVariable("commentId") Long id) {
+    public ResponseEntity<List<ChapterComment>> deleteChapterComment(@PathVariable("commentId") Long id) {
+        ChapterComment chapterComment = novelService.findChapterCommentBycommentId(id);
         novelService.deleteComment(id);
+        List<ChapterComment> chapterComments = novelService.findCommentByChapterId(chapterComment.getChapter().getId());
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(chapterComments);
     }
 
     // 댓글 추천
     @PutMapping("/api/chapter-comments-recommend/{commentId}")
-    public ResponseEntity<RecommendChapCommentResponse> recommendChapterComment(@PathVariable("commentId") Long id) {
+    public ResponseEntity<List<ChapterComment>> recommendChapterComment(@PathVariable("commentId") Long id) {
         ChapterComment chapterComment = novelService.recommendComment(id);
 
-        return ResponseEntity.ok().body(new RecommendChapCommentResponse(chapterComment));
+        List<ChapterComment> chapterComments = novelService.findCommentByChapterId(chapterComment.getChapter().getId());
+
+        return ResponseEntity.ok().body(chapterComments);
     }
 
     // 마지막으로 읽던 위치 저장

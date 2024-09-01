@@ -15,6 +15,6 @@ public interface ChapterCommentRepository extends JpaRepository<ChapterComment, 
     void updateUsername(@Param("oldName") String oldName, @Param("newName") String newName);
 
     // 댓글 list 반환
-    List<ChapterComment> findByChapterId(Long chapterId);
+    List<ChapterComment> findByChapterIdOrderByRecommendDescCreatedAtAsc(Long chapterId);
 
 }

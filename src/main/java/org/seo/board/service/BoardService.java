@@ -56,13 +56,13 @@ public class BoardService {
 
         // 정규식 패턴
         /*
-            "<img[^>]+src=\"([^\"]+)\"": 이 정규 표현식은 img 태그의 src 속성 값을 추출하기 위해 설계되었습니다.
-            "<img": 문자열이 <img로 시작하는 것을 찾는다
-            [^>]+: >가 아닌 모든 문자를 1개 이상 포함하는 패턴을 찾는다
-            src=\": src=" 문자열을 찾는다.
-            ([^\"]+): 큰따옴표(")가 아닌 모든 문자를 1개 이상 포함하는 패턴을 찾는다 src 속성 값 자체를 추출하는 역할을 한다
-            \": 닫는 큰따옴표(")를 찾는다
-        */
+         * "<img[^>]+src=\"([^\"]+)\"": 이 정규 표현식은 img 태그의 src 속성 값을 추출하기 위해 설계되었습니다.
+         * "<img": 문자열이 <img로 시작하는 것을 찾는다
+         * [^>]+: >가 아닌 모든 문자를 1개 이상 포함하는 패턴을 찾는다
+         * src=\": src=" 문자열을 찾는다.
+         * ([^\"]+): 큰따옴표(")가 아닌 모든 문자를 1개 이상 포함하는 패턴을 찾는다 src 속성 값 자체를 추출하는 역할을 한다
+         * \": 닫는 큰따옴표(")를 찾는다
+         */
         String imgTagPattern = "<img[^>]+src=\"([^\"]+)\"";
         Pattern pattern = Pattern.compile(imgTagPattern);
         Matcher matcher = pattern.matcher(content);
@@ -123,21 +123,22 @@ public class BoardService {
     public Board findById(Long id) {
         return boardRepository.findById(id)
                 .orElseThrow(BoardNotFoundException::new);
-//                .orElseThrow(IllegalArgumentException("not found : " + id));
+        // .orElseThrow(IllegalArgumentException("not found : " + id));
     }
 
     // 게시글을 작성한 유저인지 확인
-//    private static void authorizeBoardAuthor(Board board) {
-//        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-//
-//        if (!board.getAuthor().equals(userName)) {
-//            throw new IllegalArgumentException("not authorized");
-//        }
-//    }
+    // private static void authorizeBoardAuthor(Board board) {
+    // String userName =
+    // SecurityContextHolder.getContext().getAuthentication().getName();
+    //
+    // if (!board.getAuthor().equals(userName)) {
+    // throw new IllegalArgumentException("not authorized");
+    // }
+    // }
 
     // 글 삭제
     public void delete(Long id) {
-//        boardRepository.deleteById(id);
+        // boardRepository.deleteById(id);
 
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found : " + id));
@@ -160,7 +161,7 @@ public class BoardService {
             }
         }
 
-//        authorizeBoardAuthor(board);
+        // authorizeBoardAuthor(board);
         boardRepository.delete(board);
     }
 
@@ -170,7 +171,7 @@ public class BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found" + id));
 
-//        authorizeBoardAuthor(board); // 추가
+        // authorizeBoardAuthor(board); // 추가
         board.update(request.getTitle(), request.getContent());
 
         return board;
@@ -182,7 +183,8 @@ public class BoardService {
         int pageLimit = 10; // 한페이지에 보여줄 글 갯수
 
         // JpaRepository 의 findAll() 사용시 pageable 인터페이스로 파라미터를 넘기면 페이징 사용가능
-        Page<Board> boardPage = boardRepository.findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+        Page<Board> boardPage = boardRepository
+                .findAll(PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
 
         Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
 
@@ -194,7 +196,8 @@ public class BoardService {
         int page = pageable.getPageNumber() - 1;
         int pageLimit = 10; // 한페이지에 보여줄 글 갯수
 
-        Page<Board> boardPage = boardRepository.findByRecommendGreaterThanEqualOrderByIdDesc(30, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+        Page<Board> boardPage = boardRepository.findByRecommendGreaterThanEqualOrderByIdDesc(30,
+                PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
 
         Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
 
@@ -206,22 +209,23 @@ public class BoardService {
         int page = pageable.getPageNumber() - 1;
         int pageLimit = 10; // 한페이지에 보여줄 글 갯수
 
-        Page<Board> boardPage = boardRepository.findByTitleContains(keyword, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+        Page<Board> boardPage = boardRepository.findByTitleContains(keyword,
+                PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
 
-        Page<BoardListViewResponse>  boardList = boardPage.map(BoardListViewResponse::new);
+        Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
 
         return boardList;
     }
-
 
     // 자신이 작성한 글 목록
     public Page<BoardListViewResponse> myBoards(Pageable pageable, String username) {
         int page = pageable.getPageNumber() - 1;
         int pageLimit = 10; // 한페이지에 보여줄 글 갯수
 
-        Page<Board> boardPage = boardRepository.findByAuthorLike(username, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+        Page<Board> boardPage = boardRepository.findByAuthorLike(username,
+                PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
 
-        Page<BoardListViewResponse>  boardList = boardPage.map(BoardListViewResponse::new);
+        Page<BoardListViewResponse> boardList = boardPage.map(BoardListViewResponse::new);
 
         return boardList;
     }
@@ -231,13 +235,13 @@ public class BoardService {
         int page = pageable.getPageNumber() - 1;
         int pageLimit = 10; // 한페이지에 보여줄 글 갯수
 
-        Page<Comment> commentPage = commentRepository.findByAuthorLike(username, PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
+        Page<Comment> commentPage = commentRepository.findByAuthorLike(username,
+                PageRequest.of(page, pageLimit, Sort.by(Sort.Direction.DESC, "id")));
 
-        Page<CommentListViewResponse>  commentList = commentPage.map(CommentListViewResponse::new);
+        Page<CommentListViewResponse> commentList = commentPage.map(CommentListViewResponse::new);
 
         return commentList;
     }
-
 
     // 댓글 추가
     public Comment addComment(AddCommentRequest request, String username) {
@@ -246,7 +250,6 @@ public class BoardService {
 
         return commentRepository.save(request.toEntity(username, board));
     }
-
 
     // 댓글 수정
     @Transactional
@@ -294,6 +297,17 @@ public class BoardService {
         comment.updateRecommend();
 
         return comment;
+    }
+
+    // 댓글 리스트 조회
+    public List<Comment> findCommentsById(Long boardId) {
+        return commentRepository.findByBoardId(boardId);
+    }
+
+    // 댓글 하나 조회
+    public Comment findCommentById(Long id) {
+        return commentRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("not found commentId: " + id));
     }
 
 }

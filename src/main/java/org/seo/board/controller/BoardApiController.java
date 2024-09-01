@@ -166,7 +166,7 @@ public class BoardApiController {
 
     // 댓글 생성
     @PostMapping("/api/comments")
-    public ResponseEntity<AddCommentResponse> addComment(@RequestBody AddCommentRequest request,
+    public ResponseEntity<List<Comment>> addComment(@RequestBody AddCommentRequest request,
             @AuthenticationPrincipal Object principal) {
 
         String email = "";
@@ -179,38 +179,46 @@ public class BoardApiController {
 
         User user = userService.findByEmail(email);
 
-        Comment savedComment = boardService.addComment(request, user.getUsername());
+        boardService.addComment(request, user.getUsername());
+
+        List<Comment> comments = boardService.findCommentsById(request.getBoardId());
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new AddCommentResponse(savedComment));
+                .body(comments);
     }
 
     // 댓글 수정
     @PutMapping("/api/comments/{id}")
-    public ResponseEntity<UpdateCommentResponse> updateComment(@PathVariable("id") Long id,
+    public ResponseEntity<List<Comment>> updateComment(@PathVariable("id") Long id,
             @RequestBody UpdateCommentRequest request) {
         Comment comment = boardService.updateComment(id, request);
 
+        List<Comment> comments = boardService.findCommentsById(comment.getBoard().getId());
+
         return ResponseEntity.ok()
-                .body(new UpdateCommentResponse(comment));
+                .body(comments);
     }
 
     // 댓글 삭제
     @DeleteMapping("/api/comments/{id}")
-    public ResponseEntity<Void> deleteComment(@PathVariable("id") Long id) {
+    public ResponseEntity<List<Comment>> deleteComment(@PathVariable("id") Long id) {
+        Comment comment = boardService.findCommentById(id);
         boardService.deleteComment(id);
+        List<Comment> comments = boardService.findCommentsById(comment.getBoard().getId());
 
         return ResponseEntity.ok()
-                .build();
+                .body(comments);
     }
 
     // 댓글 추천수 +1
     @PutMapping("/api/comment-recommend/{id}")
-    public ResponseEntity<RecommendCommentResponse> updateCommentRecommend(@PathVariable("id") Long id,
+    public ResponseEntity<List<Comment>> updateCommentRecommend(@PathVariable("id") Long id,
             @RequestBody RecommendCommentRequest request) {
         Comment comment = boardService.updateCommentRecommend(id, request);
 
+        List<Comment> comments = boardService.findCommentsById(comment.getBoard().getId());
+
         return ResponseEntity.ok()
-                .body(new RecommendCommentResponse(comment));
+                .body(comments);
     }
 }

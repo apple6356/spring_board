@@ -191,6 +191,7 @@
         <input type="hidden" id="chapter-id" th:value="${chapter.id}">
         <input type="hidden" id="novel-id" th:value="${chapter.novel.id}">
         <input type="hidden" id="readPosition" th:value="${readPosition}">
+        <input type="hidden" id="current-user" th:value="${user?.username}">
         <span id="title" th:text="|${chapter.title}|"></span>
 
         <button id="setting-btn">설정</button>
@@ -247,17 +248,6 @@
 
     <!-- 댓글 -->
     <section id="comment-section" style="display: none;">
-        <p>인기 댓글</p>
-        <div th:each="comment: ${chapter.chapterComments}" th:if="${comment.recommend} >= 10">
-            <div th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|">
-            </div>
-            <button th:onclick="commentRecommend([[${comment.id}]])">추천</button>
-            <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
-            <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
-            <hr>
-        </div>
-
-        <hr>
 
         <div>
             <h5>댓글</h5>
@@ -270,13 +260,13 @@
         <hr>
 
         <div id="comment-list">
-            <div th:each="comment : ${chapter.chapterComments}">
+            <div th:each="comment : ${chapterComments}">
                 <input type="hidden" id="comment-id" th:value="${comment.id}">
                 <div>
                     <div
-                        th:text="|작성자 : ${comment.author}, 작성 시간 ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|">
+                        th:text="|작성자 : ${comment.author}, 작성 시간 : ${#temporals.format(comment.createdAt, 'yyyy-MM-dd HH:mm')}|">
                     </div>
-                    <button th:onclick="commentRecommend([[${comment.id}]])">추천</button>
+                    <button type="button" th:onclick="commentRecommend([[${comment.id}]])">추천</button>
                     <span th:id="'comment-recommend-' + ${comment.id}" th:text="${comment.recommend}"></span> <br>
                     <div th:id="'comment-content-' + ${comment.id}" th:text="${comment.content}"></div>
                     <!-- this 로 태그 정보 넘김 -->
@@ -293,6 +283,7 @@
     </section>
 
     <script src="/js/novel.js"></script>
+    <script src="/js/comment.js"></script>
 
 </body>
 

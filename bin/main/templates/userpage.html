@@ -51,9 +51,9 @@
                 <h3 th:text="${novel.title}"></h3>
             </div>
             <span th:text="|작가: ${novel.author}|" th:onclick="|location.href='@{/userpage?{username}(username=${novel.author})}'|"></span>
+            
+            <hr>
         </div>
-
-        <hr>
     </div>
 
     <script src="/js/novel.js"></script>
