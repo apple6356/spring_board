@@ -183,8 +183,20 @@ public class NovelService {
 
     // 회차 조회
     public Chapter getChapter(Long id) {
-        return chapterRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
+        Chapter chapter = chapterRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("not found chapterId: " + id));
+
+        chapter.hits();
+        chapter = chapterRepository.save(chapter);
+
+        Long novelId = chapter.getNovel().getId();
+        Novel novel = novelRepository.findById(novelId)
+                .orElseThrow(() -> new IllegalArgumentException("not found novelId: " + novelId));
+
+        novel.hits();
+        novelRepository.save(novel);
+
+        return chapter;
     }
 
     // 자신의 작품 목록
@@ -419,6 +431,13 @@ public class NovelService {
         userShelf.favorite();
         userShelfRepository.save(userShelf);
 
+        Long favoriteCount = userShelfRepository.countByNovelIdAndFavoriteTrue(novelId);
+        Novel novel = findById(novelId);
+
+        novel.setFavoriteCount(favoriteCount);
+
+        novelRepository.save(novel);
+
         return userShelf;
     }
 
@@ -462,6 +481,36 @@ public class NovelService {
     public ChapterComment findChapterCommentBycommentId(Long id) {
         return chapterCommentRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("not found commentId: " + id));
+    }
+
+    // 조회수 기준으로 top100
+    public List<NovelViewResponse> getTopNovelsByHits() {
+        List<Novel> novels = novelRepository.findTop100ByOrderByHitsDesc();
+
+        List<NovelViewResponse> novelList = novels.stream().map(NovelViewResponse::new)
+        .collect(Collectors.toList());
+
+        return novelList;
+    }
+    
+    // 추천수 기준으로 top100
+    public List<NovelViewResponse> getTopNovelsByRecommend() {
+        List<Novel> novels = novelRepository.findTop100ByOrderByRecommendDesc();
+
+        List<NovelViewResponse> novelList = novels.stream().map(NovelViewResponse::new)
+        .collect(Collectors.toList());
+
+        return novelList;
+    }
+    
+    // 선호작 기준으로 top100
+    public List<NovelViewResponse> getTopNovelsByFavorite() {
+        List<Novel> novels = novelRepository.findTop100ByOrderByFavoriteCountDesc();
+
+        List<NovelViewResponse> novelList = novels.stream().map(NovelViewResponse::new)
+        .collect(Collectors.toList());
+
+        return novelList;
     }
 
 }

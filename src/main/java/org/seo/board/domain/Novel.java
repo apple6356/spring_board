@@ -52,6 +52,14 @@ public class Novel {
     @Column(name = "recommend")
     private Long recommend;
 
+    // 조회수
+    @Column(name = "hits")
+    private Long hits;
+
+    // 선호작수
+    @Column(name = "favorite_count")
+    private Long favoriteCount;
+
     // 마지막으로 업데이트한 시간
     @Column(name = "last_updated_at")
     private LocalDateTime lastUpdatedAt;
@@ -72,6 +80,8 @@ public class Novel {
         this.content = content;
         this.title = title;
         this.recommend = 0L;
+        this.hits = 0L;
+        this.favoriteCount = 0L;
         if (coverImagePath != null && filename != null) {
             this.coverImagePath = coverImagePath;
             this.filename = filename;
@@ -108,6 +118,16 @@ public class Novel {
     // 추천 -1
     public void recommendCancle() {
         this.recommend--;
+    }
+
+    // 선호작 수 삽입
+    public void setFavoriteCount(Long favoriteCount) {
+        this.favoriteCount = favoriteCount;
+    }
+
+    // 조회수 + 1
+    public void hits() {
+        this.hits++;
     }
 
 }

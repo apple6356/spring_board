@@ -403,4 +403,52 @@ public class NovelViewController {
         return "novelSearch";
     }
 
+    // Top 100
+    @GetMapping("/ranking")
+    public String getTopNovels(@RequestParam(name = "sortBy", defaultValue = "hitsSort") String sortBy, Model model,
+            @AuthenticationPrincipal Object principal) {
+
+        User user;
+        String email = "";
+
+        if (principal instanceof UserDetails) {
+            email = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof OAuth2User) {
+            email = (String) ((OAuth2User) principal).getAttributes().get("email");
+        }
+
+        if (!email.equals("")) {
+            user = userService.findByEmail(email);
+            model.addAttribute("user", user);
+        }
+
+        List<NovelViewResponse> novelList = null;
+
+        switch (sortBy) {
+            case "hitsSort":
+                novelList = novelService.getTopNovelsByHits();
+                System.out.println("hitsSort");
+                break;
+
+            case "recommendSort":
+                novelList = novelService.getTopNovelsByRecommend();
+                System.out.println("recommendSort");
+                break;
+
+            case "favoriteSort":
+                novelList = novelService.getTopNovelsByFavorite();
+                System.out.println("favoriteSort");
+                break;
+
+            default:
+                novelList = novelService.getTopNovelsByHits();
+                break;
+        }
+
+        model.addAttribute("novelList", novelList);
+        model.addAttribute("sortBy", sortBy);
+
+        return "ranking";
+    }
+
 }

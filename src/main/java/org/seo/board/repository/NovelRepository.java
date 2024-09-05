@@ -3,6 +3,7 @@ package org.seo.board.repository;
 import java.util.List;
 
 import org.seo.board.domain.Novel;
+import org.seo.board.dto.NovelViewResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,5 +26,14 @@ public interface NovelRepository extends JpaRepository<Novel, Long> {
 
     // 소설 검색 제목 또는 작가명으로
     Page<Novel> findByTitleContainingOrAuthorContaining(String titleKeyword, String authorKeyword, Pageable pageable);
+
+    // 조회수 순으로 상위 100개
+    List<Novel> findTop100ByOrderByHitsDesc();
+    
+    // 추천수 순으로 상위 100개
+    List<Novel> findTop100ByOrderByRecommendDesc();
+    
+    // 선호작 순으로 상위 100개
+    List<Novel> findTop100ByOrderByFavoriteCountDesc();
 
 }

@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/nav.css">
-    <title>새 회차 작성</title>
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <title>Top 100</title>
 </head>
 
 <body>
@@ -48,24 +48,31 @@
 
     <hr>
 
-    <!-- th:value="${chapter?.id}" ?는 safe navigation operater이며, null인 경우에 null 자체를 리턴해 NullPointerException을 방지할 수 있음 -->
-    <div>
-        <article>
-            <!-- 아이디 정보 저장 -->
-            <input type="hidden" id="novel-id" th:value="${novelId}">
-            <input type="hidden" id="chapter-id" th:value="${chapter?.id}">
+    <h1>Top 100</h1>
 
-            <header>
-                <input type="text" placeholder="제목" id="title" th:value="${chapter?.title}">
-            </header>
-            <section>
-                <textarea rows="15" cols="50" placeholder="내용을 입력해주세요." id="content"
-                    th:utext="${chapter?.content}"></textarea>
-            </section>
-            <!-- id가 있을 때는 수정버튼, 없을 때는 등록 버튼 -->
-            <button th:if="${chapter} != null" type="button" id="modify-btn">수정</button>
-            <button th:if="${chapter} == null" type="button" id="create-btn">등록</button>
-        </article>
+    <select id="sortBy" onchange="window.location.href='/ranking?sortBy=' + this.value;">
+        <option value="hitsSort" th:selected="${sortBy == 'hitsSort'}">조회수 순으로</option>
+        <option value="recommendSort" th:selected="${sortBy == 'recommendSort'}">추천수 순으로</option>
+        <option value="favoriteSort" th:selected="${sortBy == 'favoriteSort'}">선호작 순으로</option>
+    </select>
+
+    <hr>
+
+    <div th:each="novel : ${novelList}">
+        <input type="hidden" id="board-id" th:value="${novel.id}">
+        <div th:onclick="|location.href='@{/novel/{id}(id=${novel.id})}'|">
+            <div th:if="${novel.filename != null}">
+                <img id="coverImage" alt="thumbnail"
+                    th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
+                    style="width: 100px; height: 100px; object-fit: cover;">
+            </div>
+            <h3 th:text="${novel.title}"></h3>
+            <span th:text="|작가: ${novel.author}|" th:onclick="|location.href='@{/userpage/{username}(username=${novel.author})}'|"></span>
+            <span th:text="'조회수 : ' + ${novel.hits}"></span>
+            <span th:text="'선호작 : ' + ${novel.favoriteCount}"></span>
+            <span th:text="'추천수 : ' + ${novel.recommend}"></span>
+        </div>
+        <hr>
     </div>
 
     <script src="/js/novel.js"></script>

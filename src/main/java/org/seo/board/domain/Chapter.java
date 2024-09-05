@@ -90,4 +90,8 @@ public class Chapter {
         this.content = content;
     }
 
+    public void hits() {
+        this.hits++;
+    }
+
 }

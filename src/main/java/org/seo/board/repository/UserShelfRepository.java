@@ -25,5 +25,8 @@ public interface UserShelfRepository extends JpaRepository<UserShelf, Long> {
     Page<UserShelf> findByUserAndFavoriteTrue(User user, Pageable pageable);
 
     Page<UserShelf> findByUserAndLastReadChapterIdIsNotNull(User user, Pageable pageable);
+
+    // 선호작 개수 세기
+    Long countByNovelIdAndFavoriteTrue(Long novelId);
     
 }

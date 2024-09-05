@@ -3,34 +3,37 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/nav.css">
     <title>검색</title>
 </head>
 
 <body>
 
-    <div>
-        <h1>검색 결과</h1>
-    </div>
-
     <nav id="navbar">
-        <span onclick="location.href='/main'">메인</span>
+        <span id="main" onclick="location.href='/main'">메인</span>
+        <div class="v-line"></div>
+
         <ul id="menu">
-            <li><span>게시판</span>
-                <ul>
-                    <li onclick="location.href='/popularBoards'">인기 게시판</li>
+            <li><div>게시판</div>
+                <ul class="dropdown">
+                    <li  onclick="location.href='/popularBoards'">인기 게시판</li>
                     <li onclick="location.href='/boards'">자유 게시판</li>
                 </ul>
             </li>
-            <li><span>소설</span>
-                <ul>
+
+            <div class="v-line"></div>
+
+            <li><div>소설</div>
+                <ul class="dropdown">
                     <li onclick="location.href='/novelList'">소설 게시판</li>
                     <li onclick="location.href='/novelSearch'">검색</li>
+                    <li onclick="location.href='/ranking'">Top 100</li>
                     <li th:if="${user} != null" onclick="location.href='/myShelf'">내 서재</li>
                 </ul>
             </li>
         </ul>
 
-        <div>
+        <div class="login-box">
             <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
                 <button type="button" onclick="location.href='/logout'">로그아웃</button>
@@ -39,6 +42,7 @@
                 <button type="button" onclick="location.href='/login'">로그인</button>
             </div>
         </div>
+
     </nav>
 
     <hr>
@@ -60,8 +64,9 @@
                         style="width: 100px; height: 100px; object-fit: cover;">
                 </div>
                 <h3 th:text="${novel.title}"></h3>
-            </div>           
-            <span th:text="|작가: ${novel.author}|" th:onclick="|location.href='@{/userpage/{username}(username=${novel.author})}'|"></span>
+            </div>
+            <span th:text="|작가: ${novel.author}|"
+                th:onclick="|location.href='@{/userpage/{username}(username=${novel.author})}'|"></span>
 
             <hr>
         </div>
@@ -91,6 +96,7 @@
     </div>
 
     <script src="/js/novel.js"></script>
+    <script src="/js/menu.js"></script>
 
 </body>
 

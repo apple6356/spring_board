@@ -15,6 +15,9 @@ public class NovelViewResponse {
     private String author;
     private String coverImagePath;
     private String filename;
+    private Long recommend;
+    private Long favoriteCount;
+    private Long hits;
 
     public NovelViewResponse(Novel novel) {
         this.id = novel.getId();
@@ -23,5 +26,8 @@ public class NovelViewResponse {
         this.author = novel.getAuthor();
         this.coverImagePath = novel.getCoverImagePath();
         this.filename = novel.getFilename();
+        this.recommend = novel.getRecommend();
+        this.favoriteCount = novel.getFavoriteCount();
+        this.hits = novel.getHits();
     }
 }
