@@ -50,7 +50,7 @@ function httpRequest(method, url, body, success, fail) {
                     .then((result) => {
                         // 재발급이 성공하면 로컬 스토리지값을 새 액세스 토큰으로 교체
                         localStorage.setItem("access_token", result.accessToken);
-                        httpRequest(method, url, body, false, success, fail);
+                        httpRequest(method, url, body, success, fail);
                     })
                     .catch((error) => fail(error.message));
             } else {
@@ -450,23 +450,23 @@ if (favoriteButton) {
 }
 
 // 소설 검색
-const novelSearchButton = document.getElementById('novel-search-btn');
+// const novelSearchButton = document.getElementById('novel-search-btn');
 
-if (novelSearchButton) {
-    novelSearchButton.addEventListener('click', event => {
-        keyword = document.getElementById('keyword').value;
+// if (novelSearchButton) {
+//     novelSearchButton.addEventListener('click', event => {
+//         keyword = document.getElementById('keyword').value;
 
-        function success(data) {
-            location.replace('/novelSearch?keyword=' + keyword);
-        };
-        function fail() {
-            alert('오류 발생 검색 실패');
-        };
+//         function success(data) {
+//             location.replace('/novelSearch?keyword=' + keyword);
+//         };
+//         function fail() {
+//             alert('오류 발생 검색 실패');
+//         };
         
-        console.log('keyword: ' + keyword);
-        httpRequest('GET', '/novelSearch?keyword=' + keyword, null, success, fail);
-    });
-}
+//         console.log('keyword: ' + keyword);
+//         httpRequest('GET', '/novelSearch?keyword=' + keyword, null, success, fail);
+//     });
+// }
 
 // 댓글 리스트 갱신
 function updateCommentList(data) {

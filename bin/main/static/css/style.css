@@ -1,0 +1,517 @@
+/* 공통 스타일 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+button {
+    padding: 12px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:active {
+    background-color: #004494;
+}
+
+/* 네비게이션 스타일 */
+#navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#navbar ul {
+    display: flex;
+    justify-content: center;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#navbar ul li {
+    position: relative;
+    padding: 10px;
+}
+
+#navbar ul li .dropdown {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #fff;
+    padding: 10px 0;
+    min-width: 150px;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+#navbar ul li .dropdown li {
+    padding: 8px 12px;
+    white-space: nowrap;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+}
+
+#navbar ul li:hover .dropdown {
+    display: block;
+}
+
+#navbar div a,
+#navbar div button {
+    margin-left: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #333;
+    background-color: #fff;
+    border: none;
+}
+
+/* 메뉴는 왼쪽 정렬 */
+#menu {
+    display: flex;
+    align-items: center;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 로그인 박스를 오른쪽으로 배치 */
+.login-box {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+/* 게시판 목록 스타일 */
+.boards-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.boards-box ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.boards-box ul li {
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.boards-box ul li:last-child {
+    border-bottom: none;
+}
+
+.boards-box ul li a {
+    color: #007bff;
+    font-size: 16px;
+}
+
+.boards-box ul li a:hover {
+    text-decoration: underline;
+}
+
+/* PC 환경 */
+.board-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.board-title {
+    font-size: 18px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.board-info {
+    font-size: 14px;
+    color: #333;
+    display: flex;
+    justify-content: space-between;
+}
+
+.board-item>div {
+    flex: 1;
+    padding: 5px;
+    text-align: center;
+    border-right: 1px solid #ddd;
+}
+
+.board-item>div:last-child {
+    border-right: none;
+}
+
+.board-header {
+    display: flex;
+    background-color: #f4f4f4;
+    font-weight: bold;
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+.board-header-item {
+    flex: 1;
+    text-align: center;
+    padding: 5px;
+}
+
+.board-list {
+    margin-top: 10px;
+}
+
+/* 소설 게시판 */
+.novels-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.novels-box ul li a {
+    color: #007bff;
+    font-size: 16px;
+}
+
+.novel-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.novel-info {
+    margin-left: 20px;
+}
+
+#coverImage {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+/* 검색 창 */
+.search-box {
+    margin: 20px 0;
+    display: flex;
+    width: 100%;
+}
+
+.search-box input {
+    width: 70%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.search-box button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+.search-box button:hover {
+    background-color: #0056b3;
+}
+
+/* 페이지네이션 */
+.page-box {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.page-box a {
+    padding: 8px 16px;
+    margin: 0 5px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.page-box a:hover {
+    background-color: #0056b3;
+}
+
+.page-box span {
+    padding: 8px 16px;
+    margin: 0 5px;
+    color: #777;
+}
+
+/* 사용자 정보 박스 */
+.info-box {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.user-info {
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.user-info p {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.user-actions {
+    margin-bottom: 20px;
+}
+
+.user-actions input {
+    width: 55%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.user-actions button {
+    margin-top: 10px;
+    display: inline-block;
+}
+
+#delete-user-btn {
+    background-color: #ff4d4d;
+}
+
+#delete-user-btn:hover {
+    background-color: #d43f3f;
+}
+
+.links-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+}
+
+.links-section a {
+    margin: 10px 0;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.links-section a:hover {
+    text-decoration: underline;
+}
+
+.hamburger {
+    display: none;
+}
+
+/* 모바일 스타일 */
+@media only screen and (max-width: 768px) {
+
+    /* 공통 */
+    body {
+        padding: 10px;
+    }
+
+    /* 네비게이션 메뉴 */
+    .hamburger {
+        display: block;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    #navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #navbar ul,
+    #menu,
+    #main,
+    .login-box {
+        display: none;
+    }
+
+    #navbar.active ul,
+    #navbar.active #menu,
+    #navbar.active .login-box {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        background-color: #fff;
+        box-sizing: border-box;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #navbar.active #main {
+        display: flex;
+    }
+
+    #navbar ul li {
+        width: 100%;
+        padding: 15px;
+        background-color: #fff;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    #navbar ul li ul.dropdown {
+        position: static;
+        box-shadow: none;
+        width: 100%;
+    }
+
+    #navbar ul li ul.dropdown li {
+        padding-left: 20px;
+        background-color: #f9f9f9;
+    }
+
+    /* 메뉴 전체 크기 설정 */
+    #menu {
+        width: 100%;
+        max-width: 400px;
+        /* .login-box와 동일한 최대 너비를 설정 */
+        margin: 0 auto;
+        background-color: #f5f5f5;
+        overflow: hidden;
+        /* 넘치는 요소 숨기기 */
+    }
+
+    /* 메뉴 항목 스타일 */
+    #menu li {
+        width: 100%;
+        max-width: 400px;
+        /* .login-box와 동일한 최대 너비 */
+        text-align: left;
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+        box-sizing: border-box;
+        /* 패딩과 테두리를 포함한 너비 계산 */
+        overflow: hidden;
+        /* 넘치는 부분 숨기기 */
+    }
+
+    /* 서브메뉴 항목 스타일 */
+    #menu li ul {
+        width: 100%;
+        max-width: 400px;
+        background-color: #ffffff;
+        overflow: hidden;
+        /* 서브메뉴 넘침 숨기기 */
+    }
+
+    /* 서브메뉴 아이템 스타일 */
+    #menu li ul li {
+        width: 100%;
+        max-width: 400px;
+        /* 상위 메뉴와 동일한 너비 */
+        text-align: left;
+        padding: 10px;
+        box-sizing: border-box;
+        /* 패딩과 테두리를 포함한 너비 계산 */
+    }
+
+    /* 로그인 박스 스타일 */
+    .login-box {
+        width: 100%;
+        text-align: left;
+    }
+
+    /* 게시판 스타일 */
+    .boards-box {
+        padding: 10px;
+    }
+
+    .board-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        padding: 10px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .board-title {
+        font-size: 16px;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .board-info {
+        font-size: 12px;
+        color: #555;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .board-header {
+        display: none;
+    }
+
+    /* 검색창 */
+    .search-box input {
+        width: 90%;
+    }
+
+    /* 페이지네이션 */
+    .page-box {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .page-box a,
+    .page-box span {
+        padding: 10px;
+        margin: 5px 0;
+        font-size: 14px;
+    }
+}

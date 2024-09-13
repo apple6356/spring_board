@@ -17,7 +17,10 @@ public interface NovelRepository extends JpaRepository<Novel, Long> {
     List<Novel> findByAuthor(String username);
 
     // 상위 10개 반환
-    List<Novel> findTop10ByOrderByIdDesc();
+    List<Novel> findTop10ByOrderByLastUpdatedAtDesc();
+    
+    // 상위 10개 반환
+    List<Novel> findTop10ByOrderByHitsDesc();
 
     // 유저 이름 변경
     @Modifying

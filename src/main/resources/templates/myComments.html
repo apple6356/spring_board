@@ -3,27 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/nav.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
     <title>작성 댓글</title>
 </head>
 
 <body>
 
     <nav id="navbar">
-        <span id="main" onclick="location.href='/main'">메인</span>
-        <div class="v-line"></div>
-
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        
+        
         <ul id="menu">
-            <li><div>게시판</div>
+            <li>
+                <div id="main" onclick="location.href='/main'">메인</div>
+            </li>
+            <li>
+                <div>게시판</div>
                 <ul class="dropdown">
-                    <li  onclick="location.href='/popularBoards'">인기 게시판</li>
+                    <li onclick="location.href='/popularBoards'">인기 게시판</li>
                     <li onclick="location.href='/boards'">자유 게시판</li>
                 </ul>
             </li>
-
-            <div class="v-line"></div>
-
-            <li><div>소설</div>
+    
+            <li>
+                <div>소설</div>
                 <ul class="dropdown">
                     <li onclick="location.href='/novelList'">소설 게시판</li>
                     <li onclick="location.href='/novelSearch'">검색</li>
@@ -32,7 +36,7 @@
                 </ul>
             </li>
         </ul>
-
+    
         <div class="login-box">
             <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
@@ -42,12 +46,11 @@
                 <button type="button" onclick="location.href='/login'">로그인</button>
             </div>
         </div>
-
     </nav>
 
     <hr>
 
-    <div th:each="item : ${commentList}">
+    <div class="boards-box"  th:each="item : ${commentList}">
         <input type="hidden" id="comment-id" th:value="${item.id}">
         <div th:onclick="|location.href='@{/boards/{id}(id=${item.boardId})}'|">
             <span th:text="${item.boardTitle}"></span>
@@ -60,7 +63,7 @@
         </div>
     </div>
 
-    <div>
+    <div class="page-box">
         <!-- 첫번째 페이지로 이동 -->
         <a th:href="@{/myComments(username=${username}, page=1)}">First</a>
 

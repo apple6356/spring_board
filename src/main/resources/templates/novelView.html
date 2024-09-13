@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title th:text="|Ep${chapter.episode}.${chapter.title}|">episode</title>
 
@@ -252,7 +253,7 @@
         <div>
             <h5>댓글</h5>
             <div>
-                <textarea id="comment-content" rows="3"></textarea>
+                <textarea id="comment-content" class="comment-window" rows="3"></textarea>
             </div>
             <button type="button" id="comment-create-btn">등록</button>
         </div>

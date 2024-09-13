@@ -64,6 +64,11 @@ public class BoardViewController {
                 .map(NovelViewResponse::new)
                 .toList();
 
+        List<NovelViewResponse> topNovelList = novelService.findTopRank()
+                .stream()
+                .map(NovelViewResponse::new)
+                .toList();
+
         String email = "";
 
         if (principal instanceof UserDetails) {
@@ -80,6 +85,7 @@ public class BoardViewController {
         model.addAttribute("boardList", boardList);
         model.addAttribute("popularBoardList", popularBoardList);
         model.addAttribute("novelList", novelList);
+        model.addAttribute("topNovelList", topNovelList);
 
         return "main";
     }

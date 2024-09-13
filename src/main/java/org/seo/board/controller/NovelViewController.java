@@ -381,12 +381,14 @@ public class NovelViewController {
             model.addAttribute("user", user);
         }
 
-        Page<Novel> novelPage = novelService.novelSearch(keyword, pageable);
+        Page<Novel> novelList = novelService.novelSearch(keyword, pageable);
+
+        System.out.println("novelList isEmpty: " + novelList.isEmpty());
 
         int blockLimit = 10;
         int startPage = (((int) (Math.ceil((double) pageable.getPageNumber() / blockLimit))) - 1) * blockLimit + 1;
-        int endPage = ((startPage + blockLimit - 1) < novelPage.getTotalPages()) ? startPage + blockLimit - 1
-                : novelPage.getTotalPages();
+        int endPage = ((startPage + blockLimit - 1) < novelList.getTotalPages()) ? startPage + blockLimit - 1
+                : novelList.getTotalPages();
 
         int prev = startPage - 1;
         int next = endPage + 1;
@@ -395,7 +397,7 @@ public class NovelViewController {
         model.addAttribute("endPage", endPage);
         model.addAttribute("prev", prev);
         model.addAttribute("next", next);
-        model.addAttribute("novelPage", novelPage);
+        model.addAttribute("novelList", novelList);
         model.addAttribute("keyword", keyword);
 
         System.out.println("keyword: " + keyword);

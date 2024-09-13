@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/nav.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
     <title>글</title>
     <!-- include libraries(bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -12,20 +13,23 @@
 <body>
 
     <nav id="navbar">
-        <span id="main" onclick="location.href='/main'">메인</span>
-        <div class="v-line"></div>
-
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        
+        
         <ul id="menu">
-            <li><div>게시판</div>
+            <li>
+                <div id="main" onclick="location.href='/main'">메인</div>
+            </li>
+            <li>
+                <div>게시판</div>
                 <ul class="dropdown">
-                    <li  onclick="location.href='/popularBoards'">인기 게시판</li>
+                    <li onclick="location.href='/popularBoards'">인기 게시판</li>
                     <li onclick="location.href='/boards'">자유 게시판</li>
                 </ul>
             </li>
-
-            <div class="v-line"></div>
-
-            <li><div>소설</div>
+    
+            <li>
+                <div>소설</div>
                 <ul class="dropdown">
                     <li onclick="location.href='/novelList'">소설 게시판</li>
                     <li onclick="location.href='/novelSearch'">검색</li>
@@ -34,7 +38,7 @@
                 </ul>
             </li>
         </ul>
-
+    
         <div class="login-box">
             <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
@@ -44,7 +48,6 @@
                 <button type="button" onclick="location.href='/login'">로그인</button>
             </div>
         </div>
-
     </nav>
 
     <hr>
@@ -101,12 +104,10 @@
                 </div>
             </div>
 
-            <hr>
-
-            <div>
+            <div class="comment-section">
                 <h5>댓글</h5>
                 <div>
-                    <textarea id="comment-content-write" rows="3"></textarea>
+                    <textarea id="comment-content-write" rows="3" placeholder="댓글을 작성하세요."></textarea>
                 </div>
                 <button type="button" id="comment-create-btn">등록</button>
             </div>

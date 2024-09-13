@@ -3,27 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/nav.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
     <title>유저 정보</title>
 </head>
 
 <body>
 
     <nav id="navbar">
-        <span id="main" onclick="location.href='/main'">메인</span>
-        <div class="v-line"></div>
-
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        
+        
         <ul id="menu">
-            <li><div>게시판</div>
+            <li>
+                <div id="main" onclick="location.href='/main'">메인</div>
+            </li>
+            <li>
+                <div>게시판</div>
                 <ul class="dropdown">
-                    <li  onclick="location.href='/popularBoards'">인기 게시판</li>
+                    <li onclick="location.href='/popularBoards'">인기 게시판</li>
                     <li onclick="location.href='/boards'">자유 게시판</li>
                 </ul>
             </li>
-
-            <div class="v-line"></div>
-
-            <li><div>소설</div>
+    
+            <li>
+                <div>소설</div>
                 <ul class="dropdown">
                     <li onclick="location.href='/novelList'">소설 게시판</li>
                     <li onclick="location.href='/novelSearch'">검색</li>
@@ -32,7 +36,7 @@
                 </ul>
             </li>
         </ul>
-
+    
         <div class="login-box">
             <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
@@ -42,26 +46,32 @@
                 <button type="button" onclick="location.href='/login'">로그인</button>
             </div>
         </div>
-
     </nav>
 
     <hr>
 
     <div th:if="${novelList != null}">
-        <div th:each="novel : ${novelList}">
-            <input type="hidden" th:value="${novel.id}">
-            <div th:onclick="|location.href='@{/novel/{id}(id=${novel.id})}'|">
-                <div th:if="${novel.filename != null}">
-                    <img id="coverImage" alt="thumbnail"
-                        th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
-                        style="width: 100px; height: 100px; object-fit: cover;">
+        <div class="novels-box">
+            <div th:each="novel : ${novelList}">
+                <input type="hidden" id="board-id" th:value="${novel.id}">
+                <div class="novel-item" th:onclick="|location.href='@{/novel/{id}(id=${novel.id})}'|">
+                    <div th:if="${novel.filename != null}">
+                        <img id="coverImage" alt="thumbnail"
+                            th:src="@{'/cover_image/' + ${novel.author} + '/' + ${novel.title} + '/' + ${novel.filename}}"
+                            style="width: 100px; height: 100px; object-fit: cover;">
+                    </div>
+                    <div class="novel-info">
+                        <h3 th:text="${novel.title}"></h3>
+                        <span th:text="|작가: ${novel.author}|"
+                            th:onclick="|event.stopPropagation(); location.href='@{/userpage/{username}(username=${novel.author})}'|">
+                        </span>
+                        <span th:text="'조회수 : ' + ${novel.hits}"></span>
+                        <span th:text="'선호작 : ' + ${novel.favoriteCount}"></span>
+                        <span th:text="'추천수 : ' + ${novel.recommend}"></span>
+                    </div>
                 </div>
-                <h3 th:text="${novel.title}"></h3>
+                <hr>
             </div>
-            <span th:text="|작가: ${novel.author}|"
-                th:onclick="|location.href='@{/userpage?{username}(username=${novel.author})}'|"></span>
-
-            <hr>
         </div>
     </div>
 

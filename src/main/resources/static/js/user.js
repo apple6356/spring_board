@@ -24,41 +24,41 @@ function httpRequest(method, url, body, success, fail) {
 
     fetch(url, {
         method: method,
-        headers : {
+        headers: {
             // 로컬 스토리지에서 액세스 토큰 값을 가져와 헤더에 추가
             Authorization: "Bearer " + localStorage.getItem("access_token"),
             "Content-Type": "application/json",
         },
         body: body,
     })
-    .then((response) => {
-        if (response.status === 200 || response.status === 201) {
-            return success(response);
-//            return response.json().then(data => success(data));
-        }
-        const refresh_token = getCookie("refresh_token");
-        if (response.status === 401 && refresh_token) {
-            fetch("/api/token", {
-                method: "POST",
-                headers: {
-                    Authorization: "Bearer " + localStorage.getItem("access_token"),
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    refreshToken: getCookie("refresh_token"),
-                }),
-            })
-            .then((res) => res.json()) // 응답을 JSON으로 파싱
-            .then((result) => {
-                // 재발급이 성공하면 로컬 스토리지값을 새 액세스 토큰으로 교체
-                localStorage.setItem("access_token", result.accessToken);
-                httpRequest(method, url, body, success, fail);
-            })
-            .catch((error) => fail());
-        } else {
-            return fail(response);
-        }
-    });
+        .then((response) => {
+            if (response.status === 200 || response.status === 201) {
+                return success(response);
+                //            return response.json().then(data => success(data));
+            }
+            const refresh_token = getCookie("refresh_token");
+            if (response.status === 401 && refresh_token) {
+                fetch("/api/token", {
+                    method: "POST",
+                    headers: {
+                        Authorization: "Bearer " + localStorage.getItem("access_token"),
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        refreshToken: getCookie("refresh_token"),
+                    }),
+                })
+                    .then((res) => res.json()) // 응답을 JSON으로 파싱
+                    .then((result) => {
+                        // 재발급이 성공하면 로컬 스토리지값을 새 액세스 토큰으로 교체
+                        localStorage.setItem("access_token", result.accessToken);
+                        httpRequest(method, url, body, success, fail);
+                    })
+                    .catch((error) => fail());
+            } else {
+                return fail(response);
+            }
+        });
 }
 
 
@@ -69,9 +69,24 @@ if (updateUserButton) {
     updateUserButton.addEventListener('click', event => {
 
         let id = document.getElementById('user-id').value;
+        let username = document.getElementById('username').value;
+
+        if (!username || username.length < 2) {
+            alert("닉네임을 2자 이상 입력해주세요.");
+            return;
+        }
+
+        // 정규표현식: 한글 음절, 알파벳, 숫자만 허용
+        const validUsernameRegex = /^[가-힣a-zA-Z0-9]+$/;
+
+        // 한글 자음, 모음만으로 구성되었거나 특수 문자가 포함된 경우
+        if (!validUsernameRegex.test(username)) {
+            alert("닉네임은 한글 음절, 알파벳, 숫자만 사용할 수 있으며, 자음/모음 단독 및 특수 문자는 허용되지 않습니다.");
+            return;
+        }
 
         body = JSON.stringify({
-            username : document.getElementById('username').value
+            username: username
         });
 
         function success() {
@@ -97,13 +112,25 @@ if (nameCheckButton) {
 
         let username = document.getElementById('username').value;
 
-        console.log("username : " + username);
+        if (!username || username.length < 2) {
+            alert("닉네임을 2자 이상 입력해주세요.");
+            return;
+        }
+
+        // 정규표현식: 한글 음절, 알파벳, 숫자만 허용
+        const validUsernameRegex = /^[가-힣a-zA-Z0-9]+$/;
+
+        // 한글 자음, 모음만으로 구성되었거나 특수 문자가 포함된 경우
+        if (!validUsernameRegex.test(username)) {
+            alert("닉네임은 한글 음절, 알파벳, 숫자만 사용할 수 있으며, 자음/모음 단독 및 특수 문자는 허용되지 않습니다.");
+            return;
+        }
 
         $.ajax({
             type: "GET",
             url: "/check", // 요청 url
             data: { username: username }, // 보낼 데이터
-            success: function(data) {
+            success: function (data) {
                 console.log("data : " + data)
                 if (data) {
                     document.getElementById('check-result').textContent = "중복입니다.";
@@ -113,7 +140,7 @@ if (nameCheckButton) {
                     document.getElementById('check-result').style.color = "green";
                 }
             },
-            error: function() {
+            error: function () {
                 alert("오류 발생");
             }
         });

@@ -256,7 +256,12 @@ public class NovelService {
 
     // main 화면 상위 10개
     public List<Novel> findTop() {
-        return novelRepository.findTop10ByOrderByIdDesc();
+        return novelRepository.findTop10ByOrderByLastUpdatedAtDesc();
+    }
+
+    // main 화면 top100 상위 10개
+    public List<Novel> findTopRank() {
+        return novelRepository.findTop10ByOrderByHitsDesc();
     }
 
     // 로그인 된 상태로 회차 조회시 usershelf에 저장

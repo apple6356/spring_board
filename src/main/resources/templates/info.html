@@ -3,27 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/nav.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
     <title>My</title>
 </head>
 
 <body>
 
     <nav id="navbar">
-        <span id="main" onclick="location.href='/main'">메인</span>
-        <div class="v-line"></div>
-
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        
+        
         <ul id="menu">
-            <li><div>게시판</div>
+            <li>
+                <div id="main" onclick="location.href='/main'">메인</div>
+            </li>
+            <li>
+                <div>게시판</div>
                 <ul class="dropdown">
-                    <li  onclick="location.href='/popularBoards'">인기 게시판</li>
+                    <li onclick="location.href='/popularBoards'">인기 게시판</li>
                     <li onclick="location.href='/boards'">자유 게시판</li>
                 </ul>
             </li>
-
-            <div class="v-line"></div>
-
-            <li><div>소설</div>
+    
+            <li>
+                <div>소설</div>
                 <ul class="dropdown">
                     <li onclick="location.href='/novelList'">소설 게시판</li>
                     <li onclick="location.href='/novelSearch'">검색</li>
@@ -32,7 +36,7 @@
                 </ul>
             </li>
         </ul>
-
+    
         <div class="login-box">
             <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
@@ -42,35 +46,34 @@
                 <button type="button" onclick="location.href='/login'">로그인</button>
             </div>
         </div>
-
     </nav>
 
     <hr>
 
-    <div>
-        <input type="hidden" id="user-id" th:value="${user.id}">
-        <p th:text="'이메일 : ' + ${user.email}"></p>
-        <p id="user-name" th:text="'이름 : ' + ${user.username}"></p>
+    <div class="info-box">
+        <div class="user-info">
+            <input type="hidden" id="user-id" th:value="${user.id}">
+            <p th:text="'이메일 : ' + ${user.email}"></p>
+            <p id="user-name" th:text="'이름 : ' + ${user.username}"></p>
+        </div>
+
+        <div class="user-actions">
+            <button type="button" id="delete-user-btn">회원 탈퇴</button>
+        </div>
+
+        <div class="user-actions">
+            <input type="text" id="username" placeholder="이름 수정">
+            <button type="button" id="name-check-btn">중복 확인</button>
+            <span id="check-result"></span><br>
+            <button type="button" id="update-user-btn">수정</button>
+        </div>
+
+        <div class="links-section">
+            <a th:href="@{/myWriting(username=${user.username})}">작성 글 보기</a>
+            <a th:href="@{/myComments(username=${user.username})}">작성 댓글 보기</a>
+            <a th:href="@{/myNovels(username=${user.username})}">내 작품</a>
+        </div>
     </div>
-
-    <button type="button" id="delete-user-btn">회원 탈퇴</button>
-
-    <div>
-        <input type="text" id="username" placeholder="이름 수정">
-        <button type="button" id="name-check-btn">중복 확인</button>
-        <span id="check-result"></span><br>
-        <button type="button" id="update-user-btn">수정</button>
-    </div>
-
-    <a th:href="@{/myWriting(username=${user.username})}">작성 글 보기</a>
-
-    <br>
-
-    <a th:href="@{/myComments(username=${user.username})}">작성 댓글 보기</a>
-
-    <!-- 내 작품 가는 링크 -->
-    <br>
-    <a th:href="@{/myNovels(username=${user.username})}">내 작품</a>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/js/user.js"></script>
