@@ -349,6 +349,37 @@ button:active {
     display: none;
 }
 
+#content {
+    width: 1000px;
+    height: 650px;
+    resize: none;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+}
+
+.author-comment-box {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: inherit; /* 본문과 같은 배경색 */
+    border: 1px solid #ddd;
+    width: 90%; /* 본문보다 작게 */
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left; /* 왼쪽 정렬 */
+}
+
+.author-comment-box h3 {
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd; /* 제목과 내용 구분선 */
+}
+
+.author-comment-box span {
+    padding-left: 10px; /* 내용과 박스의 왼쪽에 간격을 추가 */
+    display: block;
+}
+
 /* 모바일 스타일 */
 @media only screen and (max-width: 768px) {
 

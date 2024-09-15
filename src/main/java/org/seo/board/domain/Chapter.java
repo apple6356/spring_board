@@ -47,6 +47,10 @@ public class Chapter {
     @Column(name = "author", nullable = false)
     private String author;
 
+    // 작가의 말
+    @Column(name = "author_comment")
+    private String authorComment;
+
     // 회차
     @Column(name = "episode", nullable = false)
     private Long episode;
@@ -76,18 +80,20 @@ public class Chapter {
     private List<ChapterComment> chapterComments;
 
     @Builder // builder 패턴
-    public Chapter(Novel novel, String author, String title, String content, Long episode) {
+    public Chapter(Novel novel, String author, String title, String content, Long episode, String authorComment) {
         this.novel = novel;
         this.author = author;
         this.title = title;
         this.content = content;
+        this.authorComment = authorComment;
         this.hits = 0L; // 조회수 0 초기화
         this.episode = episode + 1;
     }
 
-    public void update(String title, String content) {
+    public void update(String title, String content, String authorComment) {
         this.title = title;
         this.content = content;
+        this.authorComment = authorComment;
     }
 
     public void hits() {

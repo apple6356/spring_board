@@ -8,21 +8,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title th:text="|Ep${chapter.episode}.${chapter.title}|">episode</title>
 
-    <!-- 복사 방지 -->
-    <style>
-        #content {
-            width: 1000px;
-            height: 650px;
-            /* max-height: 650px; */
-            resize: none;
-            user-select: none;
-            overflow-y: scroll;
-            overflow-x: hidden;
-            white-space: pre-wrap;
-            /* 줄 바꿈 보존 */
-            /* Prevent text selection in textarea */
-        }
-    </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const content = document.getElementById('content');
@@ -233,7 +218,13 @@
     <hr>
 
     <article>
-        <div id="content" th:utext="${chapter.content}" cols="100" rows="30" readonly></div>
+        <div id="content">
+            <div th:utext="${chapter.content}"></div>
+            <div id="author-comment" class="author-comment-box">
+                <h3>작가의 말</h3>
+                <span th:utext="${chapter.authorComment}"></span>
+            </div>
+        </div>
     </article>
 
     <!-- 버튼 박스 -->
@@ -283,8 +274,9 @@
         </div>
     </section>
 
+    <hr>
+
     <script src="/js/novel.js"></script>
-    <script src="/js/comment.js"></script>
 
 </body>
 

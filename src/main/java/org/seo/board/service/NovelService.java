@@ -240,7 +240,7 @@ public class NovelService {
         Chapter chapter = chapterRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("not found: " + id));
 
-        chapter.update(request.getTitle(), request.getContent());
+        chapter.update(request.getTitle(), request.getContent(), request.getAuthorComment());
         chapterRepository.save(chapter);
 
         return chapter;

@@ -12,5 +12,6 @@ public class UpdateChapterRequest {
     private Long novelId;
     private String title;
     private String content;
+    private String authorComment;
 
 }

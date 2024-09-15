@@ -285,7 +285,8 @@ if (createButton) {
             body = JSON.stringify({
                 novelId: novelId,
                 title: document.getElementById("title").value,
-                content: document.getElementById("content").value
+                content: document.getElementById("content").value,
+                authorComment: document.getElementById("authorComment").value
             });
 
         function success() {
@@ -313,7 +314,8 @@ if (modifyButton) {
         body = JSON.stringify({
             novelId: novelId,
             title: document.getElementById("title").value,
-            content: document.getElementById("content").value
+            content: document.getElementById("content").value,
+            authorComment: document.getElementById("authorComment").value
         });
 
         function success() {

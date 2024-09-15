@@ -15,6 +15,7 @@ public class AddChapterRequest {
     private Long novelId;
     private String title;
     private String content;
+    private String authorComment;
 
     public Chapter toEntity(Novel novel, String author, Long episode) {
         return Chapter.builder()
@@ -22,6 +23,7 @@ public class AddChapterRequest {
                 .title(title)
                 .content(content)
                 .author(author)
+                .authorComment(authorComment)
                 .episode(episode)
                 .build();
     }

@@ -12,8 +12,8 @@
 
     <nav id="navbar">
         <div class="hamburger" onclick="toggleMenu()">☰</div>
-        
-        
+
+
         <ul id="menu">
             <li>
                 <div id="main" onclick="location.href='/main'">메인</div>
@@ -25,7 +25,7 @@
                     <li onclick="location.href='/boards'">자유 게시판</li>
                 </ul>
             </li>
-    
+
             <li>
                 <div>소설</div>
                 <ul class="dropdown">
@@ -36,7 +36,7 @@
                 </ul>
             </li>
         </ul>
-    
+
         <div class="login-box">
             <div th:if="${user} != null">
                 <a href="/info">내 정보</a>
@@ -60,10 +60,19 @@
             <header>
                 <input type="text" placeholder="제목" id="title" th:value="${chapter?.title}">
             </header>
+
+            <!-- 본문 -->
             <section>
                 <textarea rows="15" cols="50" placeholder="내용을 입력해주세요." id="content"
                     th:utext="${chapter?.content}"></textarea>
             </section>
+
+            <!-- 작가의 말 -->
+            <section>
+                <textarea rows="15" cols="50" placeholder="작가의 말" id="authorComment"
+                    th:utext="${chapter?.authorComment}"></textarea>
+            </section>
+
             <!-- id가 있을 때는 수정버튼, 없을 때는 등록 버튼 -->
             <button th:if="${chapter} != null" type="button" id="modify-btn">수정</button>
             <button th:if="${chapter} == null" type="button" id="create-btn">등록</button>
